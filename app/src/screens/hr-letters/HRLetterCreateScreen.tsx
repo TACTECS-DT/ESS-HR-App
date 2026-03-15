@@ -1,0 +1,248 @@
+import React, {useState} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
+import {useTranslation} from 'react-i18next';
+import {useNavigation} from '@react-navigation/native';
+import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query';
+
+import apiClient from '../../api/client';
+import {isApiSuccess} from '../../types/api';
+import ScreenHeader from '../../components/common/ScreenHeader';
+import TextInput from '../../components/common/TextInput';
+import StatusChip from '../../components/common/StatusChip';
+import {useTheme} from '../../hooks/useTheme';
+import {spacing, fontSize, colors, radius} from '../../config/theme';
+import type {HRLetter, SalaryType} from '../../api/mocks/hr-letters.mock';
+
+const SALARY_TYPES: {key: SalaryType; en: string; ar: string}[] = [
+  {key: 'net', en: 'Net Salary', ar: 'صافي الراتب'},
+  {key: 'gross', en: 'Gross Salary', ar: 'الراتب الإجمالي'},
+];
+
+export default function HRLetterCreateScreen() {
+  const {t, i18n} = useTranslation();
+  const theme = useTheme();
+  const navigation = useNavigation();
+  const queryClient = useQueryClient();
+  const isAr = i18n.language === 'ar';
+
+  const [letterTitle, setLetterTitle] = useState('');
+  const [directedTo, setDirectedTo] = useState('');
+  const [requiredDate, setRequiredDate] = useState('');
+  const [purpose, setPurpose] = useState('');
+  const [salaryType, setSalaryType] = useState<SalaryType>('net');
+
+  const {data: previousList} = useQuery({
+    queryKey: ['hr-letters'],
+    queryFn: async () => {
+      const res = await apiClient.get('/hr-letters');
+      return isApiSuccess(res.data) ? (res.data.data as HRLetter[]) : [];
+    },
+  });
+
+  const mutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiClient.post('/hr-letters', {
+        title: letterTitle,
+        directed_to: directedTo,
+        required_date: requiredDate,
+        purpose,
+        salary_type: salaryType,
+      });
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: ['hr-letters']});
+      Alert.alert(t('common.done'), t('hrLetter.request') + ' ✓');
+      navigation.goBack();
+    },
+    onError: () => Alert.alert(t('common.error')),
+  });
+
+  function handleSubmit() {
+    if (!letterTitle.trim() || !directedTo.trim() || !requiredDate.trim() || !purpose.trim()) {
+      Alert.alert(t('common.error'), 'Please fill all required fields');
+      return;
+    }
+    mutation.mutate();
+  }
+
+  function handleSaveDraft() {
+    Alert.alert(t('common.done'), t('hrLetter.saveDraft') + ' ✓');
+    navigation.goBack();
+  }
+
+  return (
+    <KeyboardAvoidingView
+      style={{flex: 1, backgroundColor: theme.background}}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <ScreenHeader title={t('hrLetter.title')} showBack />
+      <ScrollView contentContainerStyle={styles.content}>
+
+        {/* New HR Letter section */}
+        <Text style={[styles.sectionTitle, {color: theme.text}]}>{t('hrLetter.newRequest')}</Text>
+
+        <TextInput
+          label={`${t('hrLetter.letterTitle')} *`}
+          placeholder={isAr ? 'مثال: شهادة راتب' : 'e.g., Salary Certificate'}
+          value={letterTitle}
+          onChangeText={setLetterTitle}
+        />
+
+        <TextInput
+          label={`${t('hrLetter.directedTo')} *`}
+          placeholder={isAr ? 'مثال: السفارة، البنك، إلخ' : 'e.g., Embassy, Bank, etc.'}
+          value={directedTo}
+          onChangeText={setDirectedTo}
+        />
+
+        <TextInput
+          label={`${t('hrLetter.requiredDate')} *`}
+          placeholder="YYYY-MM-DD"
+          value={requiredDate}
+          onChangeText={setRequiredDate}
+          keyboardType="numbers-and-punctuation"
+        />
+
+        <TextInput
+          label={`${t('hrLetter.purpose')} *`}
+          placeholder={isAr ? 'الغرض من الخطاب...' : 'Purpose of the letter...'}
+          value={purpose}
+          onChangeText={setPurpose}
+          multiline
+          numberOfLines={3}
+        />
+
+        {/* Salary Type segmented control */}
+        <Text style={[styles.label, {color: theme.textSecondary}]}>
+          {t('hrLetter.salaryType')} *
+        </Text>
+        <View style={[styles.segmented, {backgroundColor: theme.border}]}>
+          {SALARY_TYPES.map((s, idx) => {
+            const isActive = salaryType === s.key;
+            const isFirst = idx === 0;
+            const isLast = idx === SALARY_TYPES.length - 1;
+            return (
+              <TouchableOpacity
+                key={s.key}
+                style={[
+                  styles.segment,
+                  isActive && {backgroundColor: colors.primary},
+                  isFirst && {borderTopLeftRadius: radius.md, borderBottomLeftRadius: radius.md},
+                  isLast && {borderTopRightRadius: radius.md, borderBottomRightRadius: radius.md},
+                  !isFirst && {borderLeftWidth: StyleSheet.hairlineWidth, borderLeftColor: theme.background},
+                ]}
+                onPress={() => setSalaryType(s.key)}>
+                <Text style={{
+                  color: isActive ? colors.white : theme.textSecondary,
+                  fontSize: fontSize.sm,
+                  fontWeight: '600',
+                }}>
+                  {isAr ? s.ar : s.en}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+
+        {/* Buttons */}
+        <View style={styles.btnRow}>
+          <TouchableOpacity
+            style={[styles.btnOutline, {borderColor: colors.primary}]}
+            onPress={handleSaveDraft}>
+            <Text style={[styles.btnOutlineText, {color: colors.primary}]}>
+              {t('hrLetter.saveDraft')}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.btnPrimary, {backgroundColor: colors.primary}, mutation.isPending && {opacity: 0.6}]}
+            onPress={handleSubmit}
+            disabled={mutation.isPending}>
+            <Text style={styles.btnPrimaryText}>{t('common.submit')}</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Previous requests */}
+        {(previousList ?? []).length > 0 ? (
+          <>
+            <View style={[styles.separator, {borderColor: theme.border}]} />
+            <Text style={[styles.sectionTitle, {color: theme.text}]}>{t('hrLetter.previousRequests')}</Text>
+            {(previousList ?? []).map(item => (
+              <View
+                key={item.id}
+                style={[styles.requestRow, {backgroundColor: theme.surface, borderColor: theme.border}]}>
+                <View style={{flex: 1, gap: 3}}>
+                  <Text style={[styles.requestTitle, {color: theme.text}]}>
+                    {isAr
+                      ? `شهادة راتب - ${item.directed_to}`
+                      : `Salary Certificate - ${item.directed_to}`}
+                  </Text>
+                  <Text style={[styles.requestSub, {color: theme.textSecondary}]}>
+                    {item.request_date} · {t(`hrLetter.type.${item.salary_type}`)}
+                  </Text>
+                </View>
+                <StatusChip status={item.status} label={t(`common.status.${item.status}`)} />
+              </View>
+            ))}
+          </>
+        ) : null}
+
+      </ScrollView>
+    </KeyboardAvoidingView>
+  );
+}
+
+const styles = StyleSheet.create({
+  content: {padding: spacing.md, gap: spacing.sm, paddingBottom: spacing.xl},
+
+  sectionTitle: {fontSize: fontSize.md, fontWeight: '700', marginTop: spacing.xs},
+  separator: {borderTopWidth: StyleSheet.hairlineWidth, marginVertical: spacing.sm},
+
+  label: {fontSize: fontSize.sm, fontWeight: '600'},
+  segmented: {
+    flexDirection: 'row',
+    borderRadius: radius.md,
+    overflow: 'hidden',
+  },
+  segment: {
+    flex: 1,
+    paddingVertical: spacing.sm,
+    alignItems: 'center',
+  },
+
+  btnRow: {flexDirection: 'row', gap: spacing.sm, marginTop: spacing.xs},
+  btnOutline: {
+    flex: 1,
+    borderWidth: 1.5,
+    borderRadius: radius.md,
+    paddingVertical: spacing.md,
+    alignItems: 'center',
+  },
+  btnOutlineText: {fontSize: fontSize.sm, fontWeight: '700'},
+  btnPrimary: {
+    flex: 1,
+    borderRadius: radius.md,
+    paddingVertical: spacing.md,
+    alignItems: 'center',
+  },
+  btnPrimaryText: {color: colors.white, fontSize: fontSize.sm, fontWeight: '700'},
+
+  requestRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: radius.md,
+    borderWidth: 1,
+    padding: spacing.md,
+    gap: spacing.sm,
+  },
+  requestTitle: {fontSize: fontSize.sm, fontWeight: '600'},
+  requestSub: {fontSize: fontSize.xs},
+});
