@@ -1,0 +1,36 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Temp / scratch files
+temp.txt
+*.tmp
+*.log
+
+# Node (root level, if any)
+node_modules/
+
+# React Native / app — see app/.gitignore for more
+app/android/build/
+app/android/.gradle/
+app/android/local.properties
+app/android/.cxx/
+app/ios/build/
+app/ios/Pods/
+app/ios/DerivedData/
+app/node_modules/
+app/.expo/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Coverage
+coverage/
