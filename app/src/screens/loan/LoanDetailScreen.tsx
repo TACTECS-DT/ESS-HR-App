@@ -11,7 +11,7 @@ import ScreenHeader from '../../components/common/ScreenHeader';
 import Card from '../../components/common/Card';
 import StatusChip from '../../components/common/StatusChip';
 import {useTheme} from '../../hooks/useTheme';
-import {spacing, fontSize, colors} from '../../config/theme';
+import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
 import type {Loan} from '../../api/mocks/loan.mock';
 
@@ -44,6 +44,12 @@ export default function LoanDetailScreen() {
     );
   }
 
+  const paidInstallments = loan.installments.filter(i => i.status === 'paid');
+  const paidAmount = paidInstallments.reduce((sum, i) => sum + i.amount, 0);
+  const remainingAmount = loan.amount - paidAmount;
+  const paymentStart = loan.installments[0]?.month ?? '';
+  const paymentEnd = loan.installments[loan.installments.length - 1]?.month ?? '';
+
   return (
     <View style={[styles.container, {backgroundColor: theme.background}]}>
       <ScreenHeader title={t('loan.title')} showBack />
@@ -51,10 +57,20 @@ export default function LoanDetailScreen() {
 
         <Card style={styles.card}>
           <View style={styles.row}>
-            <Text style={[styles.amount, {color: theme.text}]}>
-              {loan.amount.toLocaleString()} SAR
-            </Text>
+            <View style={{flex: 1}}>
+              <Text style={[styles.loanTitle, {color: theme.text}]}>{t('loan.title')}</Text>
+              <Text style={[styles.amount, {color: colors.primary}]}>
+                {loan.amount.toLocaleString()} {t('common.sar')}
+              </Text>
+            </View>
             <StatusChip status={loan.status} label={t(`common.status.${loan.status}`)} />
+          </View>
+          <View style={[styles.divider, {borderColor: theme.border}]} />
+          <View style={styles.detailRow}>
+            <Text style={[styles.detailLabel, {color: theme.textSecondary}]}>{t('loan.monthly')}</Text>
+            <Text style={[styles.detailValue, {color: theme.text}]}>
+              {loan.monthly_installment.toLocaleString()} {t('common.sar')} / {t('loan.month')}
+            </Text>
           </View>
           <View style={styles.detailRow}>
             <Text style={[styles.detailLabel, {color: theme.textSecondary}]}>{t('loan.duration')}</Text>
@@ -62,12 +78,18 @@ export default function LoanDetailScreen() {
               {loan.duration_months} {t('loan.months')}
             </Text>
           </View>
-          <View style={styles.detailRow}>
-            <Text style={[styles.detailLabel, {color: theme.textSecondary}]}>{t('loan.monthly')}</Text>
-            <Text style={[styles.detailValue, {color: theme.text}]}>
-              {loan.monthly_installment.toLocaleString()} SAR
-            </Text>
-          </View>
+          {paymentStart ? (
+            <View style={styles.detailRow}>
+              <Text style={[styles.detailLabel, {color: theme.textSecondary}]}>{t('loan.paymentStart')}</Text>
+              <Text style={[styles.detailValue, {color: theme.text}]}>{paymentStart}</Text>
+            </View>
+          ) : null}
+          {paymentEnd ? (
+            <View style={styles.detailRow}>
+              <Text style={[styles.detailLabel, {color: theme.textSecondary}]}>{t('loan.paymentEnd')}</Text>
+              <Text style={[styles.detailValue, {color: theme.text}]}>{paymentEnd}</Text>
+            </View>
+          ) : null}
           <View style={styles.detailRow}>
             <Text style={[styles.detailLabel, {color: theme.textSecondary}]}>{t('loan.transferMethod')}</Text>
             <Text style={[styles.detailValue, {color: theme.text}]}>{loan.transfer_method}</Text>
@@ -76,6 +98,13 @@ export default function LoanDetailScreen() {
             <Text style={[styles.detailLabel, {color: theme.textSecondary}]}>{t('common.date')}</Text>
             <Text style={[styles.detailValue, {color: theme.text}]}>{loan.request_date}</Text>
           </View>
+          {loan.reason ? (
+            <>
+              <View style={[styles.divider, {borderColor: theme.border}]} />
+              <Text style={[styles.reasonLabel, {color: theme.textSecondary}]}>{t('loan.reason')}:</Text>
+              <Text style={[styles.reasonText, {color: theme.text}]}>{loan.reason}</Text>
+            </>
+          ) : null}
         </Card>
 
         {loan.approval_history.length > 0 ? (
@@ -154,6 +183,19 @@ export default function LoanDetailScreen() {
                   </View>
                 );
               })}
+              {/* Paid / Remaining summary */}
+              <View style={[styles.summaryRow, {borderTopColor: theme.border}]}>
+                <Text style={[styles.summaryLabel, {color: theme.textSecondary}]}>{t('loan.paid')}</Text>
+                <Text style={[styles.summaryValue, {color: colors.success}]}>
+                  {paidAmount.toLocaleString()} {t('common.sar')}
+                </Text>
+              </View>
+              <View style={styles.summaryRow}>
+                <Text style={[styles.summaryLabel, {color: theme.textSecondary}]}>{t('loan.remaining')}</Text>
+                <Text style={[styles.summaryValue, {color: colors.error}]}>
+                  {remainingAmount.toLocaleString()} {t('common.sar')}
+                </Text>
+              </View>
             </Card>
           </>
         ) : null}
@@ -168,10 +210,14 @@ const styles = StyleSheet.create({
   content: {padding: spacing.md, gap: spacing.md},
   card: {gap: spacing.sm},
   row: {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'},
-  amount: {fontSize: fontSize.xl, fontWeight: '700'},
+  loanTitle: {fontSize: fontSize.sm, color: '#888'},
+  amount: {fontSize: fontSize.xxl, fontWeight: '700'},
+  divider: {borderTopWidth: StyleSheet.hairlineWidth},
   detailRow: {flexDirection: 'row', justifyContent: 'space-between'},
   detailLabel: {fontSize: fontSize.sm, flex: 1},
   detailValue: {fontSize: fontSize.sm, fontWeight: '600', flex: 1, textAlign: 'right'},
+  reasonLabel: {fontSize: fontSize.sm, fontWeight: '700'},
+  reasonText: {fontSize: fontSize.sm, lineHeight: 20},
   sectionTitle: {fontSize: fontSize.lg, fontWeight: '700'},
   stepRow: {flexDirection: 'row', gap: spacing.sm, alignItems: 'flex-start'},
   stepDot: {width: 10, height: 10, borderRadius: 5, marginTop: 4},
@@ -182,4 +228,7 @@ const styles = StyleSheet.create({
   tableHeaderCell: {fontSize: fontSize.xs, fontWeight: '600'},
   tableRow: {flexDirection: 'row', paddingVertical: spacing.xs, borderBottomWidth: StyleSheet.hairlineWidth, alignItems: 'center'},
   tableCell: {fontSize: fontSize.sm},
+  summaryRow: {flexDirection: 'row', justifyContent: 'space-between', paddingTop: spacing.sm, borderTopWidth: StyleSheet.hairlineWidth, marginTop: spacing.xs},
+  summaryLabel: {fontSize: fontSize.sm, fontWeight: '700'},
+  summaryValue: {fontSize: fontSize.sm, fontWeight: '700'},
 });

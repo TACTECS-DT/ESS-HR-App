@@ -17,7 +17,9 @@ import apiClient from '../../api/client';
 import {isApiSuccess} from '../../types/api';
 import ScreenHeader from '../../components/common/ScreenHeader';
 import TextInput from '../../components/common/TextInput';
+import DatePickerField from '../../components/common/DatePickerField';
 import LoadingSkeleton from '../../components/common/LoadingSkeleton';
+import SelectField from '../../components/common/SelectField';
 import {useTheme} from '../../hooks/useTheme';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {LoanRules} from '../../api/mocks/loan.mock';
@@ -36,6 +38,11 @@ export default function LoanCreateScreen() {
   const navigation = useNavigation();
   const queryClient = useQueryClient();
   const isAr = i18n.language === 'ar';
+
+  const transferMethodOptions = TRANSFER_METHODS.map(m => ({
+    label: isAr ? m.ar : m.en,
+    value: m.key,
+  }));
 
   const [loanTitle, setLoanTitle] = useState('');
   const [amount, setAmount] = useState('');
@@ -163,51 +170,26 @@ export default function LoanCreateScreen() {
           editable={false}
         />
 
-        <TextInput
+        <DatePickerField
           label={`${t('loan.paymentStart')} *`}
-          placeholder="YYYY-MM-DD"
           value={startDate}
-          onChangeText={setStartDate}
+          onChange={setStartDate}
         />
 
-        <TextInput
+        <DatePickerField
           label={`${t('loan.paymentEnd')} *`}
-          placeholder="YYYY-MM-DD"
           value={endDate}
-          onChangeText={setEndDate}
+          onChange={setEndDate}
+          minimumDate={startDate ? new Date(startDate) : undefined}
         />
 
         {/* Transfer method */}
-        <Text style={[styles.label, {color: theme.textSecondary}]}>
-          {t('loan.transferMethod')} *
-        </Text>
-        <View style={[styles.segmented, {backgroundColor: theme.border}]}>
-          {TRANSFER_METHODS.map((m, idx) => {
-            const isActive = transferMethod === m.key;
-            const isFirst = idx === 0;
-            const isLast = idx === TRANSFER_METHODS.length - 1;
-            return (
-              <TouchableOpacity
-                key={m.key}
-                style={[
-                  styles.segment,
-                  isActive && {backgroundColor: colors.primary},
-                  isFirst && {borderTopLeftRadius: radius.md, borderBottomLeftRadius: radius.md},
-                  isLast && {borderTopRightRadius: radius.md, borderBottomRightRadius: radius.md},
-                  !isFirst && {borderLeftWidth: StyleSheet.hairlineWidth, borderLeftColor: theme.background},
-                ]}
-                onPress={() => setTransferMethod(m.key)}>
-                <Text style={{
-                  color: isActive ? colors.white : theme.textSecondary,
-                  fontSize: fontSize.xs,
-                  fontWeight: '600',
-                }}>
-                  {isAr ? m.ar : m.en}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
+        <SelectField
+          label={`${t('loan.transferMethod')} *`}
+          options={transferMethodOptions}
+          value={transferMethod}
+          onChange={v => setTransferMethod(v as TransferMethod)}
+        />
 
         <TextInput
           label={`${t('loan.reason')} *`}
@@ -254,18 +236,6 @@ const styles = StyleSheet.create({
   },
   warningText: {fontSize: fontSize.xs, color: '#b06000'},
   eligibleText: {fontSize: fontSize.xs, fontWeight: '600'},
-
-  label: {fontSize: fontSize.sm, fontWeight: '600'},
-  segmented: {
-    flexDirection: 'row',
-    borderRadius: radius.md,
-    overflow: 'hidden',
-  },
-  segment: {
-    flex: 1,
-    paddingVertical: spacing.sm,
-    alignItems: 'center',
-  },
 
   approvalCard: {
     backgroundColor: '#e6f4ea',

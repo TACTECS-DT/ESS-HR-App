@@ -25,7 +25,12 @@ import type {Task, TaskStage} from '../../api/mocks/tasks.mock';
 
 type Nav = StackNavigationProp<TasksStackParamList>;
 
-const STAGES: Array<TaskStage | 'all'> = ['all', 'backlog', 'in_progress', 'review', 'done'];
+const STAGES: Array<TaskStage | 'all' | 'overdue'> = ['all', 'in_progress', 'overdue', 'done', 'backlog', 'review'];
+
+function isOverdue(task: Task): boolean {
+  if (!task.deadline) {return false;}
+  return task.stage !== 'done' && task.deadline < new Date().toISOString().split('T')[0];
+}
 
 const PRIORITY_COLORS: Record<string, string> = {
   low: colors.gray500,
@@ -38,7 +43,7 @@ export default function TaskListScreen() {
   const {t} = useTranslation();
   const theme = useTheme();
   const navigation = useNavigation<Nav>();
-  const [filter, setFilter] = useState<TaskStage | 'all'>('all');
+  const [filter, setFilter] = useState<TaskStage | 'all' | 'overdue'>('all');
 
   const {data, isLoading, refetch} = useQuery({
     queryKey: ['tasks'],
@@ -48,7 +53,26 @@ export default function TaskListScreen() {
     },
   });
 
-  const filtered = filter === 'all' ? data : data?.filter(t => t.stage === filter);
+  const allTasks = data ?? [];
+  const filtered = filter === 'all'
+    ? allTasks
+    : filter === 'overdue'
+    ? allTasks.filter(isOverdue)
+    : allTasks.filter(tk => tk.stage === filter);
+
+  const stats = {
+    total: allTasks.length,
+    inProgress: allTasks.filter(tk => tk.stage === 'in_progress').length,
+    overdue: allTasks.filter(isOverdue).length,
+    done: allTasks.filter(tk => tk.stage === 'done').length,
+  };
+
+  const statItems = [
+    {id: 'total', val: stats.total, color: colors.primary, label: t('tasks.statsTotal')},
+    {id: 'inProgress', val: stats.inProgress, color: colors.warning, label: t('tasks.statsInProgress')},
+    {id: 'overdue', val: stats.overdue, color: colors.error, label: t('tasks.statsOverdue')},
+    {id: 'done', val: stats.done, color: colors.success, label: t('tasks.statsDone')},
+  ];
 
   if (isLoading) {
     return (
@@ -74,6 +98,16 @@ export default function TaskListScreen() {
         }
       />
 
+      {/* Stats summary */}
+      <View style={[styles.statsCard, {backgroundColor: theme.surface, borderColor: theme.border}]}>
+        {statItems.map(s => (
+          <View key={s.id} style={styles.statItem}>
+            <Text style={[styles.statValue, {color: s.color}]}>{s.val}</Text>
+            <Text style={[styles.statLabel, {color: theme.textSecondary}]}>{s.label}</Text>
+          </View>
+        ))}
+      </View>
+
       <View style={styles.filterRow}>
         {STAGES.map(stage => (
           <TouchableOpacity
@@ -89,7 +123,11 @@ export default function TaskListScreen() {
               fontSize: fontSize.xs,
               fontWeight: '600',
             }}>
-              {stage === 'all' ? t('common.filter') : t(`tasks.stage.${stage}`)}
+              {stage === 'all'
+                ? t('common.all')
+                : stage === 'overdue'
+                ? t('tasks.overdue')
+                : t(`tasks.stage.${stage}`)}
             </Text>
           </TouchableOpacity>
         ))}
@@ -105,32 +143,35 @@ export default function TaskListScreen() {
           <TouchableOpacity
             style={[styles.card, {backgroundColor: theme.surface, borderColor: theme.border}]}
             onPress={() => navigation.navigate('TaskDetail', {id: item.id})}>
-            <View style={styles.cardTop}>
-              <Text style={[styles.taskName, {color: theme.text}]} numberOfLines={2}>
-                {item.name}
-              </Text>
-              <View
-                style={[
-                  styles.priorityBadge,
-                  {backgroundColor: (PRIORITY_COLORS[item.priority] ?? colors.gray500) + '22'},
-                ]}>
-                <Text style={{
-                  color: PRIORITY_COLORS[item.priority] ?? colors.gray500,
-                  fontSize: fontSize.xs,
-                  fontWeight: '700',
-                }}>
-                  {t(`tasks.priority.${item.priority}`)}
+            <View style={[styles.priorityBar, {backgroundColor: PRIORITY_COLORS[item.priority] ?? colors.gray500}]} />
+            <View style={styles.cardInner}>
+              <View style={styles.cardTop}>
+                <Text style={[styles.taskName, {color: theme.text}]} numberOfLines={2}>
+                  {item.name}
                 </Text>
+                <View
+                  style={[
+                    styles.priorityBadge,
+                    {backgroundColor: (PRIORITY_COLORS[item.priority] ?? colors.gray500) + '22'},
+                  ]}>
+                  <Text style={{
+                    color: PRIORITY_COLORS[item.priority] ?? colors.gray500,
+                    fontSize: fontSize.xs,
+                    fontWeight: '700',
+                  }}>
+                    {t(`tasks.priority.${item.priority}`)}
+                  </Text>
+                </View>
               </View>
-            </View>
-            <Text style={[styles.project, {color: theme.textSecondary}]}>{item.project}</Text>
-            <View style={styles.cardBottom}>
-              <StatusChip status={item.stage} label={t(`tasks.stage.${item.stage}`)} />
-              {item.deadline ? (
-                <Text style={[styles.deadline, {color: theme.textSecondary}]}>
-                  {t('tasks.deadline')}: {item.deadline}
-                </Text>
-              ) : null}
+              <Text style={[styles.project, {color: theme.textSecondary}]}>{item.project}</Text>
+              <View style={styles.cardBottom}>
+                <StatusChip status={item.stage} label={t(`tasks.stage.${item.stage}`)} />
+                {item.deadline ? (
+                  <Text style={[styles.deadline, {color: theme.textSecondary}]}>
+                    {t('tasks.deadline')}: {item.deadline}
+                  </Text>
+                ) : null}
+              </View>
             </View>
           </TouchableOpacity>
         )}
@@ -155,7 +196,9 @@ const styles = StyleSheet.create({
     borderRadius: radius.round,
     borderWidth: 1,
   },
-  card: {borderRadius: radius.md, borderWidth: 1, padding: spacing.md, gap: spacing.xs},
+  card: {borderRadius: radius.md, borderWidth: 1, overflow: 'hidden', gap: spacing.xs},
+  priorityBar: {height: 4, marginHorizontal: 0},
+  cardInner: {padding: spacing.md, gap: spacing.xs},
   cardTop: {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start'},
   taskName: {fontSize: fontSize.md, fontWeight: '700', flex: 1, marginRight: spacing.sm},
   priorityBadge: {
@@ -166,6 +209,17 @@ const styles = StyleSheet.create({
   project: {fontSize: fontSize.sm},
   cardBottom: {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'},
   deadline: {fontSize: fontSize.xs},
+  statsCard: {
+    flexDirection: 'row',
+    marginHorizontal: spacing.md,
+    marginTop: spacing.sm,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    padding: spacing.sm,
+  },
+  statItem: {flex: 1, alignItems: 'center', paddingVertical: spacing.xs},
+  statValue: {fontSize: fontSize.xl, fontWeight: '700'},
+  statLabel: {fontSize: fontSize.xs, textAlign: 'center', marginTop: 2},
   skeletons: {padding: spacing.md, gap: spacing.sm},
   skeleton: {borderRadius: radius.md},
 });

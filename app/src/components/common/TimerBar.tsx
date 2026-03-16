@@ -1,9 +1,10 @@
-import React, {useEffect, useRef} from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, Animated} from 'react-native';
+import React, {useEffect} from 'react';
+import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import {useAppSelector} from '../../hooks/useAppSelector';
 import {useAppDispatch} from '../../hooks/useAppDispatch';
 import {stopTimer, tickTimer} from '../../store/slices/timerSlice';
 import {colors, fontSize, spacing} from '../../config/theme';
+import {navigationRef} from '../../navigation/navigationRef';
 
 function formatTime(seconds: number): string {
   const h = Math.floor(seconds / 3600);
@@ -30,17 +31,26 @@ export default function TimerBar() {
     return null;
   }
 
+  function handleBarPress() {
+    if (navigationRef.isReady()) {
+      navigationRef.navigate('MoreTab', {screen: 'Timer'});
+    }
+  }
+
   return (
-    <View style={styles.bar}>
+    <TouchableOpacity style={styles.bar} onPress={handleBarPress} activeOpacity={0.85}>
       <Text style={styles.icon}>⏱</Text>
       <Text style={styles.taskName} numberOfLines={1}>
         {taskName ?? ''}
       </Text>
       <Text style={styles.time}>{formatTime(elapsedSeconds)}</Text>
-      <TouchableOpacity onPress={() => dispatch(stopTimer())} style={styles.stopBtn}>
+      <TouchableOpacity
+        onPress={e => {e.stopPropagation?.(); dispatch(stopTimer());}}
+        style={styles.stopBtn}
+        hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
         <Text style={styles.stopText}>■</Text>
       </TouchableOpacity>
-    </View>
+    </TouchableOpacity>
   );
 }
 

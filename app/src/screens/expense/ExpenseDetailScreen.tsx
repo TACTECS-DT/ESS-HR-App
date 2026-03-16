@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, StyleSheet, ScrollView, Alert} from 'react-native';
+import {View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity} from 'react-native';
 import {useTranslation} from 'react-i18next';
 import {useRoute} from '@react-navigation/native';
 import type {RouteProp} from '@react-navigation/stack';
@@ -8,21 +8,31 @@ import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query';
 import apiClient from '../../api/client';
 import {isApiSuccess} from '../../types/api';
 import ScreenHeader from '../../components/common/ScreenHeader';
-import Card from '../../components/common/Card';
 import StatusChip from '../../components/common/StatusChip';
 import Button from '../../components/common/Button';
 import {useTheme} from '../../hooks/useTheme';
-import {spacing, fontSize} from '../../config/theme';
+import {useAppSelector} from '../../hooks/useAppSelector';
+import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
 import type {Expense} from '../../api/mocks/expense.mock';
 
 type Route = RouteProp<RequestsStackParamList, 'ExpenseDetail'>;
+
+function InfoRow({label, value, valueColor, theme}: {label: string; value: string; valueColor?: string; theme: any}) {
+  return (
+    <View style={styles.infoRow}>
+      <Text style={[styles.infoLabel, {color: theme.textSecondary}]}>{label}</Text>
+      <Text style={[styles.infoValue, {color: valueColor ?? theme.text}]}>{value}</Text>
+    </View>
+  );
+}
 
 export default function ExpenseDetailScreen() {
   const {t, i18n} = useTranslation();
   const theme = useTheme();
   const route = useRoute<Route>();
   const queryClient = useQueryClient();
+  const user = useAppSelector(state => state.auth.user);
   const isAr = i18n.language === 'ar';
   const {id} = route.params;
 
@@ -66,45 +76,134 @@ export default function ExpenseDetailScreen() {
     );
   }
 
+  const total = expense.amount + expense.tax_amount;
+
   return (
     <View style={[styles.container, {backgroundColor: theme.background}]}>
       <ScreenHeader title={t('expense.title')} showBack />
       <ScrollView contentContainerStyle={styles.content}>
 
-        <Card style={styles.card}>
-          <View style={styles.row}>
-            <Text style={[styles.title, {color: theme.text}]}>{expense.name}</Text>
+        {/* Main details card */}
+        <View style={[styles.card, {backgroundColor: theme.surface, borderColor: theme.border}]}>
+          <View style={styles.cardHeader}>
+            <Text style={[styles.expenseName, {color: theme.text}]} numberOfLines={2}>
+              {expense.name}
+            </Text>
             <StatusChip status={expense.status} label={t(`common.status.${expense.status}`)} />
           </View>
-          <View style={styles.detailRow}>
-            <Text style={[styles.detailLabel, {color: theme.textSecondary}]}>{t('expense.category')}</Text>
-            <Text style={[styles.detailValue, {color: theme.text}]}>
-              {isAr ? expense.category_ar : expense.category}
-            </Text>
-          </View>
-          <View style={styles.detailRow}>
-            <Text style={[styles.detailLabel, {color: theme.textSecondary}]}>{t('expense.amount')}</Text>
-            <Text style={[styles.detailValue, {color: theme.text}]}>
-              {expense.amount} {expense.currency}
-            </Text>
-          </View>
-          <View style={styles.detailRow}>
-            <Text style={[styles.detailLabel, {color: theme.textSecondary}]}>{t('expense.paymentMode')}</Text>
-            <Text style={[styles.detailValue, {color: theme.text}]}>
-              {t(`expense.mode.${expense.payment_mode}`)}
-            </Text>
-          </View>
-          <View style={styles.detailRow}>
-            <Text style={[styles.detailLabel, {color: theme.textSecondary}]}>{t('common.date')}</Text>
-            <Text style={[styles.detailValue, {color: theme.text}]}>{expense.date}</Text>
-          </View>
-          {expense.description ? (
-            <View style={styles.detailRow}>
-              <Text style={[styles.detailLabel, {color: theme.textSecondary}]}>{t('expense.description')}</Text>
-              <Text style={[styles.detailValue, {color: theme.text}]}>{expense.description}</Text>
-            </View>
+          <View style={[styles.divider, {borderColor: theme.border}]} />
+
+          {user?.name ? (
+            <InfoRow label={t('profile.name')} value={user.name} theme={theme} />
           ) : null}
-        </Card>
+          <InfoRow label={t('common.date')} value={expense.date} theme={theme} />
+          <InfoRow
+            label={t('expense.category')}
+            value={isAr ? expense.category_ar : expense.category}
+            theme={theme}
+          />
+
+          <View style={[styles.divider, {borderColor: theme.border}]} />
+
+          <InfoRow
+            label={t('expense.amount')}
+            value={`${expense.amount.toLocaleString()} ${expense.currency}`}
+            valueColor={colors.primary}
+            theme={theme}
+          />
+          {expense.tax_amount > 0 ? (
+            <InfoRow
+              label={t('expense.tax')}
+              value={`${expense.tax_amount.toLocaleString()} ${expense.currency}`}
+              theme={theme}
+            />
+          ) : null}
+          <InfoRow
+            label={t('loan.amount')}
+            value={`${total.toLocaleString()} ${expense.currency}`}
+            valueColor={theme.text}
+            theme={theme}
+          />
+          <InfoRow
+            label={t('expense.paymentMode.label')}
+            value={t(`expense.mode.${expense.payment_mode}`)}
+            theme={theme}
+          />
+          <InfoRow label={t('expense.currency')} value={expense.currency} theme={theme} />
+
+          {expense.description ? (
+            <>
+              <View style={[styles.divider, {borderColor: theme.border}]} />
+              <Text style={[styles.notesLabel, {color: theme.textSecondary}]}>{t('expense.notes')}:</Text>
+              <Text style={[styles.notesText, {color: theme.text}]}>{expense.description}</Text>
+            </>
+          ) : null}
+        </View>
+
+        {/* Receipt section */}
+        <Text style={[styles.sectionTitle, {color: theme.text}]}>
+          {'📎 '}{t('expense.receipt')}
+        </Text>
+        {expense.attachments.length > 0 ? (
+          <View style={[styles.card, {backgroundColor: theme.surface, borderColor: theme.border}]}>
+            {expense.attachments.map((att, idx) => (
+              <TouchableOpacity key={idx} style={[styles.receiptRow, {backgroundColor: theme.background, borderColor: theme.border}]}>
+                <Text style={{fontSize: 28}}>🧾</Text>
+                <View style={{flex: 1}}>
+                  <Text style={[styles.receiptName, {color: theme.text}]} numberOfLines={1}>{att}</Text>
+                  <Text style={[styles.receiptTap, {color: colors.primary}]}>
+                    {t('common.edit')}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        ) : (
+          <View style={[styles.receiptEmpty, {backgroundColor: theme.surface, borderColor: theme.border}]}>
+            <Text style={{fontSize: 36}}>🧾</Text>
+            <Text style={[{color: theme.textSecondary, fontSize: fontSize.sm}]}>{t('expense.addReceipt')}</Text>
+          </View>
+        )}
+
+        {/* Approval timeline if not draft */}
+        {!isDraft ? (
+          <>
+            <Text style={[styles.sectionTitle, {color: theme.text}]}>{t('leave.approvalHistory')}</Text>
+            <View style={[styles.card, {backgroundColor: theme.surface, borderColor: theme.border}]}>
+              {/* submitted step always shown */}
+              <View style={styles.timelineItem}>
+                <View style={styles.timelineLeft}>
+                  <View style={[styles.dot, {backgroundColor: colors.success}]} />
+                </View>
+                <View style={styles.timelineContent}>
+                  <Text style={[styles.stepText, {color: theme.text}]}>Submitted</Text>
+                  <StatusChip status="approved" label={t('common.done')} />
+                  <Text style={[styles.stepDate, {color: theme.textSecondary}]}>{expense.date}</Text>
+                </View>
+              </View>
+              {['submitted', 'approved', 'posted'].includes(expense.status) ? (
+                <View style={styles.timelineItem}>
+                  <View style={styles.timelineLeft}>
+                    <View style={[styles.dot, {
+                      backgroundColor: expense.status === 'approved' || expense.status === 'posted'
+                        ? colors.success
+                        : colors.warning,
+                    }]} />
+                  </View>
+                  <View style={styles.timelineContent}>
+                    <Text style={[styles.stepText, {color: theme.text}]}>Manager Review</Text>
+                    <StatusChip
+                      status={expense.status === 'approved' || expense.status === 'posted' ? 'approved' : 'pending'}
+                      label={expense.status === 'approved' || expense.status === 'posted'
+                        ? t('common.status.approved')
+                        : t('common.status.pending')}
+                    />
+                  </View>
+                </View>
+              ) : null}
+            </View>
+          </>
+        ) : null}
 
         {isDraft ? (
           <Button
@@ -123,11 +222,38 @@ export default function ExpenseDetailScreen() {
 const styles = StyleSheet.create({
   container: {flex: 1},
   center: {flex: 1, justifyContent: 'center', alignItems: 'center'},
-  content: {padding: spacing.md, gap: spacing.md},
-  card: {gap: spacing.sm},
-  row: {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'},
-  title: {fontSize: fontSize.lg, fontWeight: '700', flex: 1, marginRight: spacing.sm},
-  detailRow: {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start'},
-  detailLabel: {fontSize: fontSize.sm, flex: 1},
-  detailValue: {fontSize: fontSize.sm, fontWeight: '600', flex: 1, textAlign: 'right'},
+  content: {padding: spacing.md, gap: spacing.md, paddingBottom: spacing.xl},
+  card: {borderRadius: radius.lg, borderWidth: 1, padding: spacing.md, gap: spacing.sm},
+  cardHeader: {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start'},
+  expenseName: {fontSize: fontSize.lg, fontWeight: '700', flex: 1, marginRight: spacing.sm},
+  divider: {borderTopWidth: StyleSheet.hairlineWidth},
+  infoRow: {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'},
+  infoLabel: {fontSize: fontSize.sm},
+  infoValue: {fontSize: fontSize.sm, fontWeight: '600'},
+  notesLabel: {fontSize: fontSize.sm, fontWeight: '700'},
+  notesText: {fontSize: fontSize.sm, lineHeight: 20},
+  sectionTitle: {fontSize: fontSize.md, fontWeight: '700'},
+  receiptRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    alignItems: 'center',
+    padding: spacing.sm,
+    borderRadius: radius.md,
+    borderWidth: 1,
+  },
+  receiptName: {fontSize: fontSize.sm, fontWeight: '600'},
+  receiptTap: {fontSize: fontSize.xs, marginTop: 2},
+  receiptEmpty: {
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    padding: spacing.xl,
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  timelineItem: {flexDirection: 'row', gap: spacing.sm, minHeight: 48},
+  timelineLeft: {alignItems: 'center', width: 16},
+  dot: {width: 12, height: 12, borderRadius: 6, marginTop: 3},
+  timelineContent: {flex: 1, gap: 4, paddingBottom: spacing.sm},
+  stepText: {fontSize: fontSize.sm, fontWeight: '600'},
+  stepDate: {fontSize: fontSize.xs},
 });

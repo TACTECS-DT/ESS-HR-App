@@ -17,6 +17,8 @@ import apiClient from '../../api/client';
 import {isApiSuccess} from '../../types/api';
 import ScreenHeader from '../../components/common/ScreenHeader';
 import TextInput from '../../components/common/TextInput';
+import DatePickerField from '../../components/common/DatePickerField';
+import SelectField from '../../components/common/SelectField';
 import {useTheme} from '../../hooks/useTheme';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {LeaveType, LeaveBalance, LeaveMode} from '../../api/mocks/leave.mock';
@@ -80,6 +82,19 @@ export default function LeaveCreateScreen() {
     segment === 'half_day' ? 'half_day_am' :
     segment === 'hourly' ? 'hourly' : 'full_day';
 
+  const leaveTypeOptions = useMemo(() =>
+    (types ?? []).map(tp => {
+      const bal = balances?.find(b => b.leave_type_id === tp.id);
+      return {
+        label: isAr ? tp.name_ar : tp.name,
+        value: tp.id,
+        subtitle: bal
+          ? (bal.remaining > 0 ? `${bal.remaining} ${t('leave.days')}` : t('leave.noLimit'))
+          : undefined,
+      };
+    }),
+  [types, balances, isAr, t]);
+
   const daysDeducted = useMemo(() => {
     if (segment === 'half_day') {return 0.5;}
     if (segment === 'hourly') {return 0;}
@@ -136,6 +151,11 @@ export default function LeaveCreateScreen() {
     return !selectedType; // show all if no type selected yet
   });
 
+  const segmentOptions = visibleSegments.map(s => ({
+    label: t(s.labelKey),
+    value: s.key,
+  }));
+
   return (
     <KeyboardAvoidingView
       style={{flex: 1, backgroundColor: theme.background}}
@@ -144,91 +164,44 @@ export default function LeaveCreateScreen() {
       <ScrollView contentContainerStyle={styles.content}>
 
         {/* Leave type selector */}
-        <Text style={[styles.label, {color: theme.textSecondary}]}>
-          {t('leave.leaveType')} *
-        </Text>
-        <View style={styles.typeGrid}>
-          {(types ?? []).map(tp => {
-            const bal = balances?.find(b => b.leave_type_id === tp.id);
-            const isSelected = selectedTypeId === tp.id;
-            return (
-              <TouchableOpacity
-                key={tp.id}
-                style={[
-                  styles.typeChip,
-                  {borderColor: isSelected ? colors.primary : theme.border},
-                  isSelected && {backgroundColor: colors.primary + '22'},
-                ]}
-                onPress={() => setSelectedTypeId(tp.id)}>
-                <Text style={{color: isSelected ? colors.primary : theme.text, fontSize: fontSize.sm, fontWeight: '600'}}>
-                  {isAr ? tp.name_ar : tp.name}
-                </Text>
-                {bal ? (
-                  <Text style={{color: isSelected ? colors.primary : theme.textSecondary, fontSize: 10}}>
-                    {bal.remaining > 0 ? `${bal.remaining} ${t('leave.days')}` : t('leave.noLimit')}
-                  </Text>
-                ) : null}
-              </TouchableOpacity>
-            );
-          })}
-        </View>
+        <SelectField
+          label={`${t('leave.leaveType')} *`}
+          options={leaveTypeOptions}
+          value={selectedTypeId}
+          onChange={v => setSelectedTypeId(v as number)}
+          placeholder={t('leave.leaveType')}
+        />
 
-        {/* Duration type — segmented control */}
-        <Text style={[styles.label, {color: theme.textSecondary}]}>
-          {t('leave.durationType')}
-        </Text>
-        <View style={[styles.segmented, {backgroundColor: theme.border}]}>
-          {visibleSegments.map((s, idx) => {
-            const isActive = segment === s.key;
-            const isFirst = idx === 0;
-            const isLast = idx === visibleSegments.length - 1;
-            return (
-              <TouchableOpacity
-                key={s.key}
-                style={[
-                  styles.segment,
-                  isActive && {backgroundColor: colors.primary},
-                  !isFirst && {borderLeftWidth: StyleSheet.hairlineWidth, borderLeftColor: theme.background},
-                  isFirst && {borderTopLeftRadius: radius.md, borderBottomLeftRadius: radius.md},
-                  isLast && {borderTopRightRadius: radius.md, borderBottomRightRadius: radius.md},
-                ]}
-                onPress={() => setSegment(s.key)}>
-                <Text style={{
-                  color: isActive ? colors.white : theme.textSecondary,
-                  fontSize: fontSize.xs,
-                  fontWeight: '600',
-                }}>
-                  {t(s.labelKey)}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
+        {/* Duration type */}
+        <SelectField
+          label={t('leave.durationType')}
+          options={segmentOptions}
+          value={segment}
+          onChange={v => setSegment(v as SegmentMode)}
+        />
 
         {/* Dates */}
         {!isHourly ? (
           <>
-            <TextInput
+            <DatePickerField
               label={`${t('leave.dateFrom')} *`}
-              placeholder="YYYY-MM-DD"
               value={dateFrom}
-              onChangeText={setDateFrom}
+              onChange={setDateFrom}
             />
             {isFullDay ? (
-              <TextInput
+              <DatePickerField
                 label={`${t('leave.dateTo')} *`}
-                placeholder="YYYY-MM-DD"
                 value={dateTo}
-                onChangeText={setDateTo}
+                onChange={setDateTo}
+                minimumDate={dateFrom ? new Date(dateFrom) : undefined}
               />
             ) : null}
           </>
         ) : (
-          <TextInput
+          <DatePickerField
             label={`${t('leave.dateFrom')} *`}
-            placeholder="YYYY-MM-DD"
             value={dateFrom}
-            onChangeText={setDateFrom}
+            onChange={setDateFrom}
           />
         )}
 
@@ -298,28 +271,6 @@ export default function LeaveCreateScreen() {
 const styles = StyleSheet.create({
   content: {padding: spacing.md, gap: spacing.sm},
   label: {fontSize: fontSize.sm, fontWeight: '600'},
-
-  typeGrid: {flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs},
-  typeChip: {
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    borderRadius: radius.round,
-    borderWidth: 1,
-    alignItems: 'center',
-    gap: 2,
-  },
-
-  segmented: {
-    flexDirection: 'row',
-    borderRadius: radius.md,
-    overflow: 'hidden',
-    marginBottom: spacing.xs,
-  },
-  segment: {
-    flex: 1,
-    paddingVertical: spacing.sm,
-    alignItems: 'center',
-  },
 
   calcCard: {
     borderRadius: radius.md,

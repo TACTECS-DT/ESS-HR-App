@@ -100,6 +100,9 @@ export default function ExperienceCertDetailScreen() {
             <StatusChip status={cert.status} label={t(`common.status.${cert.status}`)} />
           </View>
           <View style={[styles.divider, {borderColor: theme.border}]} />
+          {user?.name ? (
+            <InfoRow label={t('profile.name')} value={user.name} theme={theme} />
+          ) : null}
           <InfoRow label={t('expCert.directedTo')} value={cert.directed_to} theme={theme} />
           {cert.required_date ? (
             <InfoRow label={t('expCert.requiredDate')} value={cert.required_date} theme={theme} />

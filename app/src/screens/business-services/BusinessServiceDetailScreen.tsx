@@ -100,6 +100,9 @@ export default function BusinessServiceDetailScreen() {
             <StatusChip status={service.status} label={t(`common.status.${service.status}`)} />
           </View>
           <View style={[styles.divider, {borderColor: theme.border}]} />
+          {user?.name ? (
+            <InfoRow label={t('profile.name')} value={user.name} theme={theme} />
+          ) : null}
           {/* Service type badge */}
           <View style={styles.typeRow}>
             <Text style={[styles.infoLabel, {color: theme.textSecondary}]}>{t('businessService.serviceType')}</Text>

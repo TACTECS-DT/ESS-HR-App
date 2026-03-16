@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {
   View,
   Text,
@@ -17,6 +17,8 @@ import apiClient from '../../api/client';
 import {isApiSuccess} from '../../types/api';
 import ScreenHeader from '../../components/common/ScreenHeader';
 import TextInput from '../../components/common/TextInput';
+import DatePickerField from '../../components/common/DatePickerField';
+import SelectField from '../../components/common/SelectField';
 import {useTheme} from '../../hooks/useTheme';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {ExpenseCategory} from '../../api/mocks/expense.mock';
@@ -24,52 +26,6 @@ import type {ExpenseCategory} from '../../api/mocks/expense.mock';
 type Currency = 'SAR' | 'AED' | 'USD' | 'EUR';
 type PaymentMode = 'employee_paid' | 'company_paid';
 type TaxOption = 'none' | 'vat15' | 'vat5';
-
-const CURRENCIES: Currency[] = ['SAR', 'AED', 'USD', 'EUR'];
-const PAYMENT_MODES: PaymentMode[] = ['employee_paid', 'company_paid'];
-const TAX_OPTIONS: TaxOption[] = ['none', 'vat15', 'vat5'];
-
-function SegmentedRow<T extends string>({
-  label,
-  options,
-  value,
-  onSelect,
-  getLabel,
-  theme,
-}: {
-  label: string;
-  options: T[];
-  value: T;
-  onSelect: (v: T) => void;
-  getLabel: (v: T) => string;
-  theme: any;
-}) {
-  return (
-    <View style={{gap: 6}}>
-      <Text style={[styles.label, {color: theme.textSecondary}]}>{label}</Text>
-      <View style={[styles.segRow, {borderColor: theme.border}]}>
-        {options.map((opt, idx) => {
-          const isActive = value === opt;
-          return (
-            <TouchableOpacity
-              key={opt}
-              style={[
-                styles.segBtn,
-                {borderColor: theme.border},
-                idx > 0 && {borderLeftWidth: 1},
-                isActive && {backgroundColor: colors.primary},
-              ]}
-              onPress={() => onSelect(opt)}>
-              <Text style={[styles.segBtnText, {color: isActive ? '#fff' : theme.text}]}>
-                {getLabel(opt)}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
-    </View>
-  );
-}
 
 export default function ExpenseCreateScreen() {
   const {t, i18n} = useTranslation();
@@ -88,6 +44,18 @@ export default function ExpenseCreateScreen() {
   const [paymentMode, setPaymentMode] = useState<PaymentMode>('employee_paid');
   const [notes, setNotes] = useState('');
 
+  const currencyOptions = useMemo(() =>
+    (['SAR', 'AED', 'USD', 'EUR'] as Currency[]).map(c => ({label: c, value: c})),
+  []);
+
+  const taxOptions = useMemo(() =>
+    (['none', 'vat15', 'vat5'] as TaxOption[]).map(v => ({label: t(`expense.taxOptions.${v}`), value: v})),
+  [t]);
+
+  const paymentModeOptions = useMemo(() =>
+    (['employee_paid', 'company_paid'] as PaymentMode[]).map(v => ({label: t(`expense.paymentMode.${v}`), value: v})),
+  [t]);
+
   const {data: categories} = useQuery({
     queryKey: ['expense-categories'],
     queryFn: async () => {
@@ -95,6 +63,10 @@ export default function ExpenseCreateScreen() {
       return isApiSuccess(res.data) ? (res.data.data as ExpenseCategory[]) : [];
     },
   });
+
+  const categoryOptions = useMemo(() =>
+    (categories ?? []).map(cat => ({label: isAr ? cat.name_ar : cat.name, value: cat.id})),
+  [categories, isAr]);
 
   const mutation = useMutation({
     mutationFn: async (isDraft: boolean) => {
@@ -147,33 +119,14 @@ export default function ExpenseCreateScreen() {
           onChangeText={setDescription}
         />
 
-        {/* Category chips */}
-        <Text style={[styles.label, {color: theme.textSecondary}]}>
-          {t('expense.category')} *
-        </Text>
-        <View style={styles.chipRow}>
-          {(categories ?? []).map(cat => {
-            const isActive = selectedCategoryId === cat.id;
-            return (
-              <TouchableOpacity
-                key={cat.id}
-                style={[
-                  styles.chip,
-                  {borderColor: isActive ? colors.primary : theme.border},
-                  isActive && {backgroundColor: colors.primary + '22'},
-                ]}
-                onPress={() => setSelectedCategoryId(cat.id)}>
-                <Text style={{
-                  color: isActive ? colors.primary : theme.text,
-                  fontSize: fontSize.sm,
-                  fontWeight: '600',
-                }}>
-                  {isAr ? cat.name_ar : cat.name}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
+        {/* Category */}
+        <SelectField
+          label={`${t('expense.category')} *`}
+          options={categoryOptions}
+          value={selectedCategoryId}
+          onChange={v => setSelectedCategoryId(v as number)}
+          placeholder={t('expense.category')}
+        />
 
         {/* Amount + Currency row */}
         <View style={styles.row2}>
@@ -187,32 +140,20 @@ export default function ExpenseCreateScreen() {
             />
           </View>
           <View style={{flex: 1}}>
-            <Text style={[styles.label, {color: theme.textSecondary}]}>{t('expense.currency')}</Text>
-            <View style={[styles.segRow, {borderColor: theme.border, flexDirection: 'column', borderRadius: radius.sm}]}>
-              {CURRENCIES.map(cur => {
-                const isActive = currency === cur;
-                return (
-                  <TouchableOpacity
-                    key={cur}
-                    style={[styles.dropItem, isActive && {backgroundColor: colors.primary + '22'}]}
-                    onPress={() => setCurrency(cur)}>
-                    <Text style={{fontSize: fontSize.sm, color: isActive ? colors.primary : theme.text, fontWeight: isActive ? '700' : '400'}}>
-                      {cur}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
+            <SelectField
+              label={t('expense.currency')}
+              options={currencyOptions}
+              value={currency}
+              onChange={v => setCurrency(v as Currency)}
+            />
           </View>
         </View>
 
         {/* Date */}
-        <TextInput
+        <DatePickerField
           label={t('expense.date')}
-          placeholder="YYYY-MM-DD"
           value={date}
-          onChangeText={setDate}
-          keyboardType="default"
+          onChange={setDate}
         />
 
         {/* Quantity */}
@@ -225,23 +166,19 @@ export default function ExpenseCreateScreen() {
         />
 
         {/* Tax */}
-        <SegmentedRow
+        <SelectField
           label={t('expense.tax')}
-          options={TAX_OPTIONS}
+          options={taxOptions}
           value={tax}
-          onSelect={setTax}
-          getLabel={v => t(`expense.taxOptions.${v}`)}
-          theme={theme}
+          onChange={v => setTax(v as TaxOption)}
         />
 
         {/* Payment Mode */}
-        <SegmentedRow
-          label={t('expense.paymentMode.company_paid').replace('Company Paid', '') + t('expense.paymentMode.employee_paid').replace('Employee (To Reimburse)', '') !== '' ? 'Payment Mode' : 'Payment Mode'}
-          options={PAYMENT_MODES}
+        <SelectField
+          label={t('expense.paymentMode.label')}
+          options={paymentModeOptions}
           value={paymentMode}
-          onSelect={setPaymentMode}
-          getLabel={v => t(`expense.paymentMode.${v}`)}
-          theme={theme}
+          onChange={v => setPaymentMode(v as PaymentMode)}
         />
 
         {/* Receipt upload placeholder */}
@@ -288,28 +225,7 @@ export default function ExpenseCreateScreen() {
 
 const styles = StyleSheet.create({
   content: {padding: spacing.md, gap: spacing.sm, paddingBottom: spacing.xl},
-  label: {fontSize: fontSize.sm, fontWeight: '600'},
-  chipRow: {flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs},
-  chip: {
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    borderRadius: radius.round,
-    borderWidth: 1,
-  },
   row2: {flexDirection: 'row', gap: spacing.sm, alignItems: 'flex-start'},
-  segRow: {
-    flexDirection: 'row',
-    borderWidth: 1,
-    borderRadius: radius.sm,
-    overflow: 'hidden',
-  },
-  segBtn: {
-    flex: 1,
-    paddingVertical: 8,
-    alignItems: 'center',
-  },
-  segBtnText: {fontSize: fontSize.xs, fontWeight: '600'},
-  dropItem: {paddingHorizontal: spacing.sm, paddingVertical: 6},
   receiptBox: {
     borderWidth: 1.5,
     borderStyle: 'dashed',

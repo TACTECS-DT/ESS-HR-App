@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {
   View,
   Text,
@@ -18,6 +18,8 @@ import {isApiSuccess} from '../../types/api';
 import ScreenHeader from '../../components/common/ScreenHeader';
 import StatusChip from '../../components/common/StatusChip';
 import TextInput from '../../components/common/TextInput';
+import DatePickerField from '../../components/common/DatePickerField';
+import SelectField from '../../components/common/SelectField';
 import {useTheme} from '../../hooks/useTheme';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {DocumentType, DocumentRequest} from '../../api/mocks/document-requests.mock';
@@ -31,10 +33,8 @@ export default function DocumentRequestCreateScreen() {
 
   const [requestTitle, setRequestTitle] = useState('');
   const [selectedTypeId, setSelectedTypeId] = useState<number | null>(null);
-  const [selectedTypeName, setSelectedTypeName] = useState('');
   const [returnDate, setReturnDate] = useState('');
   const [reason, setReason] = useState('');
-  const [showTypeDropdown, setShowTypeDropdown] = useState(false);
 
   const {data: types} = useQuery({
     queryKey: ['document-types'],
@@ -79,11 +79,9 @@ export default function DocumentRequestCreateScreen() {
     mutation.mutate(isDraft);
   }
 
-  function selectType(type: DocumentType) {
-    setSelectedTypeId(type.id);
-    setSelectedTypeName(isAr ? type.name_ar : type.name);
-    setShowTypeDropdown(false);
-  }
+  const typeOptions = useMemo(() =>
+    (types ?? []).map(type => ({label: isAr ? type.name_ar : type.name, value: type.id})),
+  [types, isAr]);
 
   return (
     <KeyboardAvoidingView
@@ -99,42 +97,19 @@ export default function DocumentRequestCreateScreen() {
           onChangeText={setRequestTitle}
         />
 
-        {/* Document Type dropdown */}
-        <View>
-          <Text style={[styles.label, {color: theme.textSecondary}]}>
-            {t('documentRequest.documentType')} *
-          </Text>
-          <TouchableOpacity
-            style={[styles.dropdown, {borderColor: theme.border, backgroundColor: theme.surface}]}
-            onPress={() => setShowTypeDropdown(v => !v)}>
-            <Text style={[styles.dropdownText, {color: selectedTypeId ? theme.text : theme.textSecondary}]}>
-              {selectedTypeName || t('documentRequest.documentType')}
-            </Text>
-            <Text style={[styles.chevron, {color: theme.textSecondary}]}>
-              {showTypeDropdown ? '▲' : '▼'}
-            </Text>
-          </TouchableOpacity>
-          {showTypeDropdown ? (
-            <View style={[styles.dropdownList, {backgroundColor: theme.surface, borderColor: theme.border}]}>
-              {(types ?? []).map(type => (
-                <TouchableOpacity
-                  key={type.id}
-                  style={[styles.dropdownItem, {borderBottomColor: theme.border}]}
-                  onPress={() => selectType(type)}>
-                  <Text style={[styles.dropdownItemText, {color: theme.text}]}>
-                    {isAr ? type.name_ar : type.name}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          ) : null}
-        </View>
+        {/* Document Type */}
+        <SelectField
+          label={`${t('documentRequest.documentType')} *`}
+          options={typeOptions}
+          value={selectedTypeId}
+          onChange={v => setSelectedTypeId(v as number)}
+          placeholder={t('documentRequest.documentType')}
+        />
 
-        <TextInput
+        <DatePickerField
           label={t('documentRequest.returnDate')}
-          placeholder="YYYY-MM-DD"
           value={returnDate}
-          onChangeText={setReturnDate}
+          onChange={setReturnDate}
         />
 
         <TextInput
@@ -194,30 +169,6 @@ export default function DocumentRequestCreateScreen() {
 
 const styles = StyleSheet.create({
   content: {padding: spacing.md, gap: spacing.sm, paddingBottom: spacing.xl},
-  label: {fontSize: fontSize.sm, fontWeight: '600', marginBottom: 4},
-  dropdown: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderRadius: radius.md,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm + 2,
-  },
-  dropdownText: {fontSize: fontSize.sm},
-  chevron: {fontSize: fontSize.xs},
-  dropdownList: {
-    borderWidth: 1,
-    borderRadius: radius.md,
-    marginTop: 2,
-    overflow: 'hidden',
-  },
-  dropdownItem: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderBottomWidth: 0.5,
-  },
-  dropdownItemText: {fontSize: fontSize.sm},
   btnRow: {flexDirection: 'row', gap: spacing.sm, marginTop: spacing.sm},
   draftBtn: {
     flex: 1,

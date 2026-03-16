@@ -17,6 +17,7 @@ import {setupInterceptors} from './src/api/setupInterceptors';
 import './src/i18n'; // Initialize i18n
 
 import AppNavigator from './src/AppNavigator';
+import {navigationRef} from './src/navigation/navigationRef';
 
 // Initialize mock API and Axios interceptors once
 setupMocks();
@@ -38,7 +39,7 @@ export default function App() {
         <ReduxProvider store={store}>
           <PersistGate persistor={persistor} loading={null}>
             <QueryClientProvider client={queryClient}>
-              <NavigationContainer>
+              <NavigationContainer ref={navigationRef}>
                 <AppNavigator />
               </NavigationContainer>
             </QueryClientProvider>

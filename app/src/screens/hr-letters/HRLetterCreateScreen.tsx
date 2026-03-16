@@ -17,6 +17,8 @@ import apiClient from '../../api/client';
 import {isApiSuccess} from '../../types/api';
 import ScreenHeader from '../../components/common/ScreenHeader';
 import TextInput from '../../components/common/TextInput';
+import DatePickerField from '../../components/common/DatePickerField';
+import SelectField from '../../components/common/SelectField';
 import StatusChip from '../../components/common/StatusChip';
 import {useTheme} from '../../hooks/useTheme';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
@@ -33,6 +35,11 @@ export default function HRLetterCreateScreen() {
   const navigation = useNavigation();
   const queryClient = useQueryClient();
   const isAr = i18n.language === 'ar';
+
+  const salaryTypeOptions = SALARY_TYPES.map(s => ({
+    label: isAr ? s.ar : s.en,
+    value: s.key,
+  }));
 
   const [letterTitle, setLetterTitle] = useState('');
   const [directedTo, setDirectedTo] = useState('');
@@ -104,12 +111,10 @@ export default function HRLetterCreateScreen() {
           onChangeText={setDirectedTo}
         />
 
-        <TextInput
+        <DatePickerField
           label={`${t('hrLetter.requiredDate')} *`}
-          placeholder="YYYY-MM-DD"
           value={requiredDate}
-          onChangeText={setRequiredDate}
-          keyboardType="numbers-and-punctuation"
+          onChange={setRequiredDate}
         />
 
         <TextInput
@@ -121,37 +126,13 @@ export default function HRLetterCreateScreen() {
           numberOfLines={3}
         />
 
-        {/* Salary Type segmented control */}
-        <Text style={[styles.label, {color: theme.textSecondary}]}>
-          {t('hrLetter.salaryType')} *
-        </Text>
-        <View style={[styles.segmented, {backgroundColor: theme.border}]}>
-          {SALARY_TYPES.map((s, idx) => {
-            const isActive = salaryType === s.key;
-            const isFirst = idx === 0;
-            const isLast = idx === SALARY_TYPES.length - 1;
-            return (
-              <TouchableOpacity
-                key={s.key}
-                style={[
-                  styles.segment,
-                  isActive && {backgroundColor: colors.primary},
-                  isFirst && {borderTopLeftRadius: radius.md, borderBottomLeftRadius: radius.md},
-                  isLast && {borderTopRightRadius: radius.md, borderBottomRightRadius: radius.md},
-                  !isFirst && {borderLeftWidth: StyleSheet.hairlineWidth, borderLeftColor: theme.background},
-                ]}
-                onPress={() => setSalaryType(s.key)}>
-                <Text style={{
-                  color: isActive ? colors.white : theme.textSecondary,
-                  fontSize: fontSize.sm,
-                  fontWeight: '600',
-                }}>
-                  {isAr ? s.ar : s.en}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
+        {/* Salary Type */}
+        <SelectField
+          label={`${t('hrLetter.salaryType')} *`}
+          options={salaryTypeOptions}
+          value={salaryType}
+          onChange={v => setSalaryType(v as SalaryType)}
+        />
 
         {/* Buttons */}
         <View style={styles.btnRow}>
@@ -205,18 +186,6 @@ const styles = StyleSheet.create({
 
   sectionTitle: {fontSize: fontSize.md, fontWeight: '700', marginTop: spacing.xs},
   separator: {borderTopWidth: StyleSheet.hairlineWidth, marginVertical: spacing.sm},
-
-  label: {fontSize: fontSize.sm, fontWeight: '600'},
-  segmented: {
-    flexDirection: 'row',
-    borderRadius: radius.md,
-    overflow: 'hidden',
-  },
-  segment: {
-    flex: 1,
-    paddingVertical: spacing.sm,
-    alignItems: 'center',
-  },
 
   btnRow: {flexDirection: 'row', gap: spacing.sm, marginTop: spacing.xs},
   btnOutline: {

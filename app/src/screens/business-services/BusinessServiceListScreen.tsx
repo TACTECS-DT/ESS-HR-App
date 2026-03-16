@@ -110,17 +110,13 @@ export default function BusinessServiceListScreen() {
             onPress={() => navigation.navigate('BusinessServiceDetail', {id: item.id})}>
             <View style={styles.cardTop}>
               <Text style={[styles.serviceType, {color: theme.text}]} numberOfLines={1}>
-                {isAr ? item.service_type_ar : item.service_type}
+                {isAr ? item.title_ar : item.title}
               </Text>
               <StatusChip status={item.status} label={t(`common.status.${item.status}`)} />
             </View>
-            {item.requested_date ? (
-              <Text style={[styles.detail, {color: theme.textSecondary}]}>
-                {t('businessService.requestedDate')}: {item.requested_date}
-              </Text>
-            ) : null}
-            <Text style={[styles.reason, {color: theme.textSecondary}]} numberOfLines={1}>
-              {item.reason}
+            <Text style={[styles.detail, {color: theme.textSecondary}]}>
+              {isAr ? item.service_type_ar : item.service_type}
+              {item.requested_date ? `  ·  ${item.requested_date}` : ''}
             </Text>
           </TouchableOpacity>
         )}

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {
   View,
   Text,
@@ -17,6 +17,8 @@ import apiClient from '../../api/client';
 import {isApiSuccess} from '../../types/api';
 import ScreenHeader from '../../components/common/ScreenHeader';
 import TextInput from '../../components/common/TextInput';
+import DatePickerField from '../../components/common/DatePickerField';
+import SelectField from '../../components/common/SelectField';
 import {useTheme} from '../../hooks/useTheme';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {ServiceType} from '../../api/mocks/business-services.mock';
@@ -30,10 +32,8 @@ export default function BusinessServiceCreateScreen() {
 
   const [serviceTitle, setServiceTitle] = useState('');
   const [selectedTypeId, setSelectedTypeId] = useState<number | null>(null);
-  const [selectedTypeName, setSelectedTypeName] = useState('');
   const [wantedDate, setWantedDate] = useState('');
   const [reason, setReason] = useState('');
-  const [showTypeDropdown, setShowTypeDropdown] = useState(false);
 
   const {data: types} = useQuery({
     queryKey: ['service-types'],
@@ -70,11 +70,9 @@ export default function BusinessServiceCreateScreen() {
     mutation.mutate(isDraft);
   }
 
-  function selectType(type: ServiceType) {
-    setSelectedTypeId(type.id);
-    setSelectedTypeName(isAr ? type.name_ar : type.name);
-    setShowTypeDropdown(false);
-  }
+  const typeOptions = useMemo(() =>
+    (types ?? []).map(type => ({label: isAr ? type.name_ar : type.name, value: type.id})),
+  [types, isAr]);
 
   return (
     <KeyboardAvoidingView
@@ -90,42 +88,19 @@ export default function BusinessServiceCreateScreen() {
           onChangeText={setServiceTitle}
         />
 
-        {/* Service Type dropdown */}
-        <View>
-          <Text style={[styles.label, {color: theme.textSecondary}]}>
-            {t('businessService.serviceType')} *
-          </Text>
-          <TouchableOpacity
-            style={[styles.dropdown, {borderColor: theme.border, backgroundColor: theme.surface}]}
-            onPress={() => setShowTypeDropdown(v => !v)}>
-            <Text style={[styles.dropdownText, {color: selectedTypeId ? theme.text : theme.textSecondary}]}>
-              {selectedTypeName || t('businessService.serviceType')}
-            </Text>
-            <Text style={[styles.chevron, {color: theme.textSecondary}]}>
-              {showTypeDropdown ? '▲' : '▼'}
-            </Text>
-          </TouchableOpacity>
-          {showTypeDropdown ? (
-            <View style={[styles.dropdownList, {backgroundColor: theme.surface, borderColor: theme.border}]}>
-              {(types ?? []).map(type => (
-                <TouchableOpacity
-                  key={type.id}
-                  style={[styles.dropdownItem, {borderBottomColor: theme.border}]}
-                  onPress={() => selectType(type)}>
-                  <Text style={[styles.dropdownItemText, {color: theme.text}]}>
-                    {isAr ? type.name_ar : type.name}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          ) : null}
-        </View>
+        {/* Service Type */}
+        <SelectField
+          label={`${t('businessService.serviceType')} *`}
+          options={typeOptions}
+          value={selectedTypeId}
+          onChange={v => setSelectedTypeId(v as number)}
+          placeholder={t('businessService.serviceType')}
+        />
 
-        <TextInput
+        <DatePickerField
           label={`${t('businessService.wantedDate')} *`}
-          placeholder="YYYY-MM-DD"
           value={wantedDate}
-          onChangeText={setWantedDate}
+          onChange={setWantedDate}
         />
 
         <TextInput
@@ -161,30 +136,6 @@ export default function BusinessServiceCreateScreen() {
 
 const styles = StyleSheet.create({
   content: {padding: spacing.md, gap: spacing.sm, paddingBottom: spacing.xl},
-  label: {fontSize: fontSize.sm, fontWeight: '600', marginBottom: 4},
-  dropdown: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderRadius: radius.md,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm + 2,
-  },
-  dropdownText: {fontSize: fontSize.sm},
-  chevron: {fontSize: fontSize.xs},
-  dropdownList: {
-    borderWidth: 1,
-    borderRadius: radius.md,
-    marginTop: 2,
-    overflow: 'hidden',
-  },
-  dropdownItem: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderBottomWidth: 0.5,
-  },
-  dropdownItemText: {fontSize: fontSize.sm},
   btnRow: {flexDirection: 'row', gap: spacing.sm, marginTop: spacing.sm},
   draftBtn: {
     flex: 1,

@@ -49,8 +49,16 @@ const SECTIONS: Array<{titleKey: string; items: ModuleItem[]}> = [
   {
     titleKey: 'more.tasksTimesheets',
     items: [
-      {icon: '✅', titleKey: 'tasks.title',       route: 'TaskList',       color: '#30B0C7'},
-      {icon: '🕐', titleKey: 'timesheets.title',  route: 'TimesheetWeekly',color: '#636366'},
+      {icon: '✅', titleKey: 'tasks.title',        route: 'TaskList',        color: '#30B0C7'},
+      {icon: '🕐', titleKey: 'timesheets.title',   route: 'TimesheetWeekly', color: '#636366'},
+      {icon: '👥', titleKey: 'teamHours.title',    route: 'TeamHours',       color: '#5856D6'},
+    ],
+  },
+  {
+    titleKey: 'more.personal',
+    items: [
+      {icon: '📝', titleKey: 'personalNotes.title', route: 'PersonalNotes', color: '#FF9F0A'},
+      {icon: '📊', titleKey: 'analytics.title',     route: 'Analytics',     color: '#30D158'},
     ],
   },
   {

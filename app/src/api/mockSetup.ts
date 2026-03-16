@@ -68,6 +68,9 @@ import {MOCK_PROFILE} from './mocks/profile.mock';
 import {MOCK_NOTIFICATIONS} from './mocks/notifications.mock';
 import {MOCK_ANNOUNCEMENTS} from './mocks/announcements.mock';
 import {MOCK_PENDING_APPROVALS, MOCK_APPROVAL_ACTION_SUCCESS} from './mocks/pending-approvals.mock';
+import {MOCK_PERSONAL_NOTES, MOCK_NOTE_CREATE_SUCCESS} from './mocks/personal-notes.mock';
+import {MOCK_ANALYTICS} from './mocks/analytics.mock';
+import {MOCK_TEAM_HOURS} from './mocks/team-hours.mock';
 
 function randomDelay(): number {
   return (
@@ -177,6 +180,7 @@ export function setupMocks(): void {
   // ─── Tasks ───────────────────────────────────────────────────
   mockInstance.onGet('/tasks').reply(200, MOCK_TASKS);
   mockInstance.onPatch(new RegExp('/tasks/\\d+')).reply(200, {success: true, data: null});
+  mockInstance.onPost(new RegExp('/tasks/\\d+/attachments')).reply(200, {success: true, data: null});
 
   // ─── Timesheets ──────────────────────────────────────────────
   mockInstance.onGet('/timesheets').reply(200, MOCK_TIMESHEETS);
@@ -198,6 +202,18 @@ export function setupMocks(): void {
   // ─── Pending Approvals ────────────────────────────────────────
   mockInstance.onGet('/pending-approvals').reply(200, MOCK_PENDING_APPROVALS);
   mockInstance.onPost(new RegExp('/pending-approvals/\\d+/action')).reply(200, MOCK_APPROVAL_ACTION_SUCCESS);
+
+  // ─── Personal Notes ───────────────────────────────────────────
+  mockInstance.onGet('/personal-notes').reply(200, MOCK_PERSONAL_NOTES);
+  mockInstance.onPost('/personal-notes').reply(201, MOCK_NOTE_CREATE_SUCCESS);
+  mockInstance.onPatch(new RegExp('/personal-notes/\\d+')).reply(200, {success: true, data: null});
+  mockInstance.onDelete(new RegExp('/personal-notes/\\d+')).reply(200, {success: true, data: null});
+
+  // ─── Analytics ───────────────────────────────────────────────
+  mockInstance.onGet('/analytics').reply(200, MOCK_ANALYTICS);
+
+  // ─── Team Hours ──────────────────────────────────────────────
+  mockInstance.onGet('/team-hours').reply(200, MOCK_TEAM_HOURS);
 }
 
 export function teardownMocks(): void {

@@ -16,6 +16,7 @@ import {useMutation, useQueryClient} from '@tanstack/react-query';
 import apiClient from '../../api/client';
 import ScreenHeader from '../../components/common/ScreenHeader';
 import TextInput from '../../components/common/TextInput';
+import DatePickerField from '../../components/common/DatePickerField';
 import {useTheme} from '../../hooks/useTheme';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 
@@ -78,11 +79,10 @@ export default function ExperienceCertCreateScreen() {
           onChangeText={setDirectedTo}
         />
 
-        <TextInput
+        <DatePickerField
           label={`${t('expCert.requiredDate')} *`}
-          placeholder="YYYY-MM-DD"
           value={requiredDate}
-          onChangeText={setRequiredDate}
+          onChange={setRequiredDate}
         />
 
         <TextInput

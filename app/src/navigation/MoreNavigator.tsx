@@ -35,8 +35,14 @@ import BusinessServiceDetailScreen from '../screens/business-services/BusinessSe
 import TaskListScreen from '../screens/tasks/TaskListScreen';
 import TaskDetailScreen from '../screens/tasks/TaskDetailScreen';
 import LogTimeScreen from '../screens/tasks/LogTimeScreen';
+import AddAttachmentScreen from '../screens/tasks/AddAttachmentScreen';
 import TimesheetDailyScreen from '../screens/tasks/TimesheetDailyScreen';
 import TimesheetWeeklyScreen from '../screens/tasks/TimesheetWeeklyScreen';
+import TimerScreen from '../screens/tasks/TimerScreen';
+import TeamHoursScreen from '../screens/tasks/TeamHoursScreen';
+// Personal & Analytics
+import PersonalNotesScreen from '../screens/more/PersonalNotesScreen';
+import AnalyticsScreen from '../screens/more/AnalyticsScreen';
 // Profile & Settings
 import ProfileScreen from '../screens/profile/ProfileScreen';
 import SettingsScreen from '../screens/profile/SettingsScreen';
@@ -81,8 +87,14 @@ export default function MoreNavigator() {
       <Stack.Screen name="TaskList" component={TaskListScreen} />
       <Stack.Screen name="TaskDetail" component={TaskDetailScreen} />
       <Stack.Screen name="LogTime" component={LogTimeScreen} />
+      <Stack.Screen name="AddAttachment" component={AddAttachmentScreen} />
       <Stack.Screen name="TimesheetDaily" component={TimesheetDailyScreen} />
       <Stack.Screen name="TimesheetWeekly" component={TimesheetWeeklyScreen} />
+      <Stack.Screen name="Timer" component={TimerScreen} />
+      <Stack.Screen name="TeamHours" component={TeamHoursScreen} />
+      {/* Personal & Analytics */}
+      <Stack.Screen name="PersonalNotes" component={PersonalNotesScreen} />
+      <Stack.Screen name="Analytics" component={AnalyticsScreen} />
       {/* Profile & Settings */}
       <Stack.Screen name="Profile" component={ProfileScreen} />
       <Stack.Screen name="Settings" component={SettingsScreen} />

@@ -90,8 +90,14 @@ export type MoreStackParamList = {
   TaskList: undefined;
   TaskDetail: {id: number};
   LogTime: {taskId: number; taskName: string};
+  AddAttachment: {taskId: number; taskName: string};
   TimesheetDaily: {date?: string};
   TimesheetWeekly: undefined;
+  Timer: undefined;
+  TeamHours: undefined;
+  // Personal & Analytics
+  PersonalNotes: undefined;
+  Analytics: undefined;
   // Profile & Settings
   Profile: undefined;
   Settings: undefined;

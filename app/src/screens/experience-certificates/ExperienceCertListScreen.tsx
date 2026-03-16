@@ -109,12 +109,12 @@ export default function ExperienceCertListScreen() {
             onPress={() => navigation.navigate('ExperienceCertDetail', {id: item.id})}>
             <View style={styles.cardTop}>
               <Text style={[styles.directedTo, {color: theme.text}]} numberOfLines={1}>
-                {item.directed_to}
+                {item.title}
               </Text>
               <StatusChip status={item.status} label={t(`common.status.${item.status}`)} />
             </View>
             <Text style={[styles.detail, {color: theme.textSecondary}]}>
-              {t('common.date')}: {item.request_date}
+              {item.request_date}{'  ·  '}{item.directed_to}
             </Text>
           </TouchableOpacity>
         )}
