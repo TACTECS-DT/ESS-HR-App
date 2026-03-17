@@ -25,6 +25,7 @@ import {useTheme} from '../../hooks/useTheme';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {TasksStackParamList} from '../../navigation/types';
 import type {Task} from '../../api/mocks/tasks.mock';
+import type {DailyTimesheetSummary} from '../../api/mocks/timesheets.mock';
 
 type Route = RouteProp<TasksStackParamList, 'LogTime'>;
 
@@ -42,11 +43,20 @@ export default function LogTimeScreen() {
   const navigation = useNavigation();
   const route = useRoute<Route>();
   const queryClient = useQueryClient();
-  const {taskId, taskName} = route.params;
+
+  const paramTaskId = route.params?.taskId ?? 0;
+  const paramTaskName = route.params?.taskName ?? '';
+  const isStandalone = !paramTaskId;
 
   const [date, setDate] = useState(getTodayString());
   const [hoursNum, setHoursNum] = useState<number>(1.0);
   const [description, setDescription] = useState('');
+
+  // Standalone mode state
+  const [selectedProject, setSelectedProject] = useState<string>('');
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [showProjectPicker, setShowProjectPicker] = useState(false);
+  const [showTaskPicker, setShowTaskPicker] = useState(false);
 
   const {data: tasks} = useQuery({
     queryKey: ['tasks'],
@@ -55,9 +65,30 @@ export default function LogTimeScreen() {
       return isApiSuccess(res.data) ? (res.data.data as Task[]) : [];
     },
   });
-  const currentTask = tasks?.find(tk => tk.id === taskId);
+
+  // Derive unique project names
+  const projects = [...new Set((tasks ?? []).map(tk => tk.project))];
+  const tasksForProject = (tasks ?? []).filter(tk => tk.project === selectedProject);
+
+  const resolvedTaskId = isStandalone ? (selectedTask?.id ?? 0) : paramTaskId;
+  const resolvedTaskName = isStandalone ? (selectedTask?.name ?? '') : paramTaskName;
+
+  const currentTask = (tasks ?? []).find(tk => tk.id === resolvedTaskId);
   const taskTotal = currentTask?.total_hours_logged ?? 0;
   const newTaskTotal = parseFloat((taskTotal + hoursNum).toFixed(2));
+
+  const {data: timesheets} = useQuery({
+    queryKey: ['timesheets'],
+    queryFn: async () => {
+      const res = await apiClient.get('/timesheets');
+      return isApiSuccess(res.data) ? (res.data.data as DailyTimesheetSummary[]) : [];
+    },
+  });
+
+  const todayExistingHours = (timesheets ?? [])
+    .filter(day => day.date === date)
+    .reduce((sum, day) => sum + day.total_hours, 0);
+  const todayNewTotal = parseFloat((todayExistingHours + hoursNum).toFixed(2));
 
   function stepHours(delta: number) {
     setHoursNum(prev => {
@@ -69,7 +100,7 @@ export default function LogTimeScreen() {
   const mutation = useMutation({
     mutationFn: async () => {
       const res = await apiClient.post('/timesheets', {
-        task_id: taskId,
+        task_id: resolvedTaskId,
         date,
         hours: hoursNum,
         description,
@@ -90,6 +121,10 @@ export default function LogTimeScreen() {
       Alert.alert(t('common.error'), 'Please select a date');
       return;
     }
+    if (isStandalone && !selectedTask) {
+      Alert.alert(t('common.error'), t('tasks.task'));
+      return;
+    }
     mutation.mutate();
   }
 
@@ -100,10 +135,81 @@ export default function LogTimeScreen() {
       <ScreenHeader title={t('tasks.logTime')} showBack />
       <ScrollView contentContainerStyle={styles.content}>
 
-        <Card style={styles.taskCard}>
-          <Text style={[styles.taskLabel, {color: theme.textSecondary}]}>{t('tasks.task')}</Text>
-          <Text style={[styles.taskName, {color: theme.text}]}>{taskName}</Text>
-        </Card>
+        {isStandalone ? (
+          <>
+            {/* Project picker */}
+            <View style={[styles.pickerCard, {backgroundColor: theme.surface, borderColor: theme.border}]}>
+              <Text style={[styles.pickerLabel, {color: theme.textSecondary}]}>{t('tasks.project')}</Text>
+              <TouchableOpacity
+                style={[styles.pickerRow, {borderColor: theme.border}]}
+                onPress={() => {setShowProjectPicker(p => !p); setShowTaskPicker(false);}}>
+                <Text style={[styles.pickerValue, {color: selectedProject ? theme.text : theme.textSecondary}]}>
+                  {selectedProject || '— ' + t('tasks.project') + ' —'}
+                </Text>
+                <Text style={[styles.pickerArrow, {color: theme.textSecondary}]}>
+                  {showProjectPicker ? '▴' : '▾'}
+                </Text>
+              </TouchableOpacity>
+              {showProjectPicker && (
+                <View style={[styles.dropdownList, {borderColor: theme.border, backgroundColor: theme.surface}]}>
+                  {projects.map(proj => (
+                    <TouchableOpacity
+                      key={proj}
+                      style={[styles.dropdownItem, {borderBottomColor: theme.border}, selectedProject === proj && {backgroundColor: colors.primary + '12'}]}
+                      onPress={() => {
+                        setSelectedProject(proj);
+                        setSelectedTask(null);
+                        setShowProjectPicker(false);
+                      }}>
+                      <Text style={[styles.dropdownItemText, {color: selectedProject === proj ? colors.primary : theme.text}]}>
+                        {proj}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
+            </View>
+
+            {/* Task picker */}
+            <View style={[styles.pickerCard, {backgroundColor: theme.surface, borderColor: theme.border}]}>
+              <Text style={[styles.pickerLabel, {color: theme.textSecondary}]}>{t('tasks.task')}</Text>
+              <TouchableOpacity
+                style={[styles.pickerRow, {borderColor: theme.border}, !selectedProject && styles.pickerDisabled]}
+                disabled={!selectedProject}
+                onPress={() => {setShowTaskPicker(p => !p); setShowProjectPicker(false);}}>
+                <Text style={[styles.pickerValue, {color: selectedTask ? theme.text : theme.textSecondary}]}>
+                  {selectedTask ? selectedTask.name : '— ' + t('tasks.task') + ' —'}
+                </Text>
+                <Text style={[styles.pickerArrow, {color: theme.textSecondary}]}>
+                  {showTaskPicker ? '▴' : '▾'}
+                </Text>
+              </TouchableOpacity>
+              {showTaskPicker && (
+                <View style={[styles.dropdownList, {borderColor: theme.border, backgroundColor: theme.surface}]}>
+                  {tasksForProject.map(tk => (
+                    <TouchableOpacity
+                      key={tk.id}
+                      style={[styles.dropdownItem, {borderBottomColor: theme.border}, selectedTask?.id === tk.id && {backgroundColor: colors.primary + '12'}]}
+                      onPress={() => {
+                        setSelectedTask(tk);
+                        setShowTaskPicker(false);
+                      }}>
+                      <Text style={[styles.dropdownItemText, {color: selectedTask?.id === tk.id ? colors.primary : theme.text}]}>
+                        {tk.name}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
+            </View>
+          </>
+        ) : (
+          /* Pre-selected task card (from task detail) */
+          <Card style={styles.taskCard}>
+            <Text style={[styles.taskLabel, {color: theme.textSecondary}]}>{t('tasks.task')}</Text>
+            <Text style={[styles.taskName, {color: theme.text}]}>{resolvedTaskName}</Text>
+          </Card>
+        )}
 
         <DatePickerField
           label={`${t('common.date')} *`}
@@ -147,8 +253,8 @@ export default function LogTimeScreen() {
             </View>
             <View style={styles.summaryDivider} />
             <View style={styles.summaryItem}>
-              <Text style={styles.summaryLabel}>{t('tasks.hours')}</Text>
-              <Text style={[styles.summaryValue, {color: '#fde68a'}]}>+{hoursNum.toFixed(2)}h</Text>
+              <Text style={styles.summaryLabel}>{t('tasks.todayTotal')}</Text>
+              <Text style={[styles.summaryValue, {color: '#fde68a'}]}>{todayNewTotal}h</Text>
             </View>
           </View>
         </View>
@@ -175,6 +281,26 @@ const styles = StyleSheet.create({
   taskCard: {gap: spacing.xs},
   taskLabel: {fontSize: fontSize.xs},
   taskName: {fontSize: fontSize.md, fontWeight: '700'},
+  pickerCard: {borderRadius: radius.md, borderWidth: 1, padding: spacing.md, gap: spacing.xs},
+  pickerLabel: {fontSize: fontSize.xs, fontWeight: '600'},
+  pickerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: radius.sm,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.sm,
+  },
+  pickerDisabled: {opacity: 0.45},
+  pickerValue: {fontSize: fontSize.sm, flex: 1},
+  pickerArrow: {fontSize: fontSize.sm},
+  dropdownList: {borderWidth: 1, borderRadius: radius.sm, marginTop: spacing.xs, overflow: 'hidden'},
+  dropdownItem: {
+    padding: spacing.sm,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  dropdownItemText: {fontSize: fontSize.sm},
   stepperContainer: {
     borderRadius: radius.md,
     borderWidth: 1,

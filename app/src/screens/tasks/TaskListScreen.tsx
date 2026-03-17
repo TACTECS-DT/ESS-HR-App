@@ -18,6 +18,7 @@ import ScreenHeader from '../../components/common/ScreenHeader';
 import StatusChip from '../../components/common/StatusChip';
 import EmptyState from '../../components/common/EmptyState';
 import LoadingSkeleton from '../../components/common/LoadingSkeleton';
+import TimerBar from '../../components/common/TimerBar';
 import {useTheme} from '../../hooks/useTheme';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {TasksStackParamList} from '../../navigation/types';
@@ -97,6 +98,8 @@ export default function TaskListScreen() {
           </TouchableOpacity>
         }
       />
+
+      <TimerBar />
 
       {/* Stats summary */}
       <View style={[styles.statsCard, {backgroundColor: theme.surface, borderColor: theme.border}]}>

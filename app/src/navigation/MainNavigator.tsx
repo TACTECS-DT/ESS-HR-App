@@ -73,8 +73,8 @@ export default function MainNavigator() {
         name="MoreTab"
         component={MoreNavigator}
         options={{
-          tabBarLabel: t('home.more'),
-          tabBarIcon: ({focused}) => <TabIcon emoji="☰" focused={focused} />,
+          tabBarButton: () => null,
+          tabBarItemStyle: {display: 'none', width: 0},
         }}
       />
     </Tab.Navigator>

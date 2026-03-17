@@ -89,8 +89,8 @@ export type MoreStackParamList = {
   // Tasks & Timesheets
   TaskList: undefined;
   TaskDetail: {id: number};
-  LogTime: {taskId: number; taskName: string};
-  AddAttachment: {taskId: number; taskName: string};
+  LogTime: {taskId?: number; taskName?: string};
+  AddAttachment: {taskId?: number; taskName?: string};
   TimesheetDaily: {date?: string};
   TimesheetWeekly: undefined;
   Timer: undefined;
@@ -113,3 +113,6 @@ export type RootStackParamList = {
 
 // kept for backward compat (RequestsHubScreen still imports this)
 export type RequestsStackParamList = MoreStackParamList & {RequestsHub: undefined};
+
+// kept for backward compat (Tasks/Timesheet screens still import this)
+export type TasksStackParamList = MoreStackParamList;

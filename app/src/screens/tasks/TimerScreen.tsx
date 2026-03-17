@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -13,11 +13,13 @@ import {useQuery} from '@tanstack/react-query';
 import apiClient from '../../api/client';
 import {isApiSuccess} from '../../types/api';
 import ScreenHeader from '../../components/common/ScreenHeader';
+import Button from '../../components/common/Button';
 import {useTheme} from '../../hooks/useTheme';
 import {useAppSelector} from '../../hooks/useAppSelector';
 import {useAppDispatch} from '../../hooks/useAppDispatch';
-import {stopTimer, pauseTimer, resumeTimer, tickTimer} from '../../store/slices/timerSlice';
+import {startTimer, stopTimer, pauseTimer, resumeTimer, tickTimer} from '../../store/slices/timerSlice';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
+import type {Task} from '../../api/mocks/tasks.mock';
 import type {DailyTimesheetSummary} from '../../api/mocks/timesheets.mock';
 
 function formatTime(seconds: number): string {
@@ -48,12 +50,26 @@ export default function TimerScreen() {
   const dispatch = useAppDispatch();
   const timerState = useAppSelector(state => state.timer);
 
+  // Pickers for starting a new timer
+  const [selectedProject, setSelectedProject] = useState('');
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [showProjectPicker, setShowProjectPicker] = useState(false);
+  const [showTaskPicker, setShowTaskPicker] = useState(false);
+
   // Keep ticking
   useEffect(() => {
     if (!timerState.running) {return;}
     const interval = setInterval(() => dispatch(tickTimer()), 1000);
     return () => clearInterval(interval);
   }, [timerState.running, dispatch]);
+
+  const {data: tasks} = useQuery({
+    queryKey: ['tasks'],
+    queryFn: async () => {
+      const res = await apiClient.get('/tasks');
+      return isApiSuccess(res.data) ? (res.data.data as Task[]) : [];
+    },
+  });
 
   const {data: timesheets} = useQuery({
     queryKey: ['timesheets'],
@@ -63,23 +79,31 @@ export default function TimerScreen() {
     },
   });
 
-  // Collect recent entries for the active task
+  const projects = [...new Set((tasks ?? []).map(tk => tk.project))];
+  const tasksForProject = (tasks ?? []).filter(tk => tk.project === selectedProject);
+
   const recentEntries = (timesheets ?? [])
     .flatMap(day => day.entries.map(e => ({...e, day: day.date})))
     .filter(e => timerState.taskId ? e.task_id === timerState.taskId : true)
     .slice(0, 3);
 
+  const todayStr = new Date().toISOString().split('T')[0];
+  const previousSessionsSeconds = (timesheets ?? [])
+    .filter(day => day.date === todayStr)
+    .flatMap(day => day.entries)
+    .filter(e => timerState.taskId ? e.task_id === timerState.taskId : true)
+    .reduce((sum, e) => sum + e.hours * 3600, 0);
+
+  function handleStart() {
+    if (!selectedTask) {return;}
+    dispatch(startTimer({taskId: selectedTask.id, taskName: selectedTask.name}));
+    setSelectedProject('');
+    setSelectedTask(null);
+  }
+
   function handleStop() {
     dispatch(stopTimer());
     navigation.goBack();
-  }
-
-  function handlePause() {
-    dispatch(pauseTimer());
-  }
-
-  function handleResume() {
-    dispatch(resumeTimer());
   }
 
   const isActive = timerState.running;
@@ -99,29 +123,31 @@ export default function TimerScreen() {
           <>
             {/* Main timer card */}
             <View style={[styles.timerCard, {backgroundColor: colors.primary}]}>
-              <Text style={styles.taskName} numberOfLines={2}>{timerState.taskName ?? ''}</Text>
+              {timerState.taskName ? (
+                <Text style={styles.taskName} numberOfLines={2}>{timerState.taskName}</Text>
+              ) : null}
+
+              {/* Status dot */}
+              <View style={[styles.statusDot, {backgroundColor: isActive ? '#4ade80' : '#fbbf24'}]} />
 
               <Text style={styles.timerDisplay}>{formatTime(timerState.elapsedSeconds)}</Text>
 
-              <View style={styles.statusRow}>
-                <View style={[styles.statusDot, {backgroundColor: isActive ? '#4ade80' : '#fbbf24'}]} />
-                <Text style={styles.statusText}>
-                  {isActive ? t('timer.running') : t('timer.paused')}
-                </Text>
-              </View>
+              <Text style={styles.statusText}>
+                {isActive ? t('timer.running') : t('timer.paused')}
+              </Text>
 
               {isActive ? (
                 <Text style={styles.startedAt}>{t('timer.startedAt')}: {startedAtLabel}</Text>
               ) : null}
 
-              {/* Controls row */}
+              {/* Controls */}
               <View style={styles.controls}>
                 {isActive ? (
-                  <TouchableOpacity style={styles.pauseBtn} onPress={handlePause}>
+                  <TouchableOpacity style={styles.pauseBtn} onPress={() => dispatch(pauseTimer())}>
                     <Text style={styles.controlBtnText}>{'⏸  '}{t('timer.pause')}</Text>
                   </TouchableOpacity>
                 ) : (
-                  <TouchableOpacity style={styles.pauseBtn} onPress={handleResume}>
+                  <TouchableOpacity style={styles.pauseBtn} onPress={() => dispatch(resumeTimer())}>
                     <Text style={styles.controlBtnText}>{'▶  '}{t('timer.resume')}</Text>
                   </TouchableOpacity>
                 )}
@@ -140,11 +166,19 @@ export default function TimerScreen() {
                   {formatHoursLabel(timerState.elapsedSeconds)}
                 </Text>
               </View>
+              {previousSessionsSeconds > 0 ? (
+                <View style={styles.infoRow}>
+                  <Text style={[styles.infoLabel, {color: theme.textSecondary}]}>{t('timer.previousSessions')}</Text>
+                  <Text style={[styles.infoValue, {color: theme.textSecondary}]}>
+                    {formatHoursLabel(previousSessionsSeconds)}
+                  </Text>
+                </View>
+              ) : null}
               <View style={[styles.divider, {backgroundColor: theme.border}]} />
               <View style={styles.infoRow}>
                 <Text style={[styles.infoLabel, {color: theme.text}]}>{t('timer.totalToday')}</Text>
                 <Text style={[styles.infoValueLarge, {color: theme.text}]}>
-                  {formatHoursLabel(timerState.elapsedSeconds)}
+                  {formatHoursLabel(timerState.elapsedSeconds + previousSessionsSeconds)}
                 </Text>
               </View>
             </View>
@@ -182,13 +216,89 @@ export default function TimerScreen() {
             </View>
           </>
         ) : (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyIcon}>⏱️</Text>
-            <Text style={[styles.emptyTitle, {color: theme.text}]}>{t('timer.noTimer')}</Text>
-            <Text style={[styles.emptySubtitle, {color: theme.textSecondary}]}>
-              {t('timer.startFromTask')}
-            </Text>
-          </View>
+          <>
+            {/* Empty state with start-timer form */}
+            <View style={styles.emptyHeader}>
+              <Text style={styles.emptyIcon}>⏱️</Text>
+              <Text style={[styles.emptyTitle, {color: theme.text}]}>{t('timer.noTimer')}</Text>
+              <Text style={[styles.emptySubtitle, {color: theme.textSecondary}]}>
+                {t('timer.startFromTask')}
+              </Text>
+            </View>
+
+            {/* Project picker */}
+            <View style={[styles.pickerCard, {backgroundColor: theme.surface, borderColor: theme.border}]}>
+              <Text style={[styles.pickerLabel, {color: theme.textSecondary}]}>{t('tasks.project')}</Text>
+              <TouchableOpacity
+                style={[styles.pickerRow, {borderColor: theme.border}]}
+                onPress={() => {setShowProjectPicker(p => !p); setShowTaskPicker(false);}}>
+                <Text style={[styles.pickerValue, {color: selectedProject ? theme.text : theme.textSecondary}]}>
+                  {selectedProject || '— ' + t('tasks.project') + ' —'}
+                </Text>
+                <Text style={[styles.pickerArrow, {color: theme.textSecondary}]}>
+                  {showProjectPicker ? '▴' : '▾'}
+                </Text>
+              </TouchableOpacity>
+              {showProjectPicker && (
+                <View style={[styles.dropdownList, {borderColor: theme.border, backgroundColor: theme.surface}]}>
+                  {projects.map(proj => (
+                    <TouchableOpacity
+                      key={proj}
+                      style={[styles.dropdownItem, {borderBottomColor: theme.border}, selectedProject === proj && {backgroundColor: colors.primary + '12'}]}
+                      onPress={() => {
+                        setSelectedProject(proj);
+                        setSelectedTask(null);
+                        setShowProjectPicker(false);
+                      }}>
+                      <Text style={[styles.dropdownItemText, {color: selectedProject === proj ? colors.primary : theme.text}]}>
+                        {proj}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
+            </View>
+
+            {/* Task picker */}
+            <View style={[styles.pickerCard, {backgroundColor: theme.surface, borderColor: theme.border}]}>
+              <Text style={[styles.pickerLabel, {color: theme.textSecondary}]}>{t('tasks.task')}</Text>
+              <TouchableOpacity
+                style={[styles.pickerRow, {borderColor: theme.border}, !selectedProject && styles.pickerDisabled]}
+                disabled={!selectedProject}
+                onPress={() => {setShowTaskPicker(p => !p); setShowProjectPicker(false);}}>
+                <Text style={[styles.pickerValue, {color: selectedTask ? theme.text : theme.textSecondary}]}>
+                  {selectedTask ? selectedTask.name : '— ' + t('tasks.task') + ' —'}
+                </Text>
+                <Text style={[styles.pickerArrow, {color: theme.textSecondary}]}>
+                  {showTaskPicker ? '▴' : '▾'}
+                </Text>
+              </TouchableOpacity>
+              {showTaskPicker && (
+                <View style={[styles.dropdownList, {borderColor: theme.border, backgroundColor: theme.surface}]}>
+                  {tasksForProject.map(tk => (
+                    <TouchableOpacity
+                      key={tk.id}
+                      style={[styles.dropdownItem, {borderBottomColor: theme.border}, selectedTask?.id === tk.id && {backgroundColor: colors.primary + '12'}]}
+                      onPress={() => {
+                        setSelectedTask(tk);
+                        setShowTaskPicker(false);
+                      }}>
+                      <Text style={[styles.dropdownItemText, {color: selectedTask?.id === tk.id ? colors.primary : theme.text}]}>
+                        {tk.name}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
+            </View>
+
+            <Button
+              label={'▶  ' + t('tasks.startTimer')}
+              onPress={handleStart}
+              disabled={!selectedTask}
+              fullWidth
+            />
+          </>
         )}
       </ScrollView>
     </View>
@@ -198,13 +308,16 @@ export default function TimerScreen() {
 const styles = StyleSheet.create({
   container: {flex: 1},
   content: {padding: spacing.md, gap: spacing.md, alignItems: 'stretch'},
+
+  // Timer running view
   timerCard: {
     borderRadius: radius.xl,
     padding: spacing.xl,
     alignItems: 'center',
-    gap: spacing.md,
+    gap: spacing.sm,
   },
   taskName: {color: 'rgba(255,255,255,0.85)', fontSize: fontSize.md, textAlign: 'center'},
+  statusDot: {width: 10, height: 10, borderRadius: 5},
   timerDisplay: {
     color: '#fff',
     fontSize: 56,
@@ -212,8 +325,6 @@ const styles = StyleSheet.create({
     fontVariant: ['tabular-nums'],
     letterSpacing: 2,
   },
-  statusRow: {flexDirection: 'row', alignItems: 'center', gap: spacing.xs},
-  statusDot: {width: 8, height: 8, borderRadius: 4},
   statusText: {color: 'rgba(255,255,255,0.9)', fontSize: fontSize.sm},
   startedAt: {color: 'rgba(255,255,255,0.7)', fontSize: fontSize.xs},
   controls: {flexDirection: 'row', gap: spacing.sm, marginTop: spacing.sm},
@@ -252,8 +363,29 @@ const styles = StyleSheet.create({
   hoursBadge: {paddingHorizontal: spacing.sm, paddingVertical: 4, borderRadius: radius.sm},
   tipCard: {borderRadius: radius.md, borderWidth: 1, padding: spacing.md},
   tipText: {fontSize: fontSize.xs, lineHeight: 18, color: '#92400e'},
-  emptyState: {paddingTop: 80, alignItems: 'center', gap: spacing.md},
-  emptyIcon: {fontSize: 64},
+
+  // Empty state / start timer
+  emptyHeader: {alignItems: 'center', gap: spacing.sm, paddingTop: spacing.lg, paddingBottom: spacing.xs},
+  emptyIcon: {fontSize: 56},
   emptyTitle: {fontSize: fontSize.xl, fontWeight: '700'},
-  emptySubtitle: {fontSize: fontSize.sm, textAlign: 'center'},
+  emptySubtitle: {fontSize: fontSize.sm, textAlign: 'center', color: '#666'},
+
+  // Pickers
+  pickerCard: {borderRadius: radius.md, borderWidth: 1, padding: spacing.md, gap: spacing.xs},
+  pickerLabel: {fontSize: fontSize.xs, fontWeight: '600'},
+  pickerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: radius.sm,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.sm,
+  },
+  pickerDisabled: {opacity: 0.45},
+  pickerValue: {fontSize: fontSize.sm, flex: 1},
+  pickerArrow: {fontSize: fontSize.sm},
+  dropdownList: {borderWidth: 1, borderRadius: radius.sm, marginTop: spacing.xs, overflow: 'hidden'},
+  dropdownItem: {padding: spacing.sm, borderBottomWidth: StyleSheet.hairlineWidth},
+  dropdownItemText: {fontSize: fontSize.sm},
 });

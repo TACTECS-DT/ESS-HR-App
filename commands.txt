@@ -10,6 +10,7 @@ Password: anything except "wrong" → logs in successfully
 
      emulator -list-avds
      emulator -avd Pixel_9a
+emulator -avd Pixel_9a -no-snapshot-load
 
 --Run app vs code another terminal terminal::
 

@@ -119,7 +119,7 @@ export default function ExpenseDetailScreen() {
             />
           ) : null}
           <InfoRow
-            label={t('loan.amount')}
+            label={t('expense.total')}
             value={`${total.toLocaleString()} ${expense.currency}`}
             valueColor={theme.text}
             theme={theme}
@@ -152,7 +152,7 @@ export default function ExpenseDetailScreen() {
                 <View style={{flex: 1}}>
                   <Text style={[styles.receiptName, {color: theme.text}]} numberOfLines={1}>{att}</Text>
                   <Text style={[styles.receiptTap, {color: colors.primary}]}>
-                    {t('common.edit')}
+                    {t('expense.tapToView')}
                   </Text>
                 </View>
               </TouchableOpacity>
@@ -170,10 +170,11 @@ export default function ExpenseDetailScreen() {
           <>
             <Text style={[styles.sectionTitle, {color: theme.text}]}>{t('leave.approvalHistory')}</Text>
             <View style={[styles.card, {backgroundColor: theme.surface, borderColor: theme.border}]}>
-              {/* submitted step always shown */}
+              {/* Submitted step — always shown */}
               <View style={styles.timelineItem}>
                 <View style={styles.timelineLeft}>
                   <View style={[styles.dot, {backgroundColor: colors.success}]} />
+                  <View style={[styles.line, {backgroundColor: theme.border}]} />
                 </View>
                 <View style={styles.timelineContent}>
                   <Text style={[styles.stepText, {color: theme.text}]}>Submitted</Text>
@@ -181,6 +182,21 @@ export default function ExpenseDetailScreen() {
                   <Text style={[styles.stepDate, {color: theme.textSecondary}]}>{expense.date}</Text>
                 </View>
               </View>
+              {/* Report Created — shown when a report was auto-generated */}
+              {expense.expense_report_id ? (
+                <View style={styles.timelineItem}>
+                  <View style={styles.timelineLeft}>
+                    <View style={[styles.dot, {backgroundColor: colors.success}]} />
+                    <View style={[styles.line, {backgroundColor: theme.border}]} />
+                  </View>
+                  <View style={styles.timelineContent}>
+                    <Text style={[styles.stepText, {color: theme.text}]}>{t('expense.reportCreated')}</Text>
+                    <StatusChip status="approved" label={t('common.done')} />
+                    <Text style={[styles.stepDate, {color: theme.textSecondary}]}>Auto-generated</Text>
+                  </View>
+                </View>
+              ) : null}
+              {/* Manager Review */}
               {['submitted', 'approved', 'posted'].includes(expense.status) ? (
                 <View style={styles.timelineItem}>
                   <View style={styles.timelineLeft}>
@@ -253,6 +269,7 @@ const styles = StyleSheet.create({
   timelineItem: {flexDirection: 'row', gap: spacing.sm, minHeight: 48},
   timelineLeft: {alignItems: 'center', width: 16},
   dot: {width: 12, height: 12, borderRadius: 6, marginTop: 3},
+  line: {flex: 1, width: 2, marginTop: 4},
   timelineContent: {flex: 1, gap: 4, paddingBottom: spacing.sm},
   stepText: {fontSize: fontSize.sm, fontWeight: '600'},
   stepDate: {fontSize: fontSize.xs},

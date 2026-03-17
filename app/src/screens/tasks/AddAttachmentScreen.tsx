@@ -26,7 +26,7 @@ type Route = RouteProp<MoreStackParamList, 'AddAttachment'>;
 const UPLOAD_OPTIONS = [
   {key: 'camera', icon: '📷'},
   {key: 'gallery', icon: '🖼️'},
-  {key: 'files', icon: '📄'},
+  {key: 'files', icon: '📁'},
 ] as const;
 
 export default function AddAttachmentScreen() {
@@ -35,9 +35,14 @@ export default function AddAttachmentScreen() {
   const navigation = useNavigation();
   const route = useRoute<Route>();
   const queryClient = useQueryClient();
-  const {taskId, taskName} = route.params;
+
+  const paramTaskId = route.params?.taskId ?? 0;
+  const paramTaskName = route.params?.taskName ?? '';
+  const isStandalone = !paramTaskId;
 
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [showTaskPicker, setShowTaskPicker] = useState(false);
 
   const {data: tasks} = useQuery({
     queryKey: ['tasks'],
@@ -47,16 +52,20 @@ export default function AddAttachmentScreen() {
     },
   });
 
-  const currentTask = tasks?.find(tk => tk.id === taskId);
+  const resolvedTaskId = isStandalone ? (selectedTask?.id ?? 0) : paramTaskId;
+  const resolvedTaskName = isStandalone ? (selectedTask?.name ?? '') : paramTaskName;
+  const resolvedProject = isStandalone ? (selectedTask?.project ?? '') : '';
+
+  const currentTask = (tasks ?? []).find(tk => tk.id === resolvedTaskId);
   const existingAttachments = currentTask?.attachments ?? [];
 
   const fakeFileName = selectedOption
-    ? `attachment_${taskId}.${selectedOption === 'files' ? 'pdf' : 'jpg'}`
+    ? `attachment_${resolvedTaskId}.${selectedOption === 'files' ? 'pdf' : 'jpg'}`
     : '';
 
   const uploadMutation = useMutation({
     mutationFn: async () => {
-      await apiClient.post(`/tasks/${taskId}/attachments`, {
+      await apiClient.post(`/tasks/${resolvedTaskId}/attachments`, {
         file_name: fakeFileName,
         source: selectedOption,
       });
@@ -70,6 +79,10 @@ export default function AddAttachmentScreen() {
   });
 
   function handleUpload() {
+    if (isStandalone && !selectedTask) {
+      Alert.alert(t('common.error'), t('tasks.task'));
+      return;
+    }
     if (!selectedOption) {
       Alert.alert(t('common.error'), t('tasks.tapToSelect'));
       return;
@@ -82,16 +95,66 @@ export default function AddAttachmentScreen() {
       <ScreenHeader title={t('tasks.addAttachment')} showBack />
       <ScrollView contentContainerStyle={styles.content}>
 
-        {/* Task info */}
-        <View style={[styles.taskCard, {backgroundColor: theme.surface, borderColor: theme.border}]}>
-          <Text style={[styles.taskLabel, {color: theme.textSecondary}]}>{t('tasks.task')}</Text>
-          <Text style={[styles.taskName, {color: theme.text}]}>{taskName}</Text>
-        </View>
+        {isStandalone ? (
+          /* Task picker for standalone mode */
+          <View style={[styles.pickerCard, {backgroundColor: theme.surface, borderColor: theme.border}]}>
+            <Text style={[styles.pickerLabel, {color: theme.textSecondary}]}>{t('tasks.task')}</Text>
+            <TouchableOpacity
+              style={[styles.pickerRow, {borderColor: theme.border}]}
+              onPress={() => setShowTaskPicker(p => !p)}>
+              <Text style={[styles.pickerValue, {color: selectedTask ? theme.text : theme.textSecondary}]}>
+                {selectedTask ? selectedTask.name : '— ' + t('tasks.task') + ' —'}
+              </Text>
+              <Text style={[styles.pickerArrow, {color: theme.textSecondary}]}>
+                {showTaskPicker ? '▴' : '▾'}
+              </Text>
+            </TouchableOpacity>
+            {showTaskPicker && (
+              <View style={[styles.dropdownList, {borderColor: theme.border, backgroundColor: theme.surface}]}>
+                {(tasks ?? []).map(tk => (
+                  <TouchableOpacity
+                    key={tk.id}
+                    style={[styles.dropdownItem, {borderBottomColor: theme.border}, selectedTask?.id === tk.id && {backgroundColor: colors.primary + '12'}]}
+                    onPress={() => {
+                      setSelectedTask(tk);
+                      setShowTaskPicker(false);
+                    }}>
+                    <Text style={[styles.dropdownItemText, {color: selectedTask?.id === tk.id ? colors.primary : theme.text}]}>
+                      {tk.name}
+                    </Text>
+                    <Text style={[styles.dropdownItemSub, {color: theme.textSecondary}]}>
+                      {'📁 '}{tk.project}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+          </View>
+        ) : (
+          /* Pre-selected task info */
+          <View style={[styles.taskCard, {backgroundColor: theme.surface, borderColor: theme.border}]}>
+            <Text style={[styles.taskLabel, {color: theme.textSecondary}]}>{t('tasks.task')}</Text>
+            <Text style={[styles.taskName, {color: theme.text}]}>{resolvedTaskName}</Text>
+            {resolvedProject ? (
+              <Text style={[styles.taskProject, {color: theme.textSecondary}]}>{'📁 '}{resolvedProject}</Text>
+            ) : null}
+          </View>
+        )}
 
         {/* Large upload area */}
         <TouchableOpacity
-          style={[styles.uploadArea, {borderColor: selectedOption ? colors.primary : theme.border, backgroundColor: selectedOption ? colors.primary + '08' : theme.surface}]}
-          onPress={() => setSelectedOption(prev => prev ?? 'files')}
+          style={[
+            styles.uploadArea,
+            {
+              borderColor: selectedOption ? colors.primary : theme.border,
+              backgroundColor: selectedOption ? colors.primary + '08' : theme.surface,
+            },
+            (isStandalone && !selectedTask) && styles.uploadAreaDisabled,
+          ]}
+          onPress={() => {
+            if (isStandalone && !selectedTask) {return;}
+            setSelectedOption(prev => prev ?? 'files');
+          }}
           activeOpacity={0.7}>
           <Text style={styles.uploadIcon}>📤</Text>
           <Text style={[styles.uploadText, {color: selectedOption ? colors.primary : theme.text}]}>
@@ -106,13 +169,16 @@ export default function AddAttachmentScreen() {
         <View style={styles.optionsGrid}>
           {UPLOAD_OPTIONS.map(opt => {
             const isSelected = selectedOption === opt.key;
+            const isDisabled = isStandalone && !selectedTask;
             return (
               <TouchableOpacity
                 key={opt.key}
+                disabled={isDisabled}
                 style={[
                   styles.optionCard,
                   {backgroundColor: theme.surface, borderColor: isSelected ? colors.primary : theme.border},
                   isSelected && {backgroundColor: colors.primary + '10'},
+                  isDisabled && {opacity: 0.45},
                 ]}
                 onPress={() => setSelectedOption(opt.key)}>
                 <Text style={styles.optionIcon}>{opt.icon}</Text>
@@ -135,7 +201,7 @@ export default function AddAttachmentScreen() {
               </Text>
             </View>
             <TouchableOpacity onPress={() => setSelectedOption(null)} hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
-              <Text style={[{color: theme.textSecondary, fontSize: fontSize.lg}]}>✕</Text>
+              <Text style={{color: theme.textSecondary, fontSize: fontSize.lg}}>✕</Text>
             </TouchableOpacity>
           </View>
         ) : null}
@@ -145,17 +211,24 @@ export default function AddAttachmentScreen() {
           onPress={handleUpload}
           loading={uploadMutation.isPending}
           fullWidth
-          disabled={!selectedOption}
+          disabled={!selectedOption || (isStandalone && !selectedTask)}
         />
 
         {/* Existing attachments */}
         {existingAttachments.length > 0 ? (
           <>
-            <Text style={[styles.sectionTitle, {color: theme.text}]}>{t('tasks.currentAttachments')}</Text>
+            <Text style={[styles.sectionTitle, {color: theme.text}]}>
+              {t('tasks.currentAttachments')}
+              {' ('}
+              {existingAttachments.length}
+              {')'}
+            </Text>
             <View style={[styles.attachmentsCard, {backgroundColor: theme.surface, borderColor: theme.border}]}>
               {existingAttachments.map((att, idx) => (
                 <View key={idx} style={[styles.attRow, {borderBottomColor: theme.border}]}>
-                  <Text style={{fontSize: 20}}>📎</Text>
+                  <View style={[styles.attIcon, {backgroundColor: '#e8f0fe'}]}>
+                    <Text style={{fontSize: 18}}>📄</Text>
+                  </View>
                   <View style={{flex: 1}}>
                     <Text style={[styles.attName, {color: theme.text}]} numberOfLines={1}>{att}</Text>
                   </View>
@@ -172,9 +245,27 @@ export default function AddAttachmentScreen() {
 const styles = StyleSheet.create({
   container: {flex: 1},
   content: {padding: spacing.md, gap: spacing.md, paddingBottom: spacing.xl},
+  pickerCard: {borderRadius: radius.md, borderWidth: 1, padding: spacing.md, gap: spacing.xs},
+  pickerLabel: {fontSize: fontSize.xs, fontWeight: '600'},
+  pickerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: radius.sm,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.sm,
+  },
+  pickerValue: {fontSize: fontSize.sm, flex: 1},
+  pickerArrow: {fontSize: fontSize.sm},
+  dropdownList: {borderWidth: 1, borderRadius: radius.sm, marginTop: spacing.xs, overflow: 'hidden'},
+  dropdownItem: {padding: spacing.sm, borderBottomWidth: StyleSheet.hairlineWidth, gap: 2},
+  dropdownItemText: {fontSize: fontSize.sm, fontWeight: '500'},
+  dropdownItemSub: {fontSize: fontSize.xs},
   taskCard: {borderRadius: radius.md, borderWidth: 1, padding: spacing.md, gap: spacing.xs},
   taskLabel: {fontSize: fontSize.xs},
   taskName: {fontSize: fontSize.md, fontWeight: '700'},
+  taskProject: {fontSize: fontSize.sm},
   uploadArea: {
     borderRadius: radius.lg,
     borderWidth: 2,
@@ -183,6 +274,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.sm,
   },
+  uploadAreaDisabled: {opacity: 0.45},
   uploadIcon: {fontSize: 40},
   uploadText: {fontSize: fontSize.md, fontWeight: '700', textAlign: 'center'},
   uploadSubtext: {fontSize: fontSize.sm, textAlign: 'center'},
@@ -217,5 +309,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
+  attIcon: {width: 40, height: 40, borderRadius: radius.sm, justifyContent: 'center', alignItems: 'center'},
   attName: {fontSize: fontSize.sm},
 });

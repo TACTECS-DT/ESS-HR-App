@@ -27,53 +27,55 @@ function ProgressBar({percent, color}: {percent: number; color: string}) {
 }
 
 const pbStyles = StyleSheet.create({
-  track: {height: 6, borderRadius: 3, backgroundColor: '#e5e7eb', overflow: 'hidden', flex: 1},
+  track: {height: 6, borderRadius: 3, backgroundColor: '#e5e7eb', overflow: 'hidden', marginTop: spacing.xs},
   fill: {height: '100%', borderRadius: 3},
 });
 
-function MemberRow({member, theme}: {member: TeamMemberHours; theme: any}) {
+function MemberCard({member, theme}: {member: TeamMemberHours; theme: any}) {
   const {t, i18n} = useTranslation();
   const isAr = i18n.language === 'ar';
   const isAboveTarget = member.hours >= member.target_hours;
   const barColor = isAboveTarget ? colors.success : member.percent >= 80 ? colors.warning : colors.error;
+  const hoursColor = isAboveTarget ? colors.success : member.percent >= 80 ? colors.warning : colors.error;
 
   return (
-    <View style={[memberStyles.row, {borderBottomColor: theme.border}]}>
-      <View style={[memberStyles.avatar, {backgroundColor: colors.primary + '20'}]}>
-        <Text style={[memberStyles.initials, {color: colors.primary}]}>{member.initials}</Text>
-      </View>
-      <View style={memberStyles.info}>
-        <View style={memberStyles.nameRow}>
-          <Text style={[memberStyles.name, {color: theme.text}]}>{member.name}</Text>
-          <Text style={[memberStyles.hours, {color: isAboveTarget ? colors.success : colors.warning}]}>
-            {member.hours}h
-          </Text>
+    <View style={[cardStyles.card, {backgroundColor: theme.surface, borderColor: theme.border}]}>
+      <View style={cardStyles.row}>
+        <View style={[cardStyles.avatar, {backgroundColor: colors.primary + '20'}]}>
+          <Text style={[cardStyles.initials, {color: colors.primary}]}>{member.initials}</Text>
         </View>
-        <Text style={[memberStyles.jobTitle, {color: theme.textSecondary}]}>
-          {isAr ? member.job_title_ar : member.job_title}
-        </Text>
-        <View style={memberStyles.progressRow}>
-          <ProgressBar percent={member.percent} color={barColor} />
-          <Text style={[memberStyles.percent, {color: barColor}]}>
-            {t('teamHours.percentTarget', {percent: member.percent})}
+        <View style={cardStyles.info}>
+          <View style={cardStyles.nameRow}>
+            <Text style={[cardStyles.name, {color: theme.text}]}>{member.name}</Text>
+            <View style={cardStyles.hoursBlock}>
+              <Text style={[cardStyles.hours, {color: hoursColor}]}>{member.hours}h</Text>
+              <Text style={[cardStyles.percent, {color: barColor}]}>
+                {t('teamHours.percentTarget', {percent: member.percent})}
+              </Text>
+            </View>
+          </View>
+          <Text style={[cardStyles.jobTitle, {color: theme.textSecondary}]}>
+            {isAr ? member.job_title_ar : member.job_title}
           </Text>
+          <ProgressBar percent={member.percent} color={barColor} />
         </View>
       </View>
     </View>
   );
 }
 
-const memberStyles = StyleSheet.create({
-  row: {flexDirection: 'row', gap: spacing.sm, paddingVertical: spacing.sm, borderBottomWidth: StyleSheet.hairlineWidth},
-  avatar: {width: 42, height: 42, borderRadius: 21, justifyContent: 'center', alignItems: 'center'},
+const cardStyles = StyleSheet.create({
+  card: {borderRadius: radius.lg, borderWidth: 1, padding: spacing.md},
+  row: {flexDirection: 'row', gap: spacing.sm, alignItems: 'flex-start'},
+  avatar: {width: 42, height: 42, borderRadius: 21, justifyContent: 'center', alignItems: 'center', flexShrink: 0},
   initials: {fontSize: fontSize.sm, fontWeight: '700'},
-  info: {flex: 1, gap: 3},
-  nameRow: {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'},
+  info: {flex: 1},
+  nameRow: {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start'},
   name: {fontSize: fontSize.sm, fontWeight: '600', flex: 1},
-  hours: {fontSize: fontSize.md, fontWeight: '700'},
-  jobTitle: {fontSize: fontSize.xs},
-  progressRow: {flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginTop: 2},
-  percent: {fontSize: fontSize.xs, fontWeight: '600', minWidth: 60, textAlign: 'right'},
+  hoursBlock: {alignItems: 'flex-end'},
+  hours: {fontSize: fontSize.lg, fontWeight: '700'},
+  percent: {fontSize: fontSize.xs, fontWeight: '600'},
+  jobTitle: {fontSize: fontSize.xs, marginTop: 2},
 });
 
 export default function TeamHoursScreen() {
@@ -92,10 +94,10 @@ export default function TeamHoursScreen() {
   if (isLoading) {
     return (
       <View style={[styles.container, {backgroundColor: theme.background}]}>
-        <ScreenHeader title={t('teamHours.title')} showBack />
+        <ScreenHeader title={t('teamHours.title')} showBack rightIcon="📊" />
         <View style={styles.skeletons}>
           <LoadingSkeleton height={100} style={styles.skeleton} />
-          {[0, 1, 2, 3, 4].map(i => <LoadingSkeleton key={i} height={70} style={styles.skeleton} />)}
+          {[0, 1, 2, 3, 4].map(i => <LoadingSkeleton key={i} height={80} style={styles.skeleton} />)}
         </View>
       </View>
     );
@@ -103,7 +105,7 @@ export default function TeamHoursScreen() {
 
   return (
     <View style={[styles.container, {backgroundColor: theme.background}]}>
-      <ScreenHeader title={t('teamHours.title')} showBack />
+      <ScreenHeader title={t('teamHours.title')} showBack rightIcon="📊" />
       <ScrollView
         contentContainerStyle={styles.content}
         refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}>
@@ -133,36 +135,36 @@ export default function TeamHoursScreen() {
               </TouchableOpacity>
             </View>
 
-            {/* Summary card */}
-            <View style={[styles.summaryCard, {backgroundColor: colors.primary}]}>
-              <Text style={styles.weekLabel}>
-                {t('teamHours.week', {n: data.week_number + weekOffset})} — {data.week_label}
-              </Text>
+            {/* Summary card — light blue background, dark text */}
+            <View style={styles.summaryCard}>
               <View style={styles.summaryStats}>
                 <View style={styles.summaryItem}>
-                  <Text style={styles.summaryValue}>{data.total_hours}h</Text>
-                  <Text style={styles.summaryLabel}>{t('teamHours.weekTotal')}</Text>
+                  <Text style={[styles.summaryValue, {color: colors.primary}]}>{data.total_hours}h</Text>
+                  <Text style={[styles.summaryLabel, {color: '#5f6368'}]}>{t('teamHours.weekTotal')}</Text>
                 </View>
                 <View style={styles.summaryDivider} />
                 <View style={styles.summaryItem}>
-                  <Text style={styles.summaryValue}>{data.avg_per_person}h</Text>
-                  <Text style={styles.summaryLabel}>{t('teamHours.perPerson')}</Text>
+                  <Text style={[styles.summaryValue, {color: colors.success}]}>{data.avg_per_person}h</Text>
+                  <Text style={[styles.summaryLabel, {color: '#5f6368'}]}>{t('teamHours.perPerson')}</Text>
                 </View>
                 <View style={styles.summaryDivider} />
                 <View style={styles.summaryItem}>
-                  <Text style={[styles.summaryValue, {color: '#fca5a5'}]}>{data.below_target_count}</Text>
-                  <Text style={styles.summaryLabel}>{t('teamHours.belowTarget')}</Text>
+                  <Text style={[styles.summaryValue, {color: colors.error}]}>{data.below_target_count}</Text>
+                  <Text style={[styles.summaryLabel, {color: '#5f6368'}]}>{t('teamHours.belowTarget')}</Text>
                 </View>
               </View>
             </View>
 
-            {/* Members list */}
-            <Text style={[styles.sectionTitle, {color: theme.text}]}>{t('teamHours.members')}</Text>
-            <View style={[styles.membersCard, {backgroundColor: theme.surface, borderColor: theme.border}]}>
-              {data.members.map(member => (
-                <MemberRow key={member.id} member={member} theme={theme} />
-              ))}
-            </View>
+            {/* Members — each in its own card */}
+            <Text style={[styles.sectionTitle, {color: theme.text}]}>
+              {t('teamHours.members')}
+              {' ('}
+              {data.members.length}
+              {')'}
+            </Text>
+            {data.members.map(member => (
+              <MemberCard key={member.id} member={member} theme={theme} />
+            ))}
           </>
         ) : null}
       </ScrollView>
@@ -172,19 +174,19 @@ export default function TeamHoursScreen() {
 
 const styles = StyleSheet.create({
   container: {flex: 1},
-  content: {padding: spacing.md, gap: spacing.md, paddingBottom: spacing.xl},
-  summaryCard: {borderRadius: radius.xl, padding: spacing.lg, gap: spacing.md},
-  weekLabel: {color: 'rgba(255,255,255,0.8)', fontSize: fontSize.sm, textAlign: 'center'},
-  summaryStats: {flexDirection: 'row', justifyContent: 'space-around'},
+  content: {padding: spacing.md, gap: spacing.sm, paddingBottom: spacing.xl},
+  summaryCard: {
+    borderRadius: radius.xl,
+    padding: spacing.lg,
+    backgroundColor: '#e8f0fe',
+  },
+  summaryStats: {flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center'},
   summaryItem: {alignItems: 'center', flex: 1},
-  summaryValue: {color: '#fff', fontSize: fontSize.xxl, fontWeight: '700'},
-  summaryLabel: {color: 'rgba(255,255,255,0.7)', fontSize: fontSize.xs, textAlign: 'center', marginTop: 2},
-  summaryDivider: {width: 1, backgroundColor: 'rgba(255,255,255,0.3)'},
-  sectionTitle: {fontSize: fontSize.md, fontWeight: '700'},
-  membersCard: {borderRadius: radius.lg, borderWidth: 1, paddingHorizontal: spacing.md},
+  summaryValue: {fontSize: fontSize.xxl, fontWeight: '700'},
+  summaryLabel: {fontSize: fontSize.xs, textAlign: 'center', marginTop: 2},
+  summaryDivider: {width: 1, height: 40, backgroundColor: '#c5d4f6'},
+  sectionTitle: {fontSize: fontSize.md, fontWeight: '700', marginTop: spacing.xs},
   weekSelector: {
-    marginHorizontal: spacing.md,
-    marginTop: spacing.md,
     borderRadius: radius.lg,
     borderWidth: 1,
     flexDirection: 'row',

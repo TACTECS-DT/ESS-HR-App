@@ -2,7 +2,6 @@ import React, {useState} from 'react';
 import {
   View,
   Text,
-  FlatList,
   StyleSheet,
   TouchableOpacity,
   RefreshControl,
@@ -24,14 +23,13 @@ import type {TasksStackParamList} from '../../navigation/types';
 import type {DailyTimesheetSummary} from '../../api/mocks/timesheets.mock';
 
 type Nav = StackNavigationProp<TasksStackParamList>;
-type PeriodFilter = 'this_week' | 'last_week' | 'this_month';
+type PeriodFilter = 'this_week' | 'last_week' | 'this_month' | 'custom';
 
 const PROJECT_COLORS = [colors.primary, colors.success, colors.warning, colors.info, '#8b5cf6', '#ec4899'];
 function projectColor(idx: number): string {
   return PROJECT_COLORS[idx % PROJECT_COLORS.length] ?? colors.primary;
 }
 
-// Day of week labels (Mon=1...Fri=5)
 const DAY_LABEL_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri'] as const;
 const DAY_JS_INDICES = [1, 2, 3, 4, 5];
 
@@ -44,13 +42,22 @@ function getWeekRange(data: DailyTimesheetSummary[]): string {
   return `${start}  –  ${end}`;
 }
 
+function formatDayHeader(dateStr: string): string {
+  try {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString(undefined, {weekday: 'long', day: 'numeric', month: 'long'});
+  } catch {
+    return dateStr;
+  }
+}
+
 export default function TimesheetWeeklyScreen() {
   const {t} = useTranslation();
   const theme = useTheme();
   const navigation = useNavigation<Nav>();
   const [period, setPeriod] = useState<PeriodFilter>('this_week');
 
-  const {data, isLoading, refetch} = useQuery({
+  const {data, isLoading, refetch, isRefetching} = useQuery({
     queryKey: ['timesheets'],
     queryFn: async () => {
       const res = await apiClient.get('/timesheets');
@@ -76,7 +83,7 @@ export default function TimesheetWeeklyScreen() {
   if (isLoading) {
     return (
       <View style={[styles.container, {backgroundColor: theme.background}]}>
-        <ScreenHeader title={t('tasks.timesheetWeekly')} showBack />
+        <ScreenHeader title={t('tasks.timesheetWeekly')} showBack rightIcon="📊" />
         <View style={styles.skeletons}>
           {[0, 1, 2].map(i => <LoadingSkeleton key={i} height={70} style={styles.skeleton} />)}
         </View>
@@ -85,18 +92,53 @@ export default function TimesheetWeeklyScreen() {
   }
 
   const periodTabs: Array<{key: PeriodFilter; label: string}> = [
-    {key: 'this_week', label: t('timesheets.thisWeek')},
-    {key: 'last_week', label: t('timesheets.lastWeek')},
+    {key: 'this_week',  label: t('timesheets.thisWeek')},
+    {key: 'last_week',  label: t('timesheets.lastWeek')},
     {key: 'this_month', label: t('timesheets.thisMonth')},
+    {key: 'custom',     label: t('timesheets.custom')},
   ];
+
+  const sortedData = [...(data ?? [])].sort((a, b) => b.date.localeCompare(a.date));
 
   return (
     <View style={[styles.container, {backgroundColor: theme.background}]}>
-      <ScreenHeader title={t('tasks.timesheetWeekly')} showBack />
+      <ScreenHeader title={t('tasks.timesheetWeekly')} showBack rightIcon="📊" />
 
-      {/* Period filter tabs */}
-      <View style={[styles.tabBar, {backgroundColor: theme.surface, borderBottomColor: theme.border}]}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabList}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}>
+
+        {/* Weekly summary card */}
+        {data && data.length > 0 ? (
+          <View style={[styles.weeklyCard, {backgroundColor: colors.primary}]}>
+            <Text style={styles.weekRangeLabel}>{weekRange}</Text>
+            <Text style={styles.weeklyTotal}>{weeklyTotal}h</Text>
+            <View style={styles.progressTrack}>
+              <View style={[styles.progressFill, {width: `${goalPercent}%`}]} />
+            </View>
+            <Text style={styles.goalText}>{t('timesheets.weekGoal', {percent: goalPercent})}</Text>
+            <View style={styles.barChart}>
+              {barData.map(bar => {
+                const barHeight = maxBarHours > 0 ? Math.max(4, (bar.hours / maxBarHours) * 44) : 4;
+                return (
+                  <View key={bar.key} style={styles.barColumn}>
+                    <View style={styles.barWrapper}>
+                      <View style={[styles.barFill, {height: barHeight, backgroundColor: bar.hours > 0 ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.2)'}]} />
+                    </View>
+                    <Text style={styles.barLabel}>{t(`timesheets.${bar.key}`)}</Text>
+                  </View>
+                );
+              })}
+            </View>
+          </View>
+        ) : null}
+
+        {/* Period filter tabs — below the summary card */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={[styles.tabBar, {backgroundColor: theme.surface, borderBottomColor: theme.border}]}
+          contentContainerStyle={styles.tabList}>
           {periodTabs.map(tab => {
             const isActive = period === tab.key;
             return (
@@ -111,83 +153,62 @@ export default function TimesheetWeeklyScreen() {
             );
           })}
         </ScrollView>
-      </View>
 
-      {/* Weekly summary card */}
-      {data && data.length > 0 ? (
-        <View style={[styles.weeklyCard, {backgroundColor: colors.primary}]}>
-          {/* Week range label */}
-          <Text style={styles.weekRangeLabel}>{weekRange}</Text>
-
-          {/* Big total */}
-          <Text style={styles.weeklyTotal}>{weeklyTotal}h</Text>
-
-          {/* Progress bar */}
-          <View style={styles.progressTrack}>
-            <View style={[styles.progressFill, {width: `${goalPercent}%`}]} />
-          </View>
-          <Text style={styles.goalText}>{t('timesheets.weekGoal', {percent: goalPercent})}</Text>
-
-          {/* M-T-W-T-F bar chart */}
-          <View style={styles.barChart}>
-            {barData.map(bar => {
-              const barHeight = maxBarHours > 0 ? Math.max(4, (bar.hours / maxBarHours) * 44) : 4;
-              return (
-                <View key={bar.key} style={styles.barColumn}>
-                  <View style={styles.barWrapper}>
-                    <View style={[styles.barFill, {height: barHeight, backgroundColor: bar.hours > 0 ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.2)'}]} />
-                  </View>
-                  <Text style={styles.barLabel}>{t(`timesheets.${bar.key}`)}</Text>
-                </View>
-              );
-            })}
-          </View>
-        </View>
-      ) : null}
-
-      <FlatList
-        data={data}
-        keyExtractor={item => item.date}
-        refreshControl={<RefreshControl refreshing={false} onRefresh={refetch} />}
-        ListEmptyComponent={<EmptyState title={t('common.noData')} />}
-        contentContainerStyle={styles.list}
-        renderItem={({item}) => (
-          <TouchableOpacity
-            style={[styles.card, {backgroundColor: theme.surface, borderColor: theme.border}]}
-            onPress={() => navigation.navigate('TimesheetDaily', {date: item.date})}>
-            <View style={styles.cardRow}>
-              <Text style={[styles.dateText, {color: theme.text}]}>{item.date}</Text>
-              <View style={[styles.hoursBadge, {backgroundColor: colors.primary + '22'}]}>
-                <Text style={{color: colors.primary, fontSize: fontSize.md, fontWeight: '700'}}>
-                  {item.total_hours}h
-                </Text>
-              </View>
-            </View>
-            {/* Project dots */}
-            <View style={styles.projectDots}>
-              {item.entries.map((entry, idx) => (
-                <View key={entry.id} style={styles.projectDot}>
-                  <View style={[styles.dot, {backgroundColor: projectColor(idx)}]} />
-                  <Text style={[styles.projectName, {color: theme.textSecondary}]} numberOfLines={1}>
-                    {entry.task_name}
+        {/* Entries grouped by day */}
+        <View style={styles.entriesList}>
+          {sortedData.length === 0 ? (
+            <EmptyState title={t('common.noData')} />
+          ) : (
+            sortedData.map((day, dayIdx) => (
+              <View key={day.date}>
+                {/* Day header */}
+                <TouchableOpacity
+                  style={[styles.dayHeader, {borderBottomColor: colors.primary}]}
+                  onPress={() => navigation.navigate('TimesheetDaily', {date: day.date})}>
+                  <Text style={[styles.dayHeaderDate, {color: theme.text}]}>
+                    {formatDayHeader(day.date)}
                   </Text>
-                  <Text style={[styles.projectHours, {color: projectColor(idx)}]}>{entry.hours}h</Text>
-                </View>
-              ))}
-            </View>
-          </TouchableOpacity>
-        )}
-      />
+                  <Text style={[styles.dayHeaderHours, {color: colors.primary}]}>
+                    {day.total_hours}h
+                  </Text>
+                </TouchableOpacity>
+
+                {/* Day entries */}
+                {day.entries.map((entry, idx) => {
+                  const col = projectColor(dayIdx * 10 + idx);
+                  return (
+                    <View key={entry.id} style={[styles.entryRow, {borderBottomColor: theme.border}]}>
+                      <View style={[styles.projectDot, {backgroundColor: col}]} />
+                      <View style={styles.entryInfo}>
+                        <Text style={[styles.entryTask, {color: theme.text}]} numberOfLines={1}>
+                          {entry.task_name}
+                        </Text>
+                        <Text style={[styles.entryProject, {color: theme.textSecondary}]}>
+                          {entry.project}
+                        </Text>
+                      </View>
+                      <Text style={[styles.entryHours, {color: theme.text}]}>{entry.hours}h</Text>
+                    </View>
+                  );
+                })}
+              </View>
+            ))
+          )}
+        </View>
+      </ScrollView>
+
+      {/* FAB */}
+      <TouchableOpacity
+        style={[styles.fab, {backgroundColor: colors.primary}]}
+        onPress={() => navigation.navigate('LogTime', {taskId: 0, taskName: ''})}>
+        <Text style={styles.fabText}>＋</Text>
+      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {flex: 1},
-  tabBar: {borderBottomWidth: StyleSheet.hairlineWidth},
-  tabList: {paddingHorizontal: spacing.md, gap: spacing.sm},
-  tab: {paddingVertical: spacing.sm, paddingHorizontal: spacing.xs},
-  tabText: {fontSize: fontSize.sm, fontWeight: '600'},
   weeklyCard: {
     marginHorizontal: spacing.md,
     marginTop: spacing.md,
@@ -206,20 +227,50 @@ const styles = StyleSheet.create({
   barWrapper: {height: 48, justifyContent: 'flex-end', width: '60%'},
   barFill: {borderRadius: 3, width: '100%'},
   barLabel: {color: 'rgba(255,255,255,0.7)', fontSize: 10},
-  list: {padding: spacing.md, gap: spacing.sm},
-  card: {borderRadius: radius.md, borderWidth: 1, padding: spacing.md, gap: spacing.sm},
-  cardRow: {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'},
-  dateText: {fontSize: fontSize.md, fontWeight: '600'},
-  hoursBadge: {
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    borderRadius: radius.sm,
+  tabBar: {borderBottomWidth: StyleSheet.hairlineWidth, marginTop: spacing.sm},
+  tabList: {paddingHorizontal: spacing.md, gap: spacing.sm},
+  tab: {paddingVertical: spacing.sm, paddingHorizontal: spacing.xs},
+  tabText: {fontSize: fontSize.sm, fontWeight: '600'},
+  entriesList: {paddingHorizontal: spacing.md, paddingBottom: 80},
+  dayHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: spacing.sm,
+    borderBottomWidth: 2,
+    marginTop: spacing.md,
   },
-  projectDots: {gap: 6},
-  projectDot: {flexDirection: 'row', alignItems: 'center', gap: spacing.xs},
-  dot: {width: 8, height: 8, borderRadius: 4},
-  projectName: {fontSize: fontSize.xs, flex: 1},
-  projectHours: {fontSize: fontSize.xs, fontWeight: '700'},
+  dayHeaderDate: {fontSize: fontSize.sm, fontWeight: '700'},
+  dayHeaderHours: {fontSize: fontSize.sm, fontWeight: '700'},
+  entryRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: spacing.sm + 2,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    gap: spacing.sm,
+  },
+  projectDot: {width: 10, height: 10, borderRadius: 5, flexShrink: 0},
+  entryInfo: {flex: 1, gap: 2},
+  entryTask: {fontSize: fontSize.sm, fontWeight: '500'},
+  entryProject: {fontSize: fontSize.xs},
+  entryHours: {fontSize: fontSize.sm, fontWeight: '700'},
   skeletons: {padding: spacing.md, gap: spacing.sm},
   skeleton: {borderRadius: radius.md},
+  fab: {
+    position: 'absolute',
+    bottom: spacing.xl,
+    right: spacing.lg,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    shadowOffset: {width: 0, height: 4},
+    zIndex: 10,
+  },
+  fabText: {color: '#fff', fontSize: 28, lineHeight: 32},
 });
