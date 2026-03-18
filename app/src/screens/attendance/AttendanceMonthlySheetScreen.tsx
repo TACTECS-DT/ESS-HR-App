@@ -22,13 +22,13 @@ function formatHours(h: number): string {
   return mins > 0 ? `${hrs}:${String(mins).padStart(2, '0')}` : `${hrs}:00`;
 }
 
-function statusLabel(status: DayStatus, isAr: boolean): string {
+function statusLabel(status: DayStatus, tFn: (key: string) => string): string {
   switch (status) {
-    case 'present': return isAr ? '✓' : '✓';
-    case 'absent': return isAr ? 'غياب' : 'Absent';
+    case 'present': return '✓';
+    case 'absent': return tFn('attendance.status.absent');
     case 'weekend': return 'WE';
-    case 'public_holiday': return isAr ? 'عطلة' : 'Holiday';
-    case 'on_leave': return isAr ? 'إجازة' : 'Leave';
+    case 'public_holiday': return tFn('calendar.holiday');
+    case 'on_leave': return tFn('attendance.status.on_leave');
   }
 }
 
@@ -42,11 +42,7 @@ function statusColor(status: DayStatus): string {
   }
 }
 
-function sheetStatusLabel(s: SheetStatus, isAr: boolean): string {
-  if (s === 'confirmed') {return isAr ? 'مؤكد' : 'Confirmed';}
-  if (s === 'done') {return isAr ? 'منتهي' : 'Done';}
-  return isAr ? 'مسودة' : 'Draft';
-}
+// sheetStatusLabel moved inline using t('attendance.sheetStatus.*')
 
 export default function AttendanceMonthlySheetScreen() {
   const {t, i18n} = useTranslation();
@@ -135,11 +131,11 @@ export default function AttendanceMonthlySheetScreen() {
           </Text>
           <View style={styles.statusRow}>
             <Text style={[styles.statusLabel, {color: theme.textSecondary}]}>
-              {isAr ? 'الحالة: ' : 'Status: '}
+              {t('common.statusLabel')}{': '}
             </Text>
             <View style={[styles.statusBadge, {backgroundColor: statusChipColor + '22'}]}>
               <Text style={[styles.statusBadgeText, {color: statusChipColor}]}>
-                {sheetStatusLabel(dominantSheetStatus, isAr)}
+                {t(`attendance.sheetStatus.${dominantSheetStatus}`)}
               </Text>
             </View>
           </View>
@@ -150,19 +146,19 @@ export default function AttendanceMonthlySheetScreen() {
           {/* Header row */}
           <View style={[styles.row, styles.headerRow, {backgroundColor: '#f5f7fa'}]}>
             <Text style={[styles.cell, styles.cellDay, styles.headerCell, {color: theme.text}]}>
-              {isAr ? 'اليوم' : 'Day'}
+              {t('attendance.day')}
             </Text>
             <Text style={[styles.cell, styles.cellTime, styles.headerCell, {color: theme.text}]}>
-              {isAr ? 'دخول' : 'In'}
+              {t('attendance.in')}
             </Text>
             <Text style={[styles.cell, styles.cellTime, styles.headerCell, {color: theme.text}]}>
-              {isAr ? 'خروج' : 'Out'}
+              {t('attendance.out')}
             </Text>
             <Text style={[styles.cell, styles.cellHours, styles.headerCell, {color: theme.text}]}>
-              {isAr ? 'ساعات' : 'Hours'}
+              {t('attendance.hours')}
             </Text>
             <Text style={[styles.cell, styles.cellStatus, styles.headerCell, {color: theme.text}]}>
-              {isAr ? 'الحالة' : 'Status'}
+              {t('common.statusLabel')}
             </Text>
           </View>
 
@@ -171,7 +167,7 @@ export default function AttendanceMonthlySheetScreen() {
             const bg = idx % 2 === 0 ? theme.surface : theme.background;
             const {dayLabel, checkIn, checkOut, hours, ds} = buildRowData(record, dayOfWeek, dayNum);
             const sc = statusColor(ds);
-            const sl = statusLabel(ds, isAr);
+            const sl = statusLabel(ds, t);
 
             return (
               <View key={dateStr} style={[styles.row, {backgroundColor: bg}]}>

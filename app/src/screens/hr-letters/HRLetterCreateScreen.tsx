@@ -99,14 +99,14 @@ export default function HRLetterCreateScreen() {
 
         <TextInput
           label={`${t('hrLetter.letterTitle')} *`}
-          placeholder={isAr ? 'مثال: شهادة راتب' : 'e.g., Salary Certificate'}
+          placeholder={t('hrLetter.titlePlaceholder')}
           value={letterTitle}
           onChangeText={setLetterTitle}
         />
 
         <TextInput
           label={`${t('hrLetter.directedTo')} *`}
-          placeholder={isAr ? 'مثال: السفارة، البنك، إلخ' : 'e.g., Embassy, Bank, etc.'}
+          placeholder={t('hrLetter.directedToExample')}
           value={directedTo}
           onChangeText={setDirectedTo}
         />
@@ -119,7 +119,7 @@ export default function HRLetterCreateScreen() {
 
         <TextInput
           label={`${t('hrLetter.purpose')} *`}
-          placeholder={isAr ? 'الغرض من الخطاب...' : 'Purpose of the letter...'}
+          placeholder={t('hrLetter.purposePlaceholder')}
           value={purpose}
           onChangeText={setPurpose}
           multiline

@@ -24,6 +24,8 @@
     "myRequests": "طلباتي",
     "date": "التاريخ",
     "sar": "ريال",
+    "optional": "(اختياري)",
+    "statusLabel": "الحالة",
     "status": {
       "draft": "مسودة",
       "pending": "قيد الانتظار",
@@ -135,7 +137,17 @@
     "filterCustom": "فترة مخصصة",
     "late": "متأخر",
     "totalHours": "الإجمالي",
-    "onTime": "في الوقت"
+    "onTime": "في الوقت",
+    "day": "اليوم",
+    "in": "دخول",
+    "out": "خروج",
+    "hours": "ساعات",
+    "selectTask": "اختر مهمة",
+    "clearSelection": "مسح الاختيار",
+    "mapPreview": "معاينة الموقع - الموقع الحالي",
+    "withinZone": "داخل النطاق المسموح (مكتب - 50م)",
+    "moodQuestion": "كيف حالك اليوم؟",
+    "noCheckin": "لم يسجل حضور اليوم"
   },
   "leave": {
     "title": "الإجازات",
@@ -174,6 +186,9 @@
     "remainingAfter": "المتبقي بعد الخصم: {{n}} أيام",
     "uploadFile": "اضغط لرفع ملف",
     "noLimit": "بدون حد",
+    "duration": "المدة",
+    "managerActions": "إجراء المدير",
+    "commentPlaceholder": "تعليق (اختياري)...",
     "actions": {
       "approve": "موافقة",
       "refuse": "رفض",
@@ -226,6 +241,7 @@
     "reportCreated": "تم إنشاء التقرير",
     "description": "الوصف",
     "notes": "ملاحظات",
+    "descriptionPlaceholder": "مثال: غداء اجتماع العميل",
     "saveDraft": "حفظ كمسودة"
   },
   "loan": {
@@ -251,6 +267,9 @@
     "approvalChain": "سلسلة الموافقات",
     "eligible": "أنت مؤهل للحصول على قرض",
     "notEligible": "غير مؤهل",
+    "loanTitlePlaceholder": "مثال: قرض شخصي",
+    "autoCalculated": "يحسب تلقائياً",
+    "reasonPlaceholder": "اشرح سبب طلب القرض...",
     "rules": {
       "minHiring": "الحد الأدنى لمدة التوظيف: {{months}} أشهر",
       "maxDuration": "الحد الأقصى للمدة: {{months}} أشهر",
@@ -269,6 +288,8 @@
     "salaryInfo": "معلومات الراتب",
     "maxAdvance": "أقصى سلفة",
     "recentRequests": "الطلبات السابقة",
+    "titlePlaceholder": "مثال: سلفة مارس ٢٠٢٦",
+    "reasonPlaceholder": "سبب طلب السلفة...",
     "saveDraft": "حفظ كمسودة"
   },
   "hrLetters": {
@@ -292,6 +313,9 @@
     "salaryType": "نوع الراتب",
     "newRequest": "خطاب جديد",
     "previousRequests": "الطلبات السابقة",
+    "titlePlaceholder": "مثال: شهادة راتب",
+    "directedToExample": "مثال: السفارة، البنك، إلخ",
+    "purposePlaceholder": "الغرض من الخطاب...",
     "saveDraft": "حفظ كمسودة",
     "type": {
       "net": "صافي الراتب",
@@ -565,7 +589,12 @@
     "title": "الإعلانات",
     "empty": "لا توجد إعلانات",
     "postedBy": "نشر بواسطة",
-    "readMore": "اقرأ المزيد"
+    "readMore": "اقرأ المزيد",
+    "priority": {
+      "urgent": "عاجل",
+      "info": "معلومة",
+      "general": "عام"
+    }
   },
   "pendingApprovals": {
     "title": "الموافقات المعلقة",
@@ -593,6 +622,10 @@
     "onLeave": "في إجازة",
     "holiday": "عطلة رسمية",
     "weekend": "عطلة نهاية الأسبوع",
-    "late": "متأخر"
+    "late": "متأخر",
+    "todaySummary": "ملخص اليوم",
+    "hoursToday": "ساعات اليوم",
+    "hoursMonth": "ساعات الشهر",
+    "absences": "غياب"
   }
 }

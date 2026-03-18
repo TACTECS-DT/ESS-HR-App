@@ -100,15 +100,15 @@ export default function LeaveDetailScreen() {
             <StatusChip status={request.status} label={t(`common.status.${request.status}`)} />
           </View>
           <View style={[styles.divider, {borderColor: theme.border}]} />
-          <InfoRow label={isAr ? 'من' : 'Date From'} value={request.date_from} theme={theme} />
-          <InfoRow label={isAr ? 'إلى' : 'Date To'} value={request.date_to} theme={theme} />
-          <InfoRow label={isAr ? 'المدة' : 'Duration'} value={`${request.duration} ${t('leave.days')}`} theme={theme} />
-          <InfoRow label={isAr ? 'النوع' : 'Type'} value={modeName} theme={theme} />
+          <InfoRow label={t('leave.dateFrom')} value={request.date_from} theme={theme} />
+          <InfoRow label={t('leave.dateTo')} value={request.date_to} theme={theme} />
+          <InfoRow label={t('leave.duration')} value={`${request.duration} ${t('leave.days')}`} theme={theme} />
+          <InfoRow label={t('leave.durationType')} value={modeName} theme={theme} />
           {request.description ? (
             <>
               <View style={[styles.divider, {borderColor: theme.border}]} />
               <Text style={[styles.descLabel, {color: theme.textSecondary}]}>
-                {isAr ? 'الوصف:' : 'Description:'}
+                {t('leave.description')}{':'}
               </Text>
               <Text style={[styles.descText, {color: theme.text}]}>{request.description}</Text>
             </>
@@ -150,7 +150,7 @@ export default function LeaveDetailScreen() {
         {canApprove ? (
           <View style={[styles.actionsCard, {backgroundColor: theme.surface, borderColor: colors.primary}]}>
             <Text style={[styles.actionsTitle, {color: theme.text}]}>
-              {isAr ? 'إجراء المدير' : 'Manager Actions'}
+              {t('leave.managerActions')}
             </Text>
             <View style={styles.actionBtns}>
               <TouchableOpacity
@@ -168,7 +168,7 @@ export default function LeaveDetailScreen() {
             </View>
             <TextInput
               style={[styles.commentInput, {borderColor: theme.border, color: theme.text, backgroundColor: theme.background}]}
-              placeholder={isAr ? 'تعليق (اختياري)...' : 'Comment (optional)...'}
+              placeholder={t('leave.commentPlaceholder')}
               placeholderTextColor={theme.textSecondary}
               value={comment}
               onChangeText={setComment}

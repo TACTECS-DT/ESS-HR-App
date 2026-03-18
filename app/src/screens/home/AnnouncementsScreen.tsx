@@ -24,11 +24,7 @@ const PRIORITY_COLORS: Record<AnnouncementPriority, string> = {
   general: colors.success,
 };
 
-function priorityLabel(p: AnnouncementPriority, isAr: boolean): string {
-  if (p === 'urgent') {return isAr ? 'عاجل' : 'URGENT';}
-  if (p === 'info') {return isAr ? 'معلومة' : 'INFO';}
-  return isAr ? 'عام' : 'GENERAL';
-}
+// priorityLabel replaced with t('announcements.priority.*') inline
 
 function formatDate(dateStr: string, locale: string): string {
   const d = new Date(dateStr);
@@ -79,7 +75,7 @@ export default function AnnouncementsScreen() {
                 <View style={styles.cardBody}>
                   {/* Priority label */}
                   <Text style={[styles.priorityLabel, {color: pColor}]}>
-                    {priorityLabel(item.priority ?? 'general', isAr)}
+                    {t(`announcements.priority.${item.priority ?? 'general'}`)}
                   </Text>
 
                   {/* Title */}

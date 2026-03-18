@@ -133,7 +133,7 @@ export default function AdvanceSalaryCreateScreen() {
 
         <TextInput
           label={`${t('advanceSalary.titleField')} *`}
-          placeholder={isAr ? 'مثال: سلفة مارس ٢٠٢٦' : 'e.g., Advance - March 2026'}
+          placeholder={t('advanceSalary.titlePlaceholder')}
           value={title}
           onChangeText={setTitle}
         />
@@ -148,7 +148,7 @@ export default function AdvanceSalaryCreateScreen() {
 
         <TextInput
           label={`${t('advanceSalary.reason')} *`}
-          placeholder={isAr ? 'سبب طلب السلفة...' : 'Reason for advance salary...'}
+          placeholder={t('advanceSalary.reasonPlaceholder')}
           value={reason}
           onChangeText={setReason}
           multiline

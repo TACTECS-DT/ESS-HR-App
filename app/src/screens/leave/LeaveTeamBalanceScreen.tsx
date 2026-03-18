@@ -34,15 +34,7 @@ function getInitials(name: string): string {
     .join('');
 }
 
-function getStatusLabel(status: TeamMemberStatus, isAr: boolean): string {
-  const labels: Record<TeamMemberStatus, [string, string]> = {
-    present: ['Present', 'حاضر'],
-    absent: ['Absent', 'غائب'],
-    on_leave: ['Leave', 'إجازة'],
-    pending: ['Pending', 'بانتظار'],
-  };
-  return isAr ? labels[status][1] : labels[status][0];
-}
+// getStatusLabel replaced inline with t() calls
 
 type ViewMode = 'status' | 'balances';
 
@@ -68,10 +60,10 @@ export default function LeaveTeamBalanceScreen() {
   const pendingCount = members.filter(m => m.status === 'pending').length;
 
   const statItems = [
-    {label: isAr ? 'حاضر' : 'Present', count: presentCount, color: colors.success},
-    {label: isAr ? 'غائب' : 'Absent', count: absentCount, color: colors.error},
-    {label: isAr ? 'في إجازة' : 'On Leave', count: onLeaveCount, color: colors.primary},
-    {label: isAr ? 'بانتظار' : 'Pending', count: pendingCount, color: colors.warning},
+    {label: t('attendance.status.present'), count: presentCount, color: colors.success},
+    {label: t('attendance.status.absent'), count: absentCount, color: colors.error},
+    {label: t('attendance.status.on_leave'), count: onLeaveCount, color: colors.primary},
+    {label: t('common.status.pending'), count: pendingCount, color: colors.warning},
   ];
 
   function getSubtitle(member: TeamMember): string {
@@ -84,7 +76,7 @@ export default function LeaveTeamBalanceScreen() {
     if (member.status === 'pending') {
       return isAr ? (member.leave_info_ar ?? t('leave.pending')) : (member.leave_info ?? t('leave.pending'));
     }
-    return isAr ? 'لم يسجل حضور اليوم' : 'No check-in today';
+    return t('attendance.noCheckin');
   }
 
   const isStatusView = viewMode === 'status';
@@ -110,14 +102,14 @@ export default function LeaveTeamBalanceScreen() {
             style={[styles.toggleBtn, viewMode === 'status' && {backgroundColor: colors.primary}]}
             onPress={() => setViewMode('status')}>
             <Text style={[styles.toggleText, {color: viewMode === 'status' ? '#fff' : theme.textSecondary}]}>
-              {isAr ? 'الحالة' : 'Status'}
+              {t('common.statusLabel')}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.toggleBtn, viewMode === 'balances' && {backgroundColor: colors.primary}]}
             onPress={() => setViewMode('balances')}>
             <Text style={[styles.toggleText, {color: viewMode === 'balances' ? '#fff' : theme.textSecondary}]}>
-              {isAr ? 'رصيد الإجازة' : 'Leave Balance'}
+              {t('leave.balance')}
             </Text>
           </TouchableOpacity>
         </View>
@@ -147,7 +139,9 @@ export default function LeaveTeamBalanceScreen() {
                 </View>
                 <View style={[styles.badge, {backgroundColor: badgeBg}]}>
                   <Text style={[styles.badgeText, {color: avatarColor}]}>
-                    {getStatusLabel(member.status, isAr)}
+                    {member.status === 'pending'
+                      ? t('common.status.pending')
+                      : t(`attendance.status.${member.status}`)}
                   </Text>
                 </View>
               </View>

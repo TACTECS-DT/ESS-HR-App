@@ -114,7 +114,7 @@ export default function ExpenseCreateScreen() {
         {/* Description */}
         <TextInput
           label={`${t('expense.description')} *`}
-          placeholder={isAr ? 'مثال: غداء اجتماع العميل' : 'e.g., Client meeting lunch'}
+          placeholder={t('expense.descriptionPlaceholder')}
           value={description}
           onChangeText={setDescription}
         />

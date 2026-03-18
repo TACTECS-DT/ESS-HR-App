@@ -24,6 +24,8 @@
     "myRequests": "My Requests",
     "date": "Date",
     "sar": "SAR",
+    "optional": "(Optional)",
+    "statusLabel": "Status",
     "status": {
       "draft": "Draft",
       "pending": "Pending",
@@ -135,7 +137,17 @@
     "filterCustom": "Custom Range",
     "late": "Late",
     "totalHours": "Total",
-    "onTime": "On Time"
+    "onTime": "On Time",
+    "day": "Day",
+    "in": "In",
+    "out": "Out",
+    "hours": "Hours",
+    "selectTask": "Select Task",
+    "clearSelection": "Clear Selection",
+    "mapPreview": "Map Preview - Current Location",
+    "withinZone": "Within allowed zone (Office - 50m)",
+    "moodQuestion": "How are you feeling today?",
+    "noCheckin": "No check-in today"
   },
   "leave": {
     "title": "Leave",
@@ -174,6 +186,9 @@
     "remainingAfter": "Remaining after: {{n}} days",
     "uploadFile": "Tap to upload file",
     "noLimit": "No Limit",
+    "duration": "Duration",
+    "managerActions": "Manager Actions",
+    "commentPlaceholder": "Comment (optional)...",
     "actions": {
       "approve": "Approve",
       "refuse": "Refuse",
@@ -226,6 +241,7 @@
     "reportCreated": "Report Created",
     "description": "Description",
     "notes": "Notes",
+    "descriptionPlaceholder": "e.g., Client meeting lunch",
     "saveDraft": "Save Draft"
   },
   "loan": {
@@ -251,6 +267,9 @@
     "approvalChain": "Approval Chain",
     "eligible": "You are eligible for a loan",
     "notEligible": "Not eligible",
+    "loanTitlePlaceholder": "e.g., Personal Loan",
+    "autoCalculated": "Auto-calculated",
+    "reasonPlaceholder": "Explain loan reason...",
     "rules": {
       "minHiring": "Minimum hiring period: {{months}} months",
       "maxDuration": "Maximum duration: {{months}} months",
@@ -269,6 +288,8 @@
     "salaryInfo": "Salary Information",
     "maxAdvance": "Max Advance",
     "recentRequests": "Previous Requests",
+    "titlePlaceholder": "e.g., Advance - March 2026",
+    "reasonPlaceholder": "Reason for advance salary...",
     "saveDraft": "Save Draft"
   },
   "hrLetters": {
@@ -292,6 +313,9 @@
     "salaryType": "Salary Type",
     "newRequest": "New HR Letter",
     "previousRequests": "Previous Requests",
+    "titlePlaceholder": "e.g., Salary Certificate",
+    "directedToExample": "e.g., Embassy, Bank, etc.",
+    "purposePlaceholder": "Purpose of the letter...",
     "saveDraft": "Save Draft",
     "type": {
       "net": "Net Salary",
@@ -565,7 +589,12 @@
     "title": "Announcements",
     "empty": "No announcements",
     "postedBy": "Posted by",
-    "readMore": "Read more"
+    "readMore": "Read more",
+    "priority": {
+      "urgent": "URGENT",
+      "info": "INFO",
+      "general": "GENERAL"
+    }
   },
   "pendingApprovals": {
     "title": "Pending Approvals",
@@ -593,6 +622,10 @@
     "onLeave": "On Leave",
     "holiday": "Holiday",
     "weekend": "Weekend",
-    "late": "Late"
+    "late": "Late",
+    "todaySummary": "Today's Summary",
+    "hoursToday": "Hours Today",
+    "hoursMonth": "Hours This Month",
+    "absences": "Absences"
   }
 }

@@ -116,7 +116,7 @@ export default function AttendanceDashboardScreen() {
 
   function handleTaskSelect() {
     const clearOpt = selectedTask
-      ? [{text: isAr ? '✕ مسح الاختيار' : '✕ Clear selection', onPress: () => setSelectedTask(null)}]
+      ? [{text: `✕ ${t('attendance.clearSelection')}`, onPress: () => setSelectedTask(null)}]
       : [];
     Alert.alert(
       t('attendance.task'),
@@ -194,20 +194,18 @@ export default function AttendanceDashboardScreen() {
           <Text style={[styles.cardTitle, {color: theme.text}]}>📍 {t('attendance.location')}</Text>
           <View style={[styles.mapPlaceholder, {backgroundColor: theme.border}]}>
             <Text style={[styles.mapLabel, {color: theme.textSecondary}]}>
-              🗺 {isAr ? '[معاينة الموقع - الموقع الحالي]' : '[Map Preview - Current Location]'}
+              🗺 {t('attendance.mapPreview')}
             </Text>
           </View>
           <Text style={[styles.locationStatus, {color: colors.success}]}>
-            {isAr
-              ? '✓ داخل النطاق المسموح (مكتب - 50م)'
-              : '✓ Within allowed zone (Office - 50m)'}
+            {'✓ '}{t('attendance.withinZone')}
           </Text>
         </View>
 
         {/* ── Task Assignment ── */}
         <View style={[styles.card, {backgroundColor: theme.surface, borderColor: theme.border}]}>
           <Text style={[styles.cardLabel, {color: theme.textSecondary}]}>
-            {t('attendance.task')}{isAr ? ' (اختياري)' : ' (Optional)'}
+            {t('attendance.task')}{` ${t('common.optional')}`}
           </Text>
           <TouchableOpacity
             style={[styles.taskSelector, {borderColor: theme.border, backgroundColor: theme.background}]}
@@ -218,7 +216,7 @@ export default function AttendanceDashboardScreen() {
                 {color: selectedTaskName ? theme.text : theme.textSecondary},
               ]}
               numberOfLines={1}>
-              {selectedTaskName ?? (isAr ? '-- اختر مهمة --' : '-- Select Task --')}
+              {selectedTaskName ?? `-- ${t('attendance.selectTask')} --`}
             </Text>
             <Text style={[styles.chevron, {color: theme.textSecondary}]}>▾</Text>
           </TouchableOpacity>
@@ -227,7 +225,7 @@ export default function AttendanceDashboardScreen() {
         {/* ── Mood ── */}
         <View style={[styles.card, {backgroundColor: theme.surface, borderColor: theme.border}]}>
           <Text style={[styles.cardTitle, {color: theme.text}]}>
-            {isAr ? '😊 كيف حالك اليوم؟' : '😊 How are you feeling today?'}
+            {'😊 '}{t('attendance.moodQuestion')}
           </Text>
           <View style={styles.moodRow}>
             {MOODS.map((emoji, idx) => {

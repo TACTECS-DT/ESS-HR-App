@@ -229,7 +229,7 @@ export default function CalendarScreen() {
         {summaryData && (
           <Card style={styles.summaryCard}>
             <Text style={[styles.summaryTitle, {color: theme.text}]}>
-              {isAr ? 'ملخص اليوم' : "Today's Summary"}
+              {t('calendar.todaySummary')}
             </Text>
             <View style={styles.summaryRow}>
               <View style={styles.summaryItem}>
@@ -237,7 +237,7 @@ export default function CalendarScreen() {
                   {summaryData.hours_worked_today.toFixed(1)}
                 </Text>
                 <Text style={[styles.summaryLabel, {color: theme.textSecondary}]}>
-                  {isAr ? 'ساعات اليوم' : 'Hours Today'}
+                  {t('calendar.hoursToday')}
                 </Text>
               </View>
               <View style={styles.summaryItem}>
@@ -245,7 +245,7 @@ export default function CalendarScreen() {
                   {summaryData.hours_worked_this_month.toFixed(0)}
                 </Text>
                 <Text style={[styles.summaryLabel, {color: theme.textSecondary}]}>
-                  {isAr ? 'ساعات الشهر' : 'Hours Month'}
+                  {t('calendar.hoursMonth')}
                 </Text>
               </View>
               <View style={styles.summaryItem}>
@@ -253,7 +253,7 @@ export default function CalendarScreen() {
                   {summaryData.absences_this_month}
                 </Text>
                 <Text style={[styles.summaryLabel, {color: theme.textSecondary}]}>
-                  {isAr ? 'غياب' : 'Absences'}
+                  {t('calendar.absences')}
                 </Text>
               </View>
             </View>

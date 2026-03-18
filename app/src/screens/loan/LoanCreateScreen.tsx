@@ -149,7 +149,7 @@ export default function LoanCreateScreen() {
 
         <TextInput
           label={`${t('loan.loanTitle')} *`}
-          placeholder={isAr ? 'مثال: قرض شخصي' : 'e.g., Personal Loan'}
+          placeholder={t('loan.loanTitlePlaceholder')}
           value={loanTitle}
           onChangeText={setLoanTitle}
         />
@@ -164,7 +164,7 @@ export default function LoanCreateScreen() {
 
         <TextInput
           label={t('loan.installmentAmount')}
-          placeholder={isAr ? 'يحسب تلقائياً' : 'Auto-calculated'}
+          placeholder={t('loan.autoCalculated')}
           value={installment}
           onChangeText={() => {}}
           editable={false}
@@ -193,7 +193,7 @@ export default function LoanCreateScreen() {
 
         <TextInput
           label={`${t('loan.reason')} *`}
-          placeholder={isAr ? 'اشرح سبب طلب القرض...' : 'Explain loan reason...'}
+          placeholder={t('loan.reasonPlaceholder')}
           value={reason}
           onChangeText={setReason}
           multiline
