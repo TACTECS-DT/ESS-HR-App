@@ -12,6 +12,7 @@ import StatusChip from '../../components/common/StatusChip';
 import Button from '../../components/common/Button';
 import {useTheme} from '../../hooks/useTheme';
 import {useAppSelector} from '../../hooks/useAppSelector';
+import {useRBAC} from '../../hooks/useRBAC';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
 import type {Expense} from '../../api/mocks/expense.mock';
@@ -33,6 +34,7 @@ export default function ExpenseDetailScreen() {
   const route = useRoute<Route>();
   const queryClient = useQueryClient();
   const user = useAppSelector(state => state.auth.user);
+  const {canApproveExpense, canRefuseExpense, canDeleteDraftLeave} = useRBAC();
   const isAr = i18n.language === 'ar';
   const {id} = route.params;
 
@@ -45,7 +47,10 @@ export default function ExpenseDetailScreen() {
   });
 
   const expense = expenses?.find(e => e.id === id);
-  const isDraft = expense?.status === 'draft';
+  const isDraft    = expense?.status === 'draft';
+  const canApprove = canApproveExpense && expense?.status === 'submitted';
+  const canRefuse  = canRefuseExpense  && expense?.status === 'submitted';
+  const canDelete  = canDeleteDraftLeave && isDraft;
 
   const deleteMutation = useMutation({
     mutationFn: async () => {
@@ -58,10 +63,27 @@ export default function ExpenseDetailScreen() {
     onError: () => Alert.alert(t('common.error')),
   });
 
+  const patchMutation = useMutation({
+    mutationFn: async (action: string) => {
+      await apiClient.patch(`/expenses/${id}`, {action});
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: ['expenses']});
+    },
+    onError: () => Alert.alert(t('common.error')),
+  });
+
   function confirmDelete() {
     Alert.alert(t('common.delete'), `${t('common.confirm')}?`, [
       {text: t('common.cancel'), style: 'cancel'},
       {text: t('common.delete'), style: 'destructive', onPress: () => deleteMutation.mutate()},
+    ]);
+  }
+
+  function confirmAction(action: string, label: string) {
+    Alert.alert(label, `${t('common.confirm')}?`, [
+      {text: t('common.cancel'), style: 'cancel'},
+      {text: label, onPress: () => patchMutation.mutate(action)},
     ]);
   }
 
@@ -93,9 +115,7 @@ export default function ExpenseDetailScreen() {
           </View>
           <View style={[styles.divider, {borderColor: theme.border}]} />
 
-          {user?.name ? (
-            <InfoRow label={t('profile.name')} value={user.name} theme={theme} />
-          ) : null}
+          <InfoRow label={t('common.employee')} value={isAr ? expense.employee_ar : expense.employee} theme={theme} />
           <InfoRow label={t('common.date')} value={expense.date} theme={theme} />
           <InfoRow
             label={t('expense.category')}
@@ -221,7 +241,29 @@ export default function ExpenseDetailScreen() {
           </>
         ) : null}
 
-        {isDraft ? (
+        {/* Manager / HR approve-refuse */}
+        {(canApprove || canRefuse) ? (
+          <View style={styles.actionRow}>
+            {canApprove ? (
+              <TouchableOpacity
+                style={[styles.actionBtn, {backgroundColor: colors.success}]}
+                onPress={() => confirmAction('approve', t('leave.actions.approve'))}
+                disabled={patchMutation.isPending}>
+                <Text style={styles.actionBtnText}>{'✓ '}{t('leave.actions.approve')}</Text>
+              </TouchableOpacity>
+            ) : null}
+            {canRefuse ? (
+              <TouchableOpacity
+                style={[styles.actionBtn, {backgroundColor: colors.error}]}
+                onPress={() => confirmAction('refuse', t('leave.actions.refuse'))}
+                disabled={patchMutation.isPending}>
+                <Text style={styles.actionBtnText}>{'✗ '}{t('leave.actions.refuse')}</Text>
+              </TouchableOpacity>
+            ) : null}
+          </View>
+        ) : null}
+
+        {canDelete ? (
           <Button
             label={t('common.delete')}
             variant="danger"
@@ -273,4 +315,7 @@ const styles = StyleSheet.create({
   timelineContent: {flex: 1, gap: 4, paddingBottom: spacing.sm},
   stepText: {fontSize: fontSize.sm, fontWeight: '600'},
   stepDate: {fontSize: fontSize.xs},
+  actionRow: {flexDirection: 'row', gap: spacing.sm},
+  actionBtn: {flex: 1, borderRadius: radius.md, paddingVertical: spacing.md, alignItems: 'center'},
+  actionBtnText: {color: '#fff', fontSize: fontSize.sm, fontWeight: '700'},
 });

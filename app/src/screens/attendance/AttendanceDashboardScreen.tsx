@@ -17,6 +17,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import apiClient from '../../api/client';
 import {isApiSuccess} from '../../types/api';
 import {useTheme} from '../../hooks/useTheme';
+import {useRBAC} from '../../hooks/useRBAC';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {AttendanceStackParamList} from '../../navigation/types';
 import type {AttendanceSummary} from '../../api/mocks/attendance.mock';
@@ -35,6 +36,7 @@ export default function AttendanceDashboardScreen() {
   const {t, i18n} = useTranslation();
   const theme = useTheme();
   const navigation = useNavigation<Nav>();
+  const {canViewTeamAttendance, canManualEditAttendance} = useRBAC();
   const queryClient = useQueryClient();
   const insets = useSafeAreaInsets();
   const isAr = i18n.language === 'ar';
@@ -281,6 +283,26 @@ export default function AttendanceDashboardScreen() {
               {t('attendance.monthlySheet')}
             </Text>
           </TouchableOpacity>
+          {canViewTeamAttendance ? (
+            <TouchableOpacity
+              style={[styles.navCard, {backgroundColor: theme.surface, borderColor: theme.border}]}
+              onPress={() => navigation.navigate('AttendanceTeam')}>
+              <Text style={styles.navIcon}>👥</Text>
+              <Text style={[styles.navLabel, {color: theme.text}]} numberOfLines={2}>
+                {t('attendance.teamAttendance', 'Team')}
+              </Text>
+            </TouchableOpacity>
+          ) : null}
+          {canManualEditAttendance ? (
+            <TouchableOpacity
+              style={[styles.navCard, {backgroundColor: theme.surface, borderColor: theme.border}]}
+              onPress={() => navigation.navigate('AttendanceManualEntry')}>
+              <Text style={styles.navIcon}>✏️</Text>
+              <Text style={[styles.navLabel, {color: theme.text}]} numberOfLines={2}>
+                {t('attendance.manualEntry', 'Manual Entry')}
+              </Text>
+            </TouchableOpacity>
+          ) : null}
         </View>
       </ScrollView>
     </View>

@@ -15,6 +15,8 @@ import {isApiSuccess} from '../../types/api';
 import ScreenHeader from '../../components/common/ScreenHeader';
 import LoadingSkeleton from '../../components/common/LoadingSkeleton';
 import {useTheme} from '../../hooks/useTheme';
+import {useRBAC} from '../../hooks/useRBAC';
+import AccessDenied from '../../components/common/AccessDenied';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {TeamHoursSummary, TeamMemberHours} from '../../api/mocks/team-hours.mock';
 
@@ -82,14 +84,21 @@ export default function TeamHoursScreen() {
   const {t} = useTranslation();
   const theme = useTheme();
   const [weekOffset, setWeekOffset] = useState(0);
+  const {canAccessTeamHours} = useRBAC();
 
+  // Hook must be called unconditionally — disabled when no access
   const {data, isLoading, refetch, isRefetching} = useQuery({
     queryKey: ['team-hours'],
+    enabled: canAccessTeamHours,
     queryFn: async () => {
       const res = await apiClient.get('/team-hours');
       return isApiSuccess(res.data) ? (res.data.data as TeamHoursSummary) : null;
     },
   });
+
+  if (!canAccessTeamHours) {
+    return <AccessDenied />;
+  }
 
   if (isLoading) {
     return (

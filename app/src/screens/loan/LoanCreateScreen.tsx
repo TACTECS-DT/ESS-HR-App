@@ -21,6 +21,7 @@ import DatePickerField from '../../components/common/DatePickerField';
 import LoadingSkeleton from '../../components/common/LoadingSkeleton';
 import SelectField from '../../components/common/SelectField';
 import {useTheme} from '../../hooks/useTheme';
+import {useAppSelector} from '../../hooks/useAppSelector';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {LoanRules} from '../../api/mocks/loan.mock';
 
@@ -38,6 +39,7 @@ export default function LoanCreateScreen() {
   const navigation = useNavigation();
   const queryClient = useQueryClient();
   const isAr = i18n.language === 'ar';
+  const user = useAppSelector(state => state.auth.user);
 
   const transferMethodOptions = TRANSFER_METHODS.map(m => ({
     label: isAr ? m.ar : m.en,
@@ -130,6 +132,14 @@ export default function LoanCreateScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScreenHeader title={t('loan.apply')} showBack />
       <ScrollView contentContainerStyle={styles.content}>
+
+        {/* Employee (readonly) */}
+        <TextInput
+          label={t('common.employee')}
+          value={isAr ? (user?.name_ar ?? '') : (user?.name ?? '')}
+          onChangeText={() => {}}
+          editable={false}
+        />
 
         {/* Warning / rules card */}
         {rules ? (

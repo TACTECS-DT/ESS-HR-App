@@ -13,6 +13,7 @@ export interface TimesheetEntry {
 }
 
 export interface DailyTimesheetSummary {
+  employee_id: number;
   date: string;
   total_hours: number;
   entries: TimesheetEntry[];
@@ -23,6 +24,7 @@ export const MOCK_TIMESHEETS: ApiSuccess<DailyTimesheetSummary[]> = {
   data: [
     // Current week — Wed Mar 18
     {
+      employee_id: 100,
       date: '2026-03-18',
       total_hours: 3.5,
       entries: [
@@ -32,6 +34,7 @@ export const MOCK_TIMESHEETS: ApiSuccess<DailyTimesheetSummary[]> = {
     },
     // Current week — Tue Mar 17
     {
+      employee_id: 100,
       date: '2026-03-17',
       total_hours: 8.5,
       entries: [
@@ -41,6 +44,7 @@ export const MOCK_TIMESHEETS: ApiSuccess<DailyTimesheetSummary[]> = {
     },
     // Current week — Mon Mar 16
     {
+      employee_id: 100,
       date: '2026-03-16',
       total_hours: 8.0,
       entries: [
@@ -50,6 +54,7 @@ export const MOCK_TIMESHEETS: ApiSuccess<DailyTimesheetSummary[]> = {
     },
     // Previous week — Thu Mar 12
     {
+      employee_id: 100,
       date: '2026-03-12',
       total_hours: 7.5,
       entries: [
@@ -59,6 +64,7 @@ export const MOCK_TIMESHEETS: ApiSuccess<DailyTimesheetSummary[]> = {
     },
     // Previous week — Wed Mar 11
     {
+      employee_id: 100,
       date: '2026-03-11',
       total_hours: 8.0,
       entries: [

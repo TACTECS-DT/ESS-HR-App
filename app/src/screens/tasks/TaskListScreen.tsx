@@ -167,6 +167,7 @@ export default function TaskListScreen() {
                 </View>
               </View>
               <Text style={[styles.project, {color: theme.textSecondary}]}>{item.project}</Text>
+              <Text style={[styles.assignee, {color: theme.textSecondary}]}>👤 {item.assigned_to}</Text>
               <View style={styles.cardBottom}>
                 <StatusChip status={item.stage} label={t(`tasks.stage.${item.stage}`)} />
                 {item.deadline ? (
@@ -210,6 +211,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.sm,
   },
   project: {fontSize: fontSize.sm},
+  assignee: {fontSize: fontSize.xs},
   cardBottom: {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'},
   deadline: {fontSize: fontSize.xs},
   statsCard: {

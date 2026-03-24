@@ -31,7 +31,7 @@ npx react-native doctor
 
 
 ************Create Project (VS Code / Terminal)***********************
-
+npm uninstall -g react-native-cli @react-native-community/cli 
 npx @react-native-community/cli init App   # Create new project
 cd App                                     # Enter project folder
 npm install                                # Install dependencies
@@ -82,3 +82,20 @@ emulator -avd Pixel_9a
 Run app:
 
 npx react-native run-android
+
+
+
+Two commands — run them from the app/ folder:
+
+1. Bundle the JS:
+
+
+npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
+2. Build the APK:
+
+
+cd android && ./gradlew assembleRelease
+Output APK will be at:
+
+
+android/app/build/outputs/apk/release/app-release.apk

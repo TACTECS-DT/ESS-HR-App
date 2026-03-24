@@ -22,6 +22,7 @@ import Button from '../../components/common/Button';
 import TextInput from '../../components/common/TextInput';
 import DatePickerField from '../../components/common/DatePickerField';
 import {useTheme} from '../../hooks/useTheme';
+import {useAppSelector} from '../../hooks/useAppSelector';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {TasksStackParamList} from '../../navigation/types';
 import type {Task} from '../../api/mocks/tasks.mock';
@@ -38,11 +39,13 @@ function getTodayString(): string {
 }
 
 export default function LogTimeScreen() {
-  const {t} = useTranslation();
+  const {t, i18n} = useTranslation();
   const theme = useTheme();
   const navigation = useNavigation();
   const route = useRoute<Route>();
   const queryClient = useQueryClient();
+  const isAr = i18n.language === 'ar';
+  const user = useAppSelector(state => state.auth.user);
 
   const paramTaskId = route.params?.taskId ?? 0;
   const paramTaskName = route.params?.taskName ?? '';
@@ -134,6 +137,14 @@ export default function LogTimeScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScreenHeader title={t('tasks.logTime')} showBack />
       <ScrollView contentContainerStyle={styles.content}>
+
+        {/* Employee (readonly) */}
+        <TextInput
+          label={t('common.employee')}
+          value={isAr ? (user?.name_ar ?? '') : (user?.name ?? '')}
+          onChangeText={() => {}}
+          editable={false}
+        />
 
         {isStandalone ? (
           <>

@@ -10,6 +10,9 @@ export interface LoanInstallment {
 
 export interface Loan {
   id: number;
+  employee_id: number;
+  employee: string;
+  employee_ar: string;
   amount: number;
   duration_months: number;
   monthly_installment: number;
@@ -47,6 +50,9 @@ export const MOCK_LOANS: ApiSuccess<Loan[]> = {
   data: [
     {
       id: 501,
+      employee_id: 100,
+      employee: 'Ahmed Al-Farsi',
+      employee_ar: 'أحمد الفارسي',
       amount: 15000,
       duration_months: 12,
       monthly_installment: 1250,
@@ -73,8 +79,85 @@ export const MOCK_LOANS: ApiSuccess<Loan[]> = {
         {step: 'CEO', approver: 'Mohammed Al-Rashid', status: 'approved', date: '2025-06-04'},
       ],
     },
+    {
+      id: 502,
+      employee_id: 100,
+      employee: 'Ahmed Al-Farsi',
+      employee_ar: 'أحمد الفارسي',
+      amount: 10000,
+      duration_months: 10,
+      monthly_installment: 1000,
+      transfer_method: 'Bank Transfer',
+      status: 'pending',
+      request_date: '2026-03-20',
+      reason: 'Home renovation',
+      installments: [],
+      approval_history: [
+        {step: 'Manager', approver: 'Khalid Nasser', status: 'pending'},
+        {step: 'HR', approver: 'Fatima Hassan', status: 'pending'},
+        {step: 'CEO', approver: 'Mohammed Al-Rashid', status: 'pending'},
+      ],
+    },
+    {
+      id: 503,
+      employee_id: 100,
+      employee: 'Ahmed Al-Farsi',
+      employee_ar: 'أحمد الفارسي',
+      amount: 20000,
+      duration_months: 20,
+      monthly_installment: 1000,
+      transfer_method: 'Bank Transfer',
+      status: 'manager_approved',
+      request_date: '2026-03-15',
+      reason: 'Medical expenses',
+      installments: [],
+      approval_history: [
+        {step: 'Manager', approver: 'Khalid Nasser', status: 'approved', date: '2026-03-16'},
+        {step: 'HR', approver: 'Fatima Hassan', status: 'pending'},
+        {step: 'CEO', approver: 'Mohammed Al-Rashid', status: 'pending'},
+      ],
+    },
+    {
+      id: 504,
+      employee_id: 100,
+      employee: 'Ahmed Al-Farsi',
+      employee_ar: 'أحمد الفارسي',
+      amount: 25000,
+      duration_months: 24,
+      monthly_installment: 1042,
+      transfer_method: 'Bank Transfer',
+      status: 'hr_approved',
+      request_date: '2026-03-10',
+      reason: 'Education fees',
+      installments: [],
+      approval_history: [
+        {step: 'Manager', approver: 'Khalid Nasser', status: 'approved', date: '2026-03-11'},
+        {step: 'HR', approver: 'Fatima Hassan', status: 'approved', date: '2026-03-12'},
+        {step: 'CEO', approver: 'Mohammed Al-Rashid', status: 'pending'},
+      ],
+    },
+    // Subordinate Omar (id=111) — visible to manager/hr/admin
+    {
+      id: 505,
+      employee_id: 111,
+      employee: 'Omar Al-Rashid',
+      employee_ar: 'عمر الراشد',
+      amount: 8000,
+      duration_months: 8,
+      monthly_installment: 1000,
+      transfer_method: 'Bank Transfer',
+      status: 'pending',
+      request_date: '2026-03-15',
+      reason: 'Car repair',
+      installments: [],
+      approval_history: [
+        {step: 'Manager', approver: 'Khalid Al-Mansouri', status: 'pending'},
+        {step: 'HR', approver: 'Sara Al-Amin', status: 'pending'},
+        {step: 'CEO', approver: 'Omar Nasser', status: 'pending'},
+      ],
+    },
   ],
-  pagination: {page: 1, pageSize: 10, total: 1, totalPages: 1},
+  pagination: {page: 1, pageSize: 10, total: 5, totalPages: 1},
 };
 
 export const MOCK_LOAN_CREATE_SUCCESS: ApiSuccess<{id: number}> = {

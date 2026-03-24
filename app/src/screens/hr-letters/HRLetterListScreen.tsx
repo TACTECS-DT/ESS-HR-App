@@ -113,6 +113,9 @@ export default function HRLetterListScreen() {
               </Text>
               <StatusChip status={item.status} label={t(`common.status.${item.status}`)} />
             </View>
+            <Text style={[styles.employee, {color: theme.textSecondary}]}>
+              👤 {item.employee}
+            </Text>
             <Text style={[styles.detail, {color: theme.textSecondary}]}>
               {t('hrLetter.directedTo')}: {item.directed_to}
             </Text>
@@ -148,6 +151,7 @@ const styles = StyleSheet.create({
   card: {borderRadius: radius.md, borderWidth: 1, padding: spacing.md, gap: spacing.xs},
   cardTop: {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'},
   letterTitle: {fontSize: fontSize.md, fontWeight: '700', flex: 1, marginRight: spacing.sm},
+  employee: {fontSize: fontSize.xs},
   detail: {fontSize: fontSize.sm},
   metaRow: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'},
   salaryBadge: {paddingHorizontal: spacing.sm, paddingVertical: 3, borderRadius: radius.sm},

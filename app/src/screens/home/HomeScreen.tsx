@@ -18,6 +18,7 @@ import {isApiSuccess} from '../../types/api';
 import {useTheme} from '../../hooks/useTheme';
 import {useAppSelector} from '../../hooks/useAppSelector';
 import {useAppDispatch} from '../../hooks/useAppDispatch';
+import {useRBAC} from '../../hooks/useRBAC';
 import {toggleDarkMode, setLanguage} from '../../store/slices/settingsSlice';
 import {toggleLanguage} from '../../i18n/';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
@@ -35,9 +36,11 @@ type ServiceItem = {
   screen?: string;
   screenTab?: string;
   homeScreen?: string; // navigate within HomeStack directly
+  /** If set, item is hidden unless the role has this permission */
+  requiresPermission?: 'canViewTeamWidgets' | 'canAccessPendingApprovals' | 'canAccessAnalytics' | 'canAccessTeamHours';
 };
 
-const SERVICES: ServiceItem[] = [
+const ALL_SERVICES: ServiceItem[] = [
   {icon: '⏰', labelKey: 'attendance.title',           tab: 'AttendanceTab'},
   {icon: '🏖', labelKey: 'leave.title',                tab: 'LeavesTab'},
   {icon: '💰', labelKey: 'payslip.title',              tab: 'PayslipTab'},
@@ -50,10 +53,12 @@ const SERVICES: ServiceItem[] = [
   {icon: '🔧', labelKey: 'businessServices.title',     screenTab: 'MoreTab', screen: 'BusinessServiceList'},
   {icon: '✅', labelKey: 'tasks.title',                screenTab: 'MoreTab', screen: 'TaskList'},
   {icon: '🕐', labelKey: 'timesheets.title',           screenTab: 'MoreTab', screen: 'TimesheetWeekly'},
-  {icon: '👥', labelKey: 'home.myTeam', tab: 'LeavesTab', screen: 'LeaveTeamBalance', screenTab: 'LeavesTab'},
+  // Manager/HR/Admin only
+  {icon: '👥', labelKey: 'home.myTeam',               screenTab: 'LeavesTab', screen: 'LeaveTeamBalance', requiresPermission: 'canViewTeamWidgets'},
+  {icon: '⏳', labelKey: 'home.pendingApprovals',      homeScreen: 'PendingApprovals',                   requiresPermission: 'canAccessPendingApprovals'},
+  // Always visible
   {icon: '⚙️', labelKey: 'settings.title',             screenTab: 'MoreTab', screen: 'Settings'},
   {icon: '☰',  labelKey: 'home.more',                  screenTab: 'MoreTab', screen: 'MoreHub'},
-  {icon: '⏳', labelKey: 'home.pendingApprovals',       homeScreen: 'PendingApprovals'},
 ];
 
 export default function HomeScreen() {
@@ -65,6 +70,13 @@ export default function HomeScreen() {
   const user = useAppSelector(state => state.auth.user);
   const darkMode = useAppSelector(state => state.settings.darkMode);
   const currentLanguage = useAppSelector(state => state.settings.language);
+  const rbac = useRBAC();
+
+  // Filter services based on role permissions
+  const SERVICES = ALL_SERVICES.filter(svc => {
+    if (!svc.requiresPermission) {return true;}
+    return rbac[svc.requiresPermission] === true;
+  });
   const isAr = i18n.language === 'ar';
 
   const {data: balancesData, isLoading: balancesLoading, refetch: refetchBalances} = useQuery({
@@ -99,6 +111,7 @@ export default function HomeScreen() {
   const displayName = isAr ? user?.name_ar : user?.name;
   const displayDept = isAr ? user?.department_ar : user?.department;
   const unreadCount = (notificationsData ?? []).filter(n => !n.is_read).length;
+  const roleLabel = user?.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : '';
 
   function handleServicePress(svc: ServiceItem) {
     if (!svc.tab && !svc.screenTab && !svc.homeScreen) {return;}
@@ -163,7 +176,10 @@ export default function HomeScreen() {
           )}
           <View style={{flex: 1}}>
             <Text style={styles.profileName}>{displayName}</Text>
-            <Text style={styles.profileSub}>{user?.badge_id} · {displayDept}</Text>
+            <Text style={styles.profileSub}>
+              {user?.badge_id} · {displayDept}
+              {roleLabel ? ` · ${roleLabel}` : ''}
+            </Text>
           </View>
           <Text style={{color: 'rgba(255,255,255,0.7)', fontSize: 20}}>›</Text>
         </TouchableOpacity>

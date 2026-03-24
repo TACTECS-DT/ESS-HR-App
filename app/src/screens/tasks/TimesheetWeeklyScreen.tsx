@@ -18,6 +18,8 @@ import ScreenHeader from '../../components/common/ScreenHeader';
 import EmptyState from '../../components/common/EmptyState';
 import LoadingSkeleton from '../../components/common/LoadingSkeleton';
 import {useTheme} from '../../hooks/useTheme';
+import {useRBAC} from '../../hooks/useRBAC';
+import {useAppSelector} from '../../hooks/useAppSelector';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {TasksStackParamList} from '../../navigation/types';
 import type {DailyTimesheetSummary} from '../../api/mocks/timesheets.mock';
@@ -52,9 +54,12 @@ function formatDayHeader(dateStr: string): string {
 }
 
 export default function TimesheetWeeklyScreen() {
-  const {t} = useTranslation();
+  const {t, i18n} = useTranslation();
   const theme = useTheme();
   const navigation = useNavigation<Nav>();
+  const {canAccessTeamHours} = useRBAC();
+  const user = useAppSelector(state => state.auth.user);
+  const isAr = i18n.language === 'ar';
   const [period, setPeriod] = useState<PeriodFilter>('this_week');
 
   const {data, isLoading, refetch, isRefetching} = useQuery({
@@ -111,6 +116,7 @@ export default function TimesheetWeeklyScreen() {
         {/* Weekly summary card */}
         {data && data.length > 0 ? (
           <View style={[styles.weeklyCard, {backgroundColor: colors.primary}]}>
+            <Text style={styles.weekEmployeeLabel}>👤 {isAr ? (user?.name_ar ?? '') : (user?.name ?? '')}</Text>
             <Text style={styles.weekRangeLabel}>{weekRange}</Text>
             <Text style={styles.weeklyTotal}>{weeklyTotal}h</Text>
             <View style={styles.progressTrack}>
@@ -131,6 +137,18 @@ export default function TimesheetWeeklyScreen() {
               })}
             </View>
           </View>
+        ) : null}
+
+        {/* Team Hours shortcut — manager/hr/admin only */}
+        {canAccessTeamHours ? (
+          <TouchableOpacity
+            style={[styles.teamHoursBtn, {backgroundColor: theme.surface, borderColor: theme.border}]}
+            onPress={() => navigation.navigate('TeamHours')}>
+            <Text style={[styles.teamHoursBtnText, {color: colors.primary}]}>
+              {'👥 '}{t('tasks.teamHours', 'Team Hours')}
+            </Text>
+            <Text style={{color: theme.textSecondary, fontSize: 14}}>›</Text>
+          </TouchableOpacity>
         ) : null}
 
         {/* Period filter tabs — below the summary card */}
@@ -217,6 +235,7 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     alignItems: 'center',
   },
+  weekEmployeeLabel: {color: 'rgba(255,255,255,0.9)', fontSize: fontSize.sm, fontWeight: '600'},
   weekRangeLabel: {color: 'rgba(255,255,255,0.75)', fontSize: fontSize.xs},
   weeklyTotal: {color: '#fff', fontSize: 48, fontWeight: '700'},
   progressTrack: {width: '100%', height: 6, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.25)', overflow: 'hidden'},
@@ -227,6 +246,18 @@ const styles = StyleSheet.create({
   barWrapper: {height: 48, justifyContent: 'flex-end', width: '60%'},
   barFill: {borderRadius: 3, width: '100%'},
   barLabel: {color: 'rgba(255,255,255,0.7)', fontSize: 10},
+  teamHoursBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginHorizontal: spacing.md,
+    marginTop: spacing.sm,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.md,
+    borderWidth: 1,
+  },
+  teamHoursBtnText: {fontSize: fontSize.sm, fontWeight: '600'},
   tabBar: {borderBottomWidth: StyleSheet.hairlineWidth, marginTop: spacing.sm},
   tabList: {paddingHorizontal: spacing.md, gap: spacing.sm},
   tab: {paddingVertical: spacing.sm, paddingHorizontal: spacing.xs},

@@ -6,6 +6,8 @@ import AttendanceDashboardScreen from '../screens/attendance/AttendanceDashboard
 import AttendanceHistoryScreen from '../screens/attendance/AttendanceHistoryScreen';
 import AttendanceDailySheetScreen from '../screens/attendance/AttendanceDailySheetScreen';
 import AttendanceMonthlySheetScreen from '../screens/attendance/AttendanceMonthlySheetScreen';
+import AttendanceTeamScreen from '../screens/attendance/AttendanceTeamScreen';
+import AttendanceManualEntryScreen from '../screens/attendance/AttendanceManualEntryScreen';
 
 const Stack = createStackNavigator<AttendanceStackParamList>();
 
@@ -16,6 +18,8 @@ export default function AttendanceNavigator() {
       <Stack.Screen name="AttendanceHistory" component={AttendanceHistoryScreen} />
       <Stack.Screen name="AttendanceDailySheet" component={AttendanceDailySheetScreen} />
       <Stack.Screen name="AttendanceMonthlySheet" component={AttendanceMonthlySheetScreen} />
+      <Stack.Screen name="AttendanceTeam" component={AttendanceTeamScreen} />
+      <Stack.Screen name="AttendanceManualEntry" component={AttendanceManualEntryScreen} />
     </Stack.Navigator>
   );
 }

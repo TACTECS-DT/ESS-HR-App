@@ -25,6 +25,7 @@
     "date": "Date",
     "sar": "SAR",
     "optional": "(Optional)",
+    "employee": "Employee",
     "statusLabel": "Status",
     "status": {
       "draft": "Draft",
@@ -147,7 +148,20 @@
     "mapPreview": "Map Preview - Current Location",
     "withinZone": "Within allowed zone (Office - 50m)",
     "moodQuestion": "How are you feeling today?",
-    "noCheckin": "No check-in today"
+    "noCheckin": "No check-in today",
+    "teamAttendance": "Team Attendance",
+    "checkedIn": "Checked In",
+    "checkedOut": "Checked Out",
+    "absent": "Absent",
+    "manualEntry": "Manual Entry",
+    "addManualEntry": "Add Attendance",
+    "employeeLabel": "Employee",
+    "selectEmployee": "Select Employee",
+    "dateLabel": "Date",
+    "checkInTime": "Check-in Time",
+    "checkOutTime": "Check-out Time",
+    "manualEntrySuccess": "Attendance record saved.",
+    "fillRequired": "Date and check-in time are required."
   },
   "leave": {
     "title": "Leave",
@@ -188,6 +202,7 @@
     "noLimit": "No Limit",
     "duration": "Duration",
     "managerActions": "Manager Actions",
+    "hrActions": "HR Actions",
     "commentPlaceholder": "Comment (optional)...",
     "actions": {
       "approve": "Approve",
@@ -275,6 +290,12 @@
       "maxDuration": "Maximum duration: {{months}} months",
       "maxAmount": "Maximum amount: {{amount}}",
       "minGap": "Minimum gap between loans: {{months}} months"
+    },
+    "actions": {
+      "approve": "Approve (Manager)",
+      "hrApprove": "Approve (HR Level)",
+      "ceoApprove": "Approve (CEO Level)",
+      "refuse": "Refuse"
     }
   },
   "advanceSalary": {
@@ -383,6 +404,7 @@
     "project": "Project",
     "timesheet": "Timesheet",
     "assignedTo": "Assigned To",
+    "assignTo": "Assign To",
     "timeTracker": "Time Tracker",
     "todayTime": "Today",
     "addAttachment": "Add Attachment",
@@ -540,7 +562,8 @@
     "company": "Company",
     "hireDate": "Hire Date",
     "contractType": "Contract Type",
-    "basicSalary": "Basic Salary"
+    "basicSalary": "Basic Salary",
+    "directory": "Employee Directory"
   },
   "settings": {
     "title": "Settings",
@@ -590,6 +613,11 @@
     "empty": "No announcements",
     "postedBy": "Posted by",
     "readMore": "Read more",
+    "create": "New Announcement",
+    "titleLabel": "Title",
+    "bodyLabel": "Body",
+    "priorityLabel": "Priority",
+    "fillRequired": "Please fill in title and body.",
     "priority": {
       "urgent": "URGENT",
       "info": "INFO",

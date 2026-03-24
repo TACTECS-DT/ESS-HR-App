@@ -11,6 +11,7 @@ import ScreenHeader from '../../components/common/ScreenHeader';
 import StatusChip from '../../components/common/StatusChip';
 import {useTheme} from '../../hooks/useTheme';
 import {useAppSelector} from '../../hooks/useAppSelector';
+import {useRBAC} from '../../hooks/useRBAC';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
 import type {BusinessService} from '../../api/mocks/business-services.mock';
@@ -38,6 +39,7 @@ export default function BusinessServiceDetailScreen() {
   const route = useRoute<Route>();
   const queryClient = useQueryClient();
   const user = useAppSelector(state => state.auth.user);
+  const {canApproveBusinessService, canRefuseBusinessService, canResetLeave, canDeleteDraftLeave} = useRBAC();
   const isAr = i18n.language === 'ar';
   const {id} = route.params;
 
@@ -51,10 +53,10 @@ export default function BusinessServiceDetailScreen() {
 
   const service = services?.find(s => s.id === id);
 
-  const isManager = user?.role === 'manager' || user?.role === 'hr' || user?.role === 'admin';
-  const canApprove = isManager && service?.status === 'pending';
-  const canReset = service?.status === 'refused';
-  const canDelete = service?.status === 'draft';
+  const canApprove = canApproveBusinessService && service?.status === 'pending';
+  const canRefuse  = canRefuseBusinessService  && service?.status === 'pending';
+  const canReset   = canResetLeave             && service?.status === 'refused';
+  const canDelete  = canDeleteDraftLeave       && service?.status === 'draft';
 
   const patchMutation = useMutation({
     mutationFn: async (action: string) => {
@@ -100,9 +102,7 @@ export default function BusinessServiceDetailScreen() {
             <StatusChip status={service.status} label={t(`common.status.${service.status}`)} />
           </View>
           <View style={[styles.divider, {borderColor: theme.border}]} />
-          {user?.name ? (
-            <InfoRow label={t('profile.name')} value={user.name} theme={theme} />
-          ) : null}
+          <InfoRow label={t('common.employee')} value={isAr ? service.employee_ar : service.employee} theme={theme} />
           {/* Service type badge */}
           <View style={styles.typeRow}>
             <Text style={[styles.infoLabel, {color: theme.textSecondary}]}>{t('businessService.serviceType')}</Text>
@@ -155,21 +155,25 @@ export default function BusinessServiceDetailScreen() {
           </>
         ) : null}
 
-        {/* Manager Actions */}
-        {canApprove ? (
+        {/* Manager / Admin Actions */}
+        {(canApprove || canRefuse) ? (
           <View style={styles.actionRow}>
-            <TouchableOpacity
-              style={[styles.actionBtn, {backgroundColor: colors.success}]}
-              onPress={() => confirmAction('approve', t('leave.actions.approve'))}
-              disabled={patchMutation.isPending}>
-              <Text style={styles.actionBtnText}>{'✓ '}{t('leave.actions.approve')}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.actionBtn, {backgroundColor: colors.error}]}
-              onPress={() => confirmAction('refuse', t('leave.actions.refuse'))}
-              disabled={patchMutation.isPending}>
-              <Text style={styles.actionBtnText}>{'✗ '}{t('leave.actions.refuse')}</Text>
-            </TouchableOpacity>
+            {canApprove ? (
+              <TouchableOpacity
+                style={[styles.actionBtn, {backgroundColor: colors.success}]}
+                onPress={() => confirmAction('approve', t('leave.actions.approve'))}
+                disabled={patchMutation.isPending}>
+                <Text style={styles.actionBtnText}>{'✓ '}{t('leave.actions.approve')}</Text>
+              </TouchableOpacity>
+            ) : null}
+            {canRefuse ? (
+              <TouchableOpacity
+                style={[styles.actionBtn, {backgroundColor: colors.error}]}
+                onPress={() => confirmAction('refuse', t('leave.actions.refuse'))}
+                disabled={patchMutation.isPending}>
+                <Text style={styles.actionBtnText}>{'✗ '}{t('leave.actions.refuse')}</Text>
+              </TouchableOpacity>
+            ) : null}
           </View>
         ) : null}
 

@@ -20,6 +20,7 @@ import TextInput from '../../components/common/TextInput';
 import DatePickerField from '../../components/common/DatePickerField';
 import SelectField from '../../components/common/SelectField';
 import {useTheme} from '../../hooks/useTheme';
+import {useAppSelector} from '../../hooks/useAppSelector';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {LeaveType, LeaveBalance, LeaveMode} from '../../api/mocks/leave.mock';
 
@@ -52,6 +53,7 @@ export default function LeaveCreateScreen() {
   const navigation = useNavigation();
   const queryClient = useQueryClient();
   const isAr = i18n.language === 'ar';
+  const user = useAppSelector(state => state.auth.user);
 
   const [selectedTypeId, setSelectedTypeId] = useState<number | null>(null);
   const [segment, setSegment] = useState<SegmentMode>('full_day');
@@ -162,6 +164,14 @@ export default function LeaveCreateScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScreenHeader title={t('leave.request')} showBack />
       <ScrollView contentContainerStyle={styles.content}>
+
+        {/* Employee (readonly) */}
+        <TextInput
+          label={t('common.employee')}
+          value={isAr ? (user?.name_ar ?? '') : (user?.name ?? '')}
+          onChangeText={() => {}}
+          editable={false}
+        />
 
         {/* Leave type selector */}
         <SelectField

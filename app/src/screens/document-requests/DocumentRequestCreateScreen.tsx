@@ -21,6 +21,7 @@ import TextInput from '../../components/common/TextInput';
 import DatePickerField from '../../components/common/DatePickerField';
 import SelectField from '../../components/common/SelectField';
 import {useTheme} from '../../hooks/useTheme';
+import {useAppSelector} from '../../hooks/useAppSelector';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {DocumentType, DocumentRequest} from '../../api/mocks/document-requests.mock';
 
@@ -30,6 +31,7 @@ export default function DocumentRequestCreateScreen() {
   const navigation = useNavigation();
   const queryClient = useQueryClient();
   const isAr = i18n.language === 'ar';
+  const user = useAppSelector(state => state.auth.user);
 
   const [requestTitle, setRequestTitle] = useState('');
   const [selectedTypeId, setSelectedTypeId] = useState<number | null>(null);
@@ -89,6 +91,14 @@ export default function DocumentRequestCreateScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScreenHeader title={t('documentRequest.request')} showBack />
       <ScrollView contentContainerStyle={styles.content}>
+
+        {/* Employee (readonly) */}
+        <TextInput
+          label={t('common.employee')}
+          value={isAr ? (user?.name_ar ?? '') : (user?.name ?? '')}
+          onChangeText={() => {}}
+          editable={false}
+        />
 
         <TextInput
           label={`${t('documentRequest.requestTitle')} *`}

@@ -7,8 +7,8 @@ import {
   RefreshControl,
 } from 'react-native';
 import {useTranslation} from 'react-i18next';
-import {useNavigation} from '@react-navigation/native';
-import type {StackNavigationProp} from '@react-navigation/stack';
+import {useNavigation, useRoute} from '@react-navigation/native';
+import type {StackNavigationProp, RouteProp} from '@react-navigation/stack';
 import {useQuery} from '@tanstack/react-query';
 
 import apiClient from '../../api/client';
@@ -17,7 +17,9 @@ import {isApiSuccess} from '../../types/api';
 import ScreenHeader from '../../components/common/ScreenHeader';
 import Card from '../../components/common/Card';
 import LoadingSkeleton from '../../components/common/LoadingSkeleton';
+import AccessDenied from '../../components/common/AccessDenied';
 import {useTheme} from '../../hooks/useTheme';
+import {useRBAC} from '../../hooks/useRBAC';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {EmployeeProfile} from '../../api/mocks/profile.mock';
 
@@ -35,20 +37,43 @@ export default function ProfileScreen() {
   const {t, i18n} = useTranslation();
   const theme = useTheme();
   const navigation = useNavigation<StackNavigationProp<MoreStackParamList>>();
+  const route = useRoute<RouteProp<MoreStackParamList, 'Profile'>>();
   const isAr = i18n.language === 'ar';
 
+  const {canViewOtherProfiles, role} = useRBAC();
+
+  const employeeId = route.params?.employeeId;
+  const employeeName = route.params?.employeeName;
+  const isViewingOther = !!employeeId;
+  const accessAllowed = !isViewingOther || canViewOtherProfiles;
+
+  const roleLabel = role ? role.charAt(0).toUpperCase() + role.slice(1) : '';
+
   const {data: profile, isLoading, refetch} = useQuery({
-    queryKey: ['profile'],
+    queryKey: ['profile', employeeId ?? 'me'],
+    enabled: accessAllowed,
     queryFn: async () => {
-      const res = await apiClient.get('/profile');
+      const res = await apiClient.get('/profile', {params: employeeId ? {employee_id: employeeId} : undefined});
       return isApiSuccess(res.data) ? (res.data.data as EmployeeProfile) : null;
     },
   });
 
+  // Block access to other employees' profiles for employee and manager roles
+  if (!accessAllowed) {
+    return <AccessDenied />;
+  }
+
+  const headerTitle = isViewingOther
+    ? (employeeName ?? t('profile.title'))
+    : t('profile.title');
+  const handleBack = isViewingOther
+    ? () => navigation.goBack()
+    : () => navigation.getParent()?.navigate('HomeTab' as never);
+
   if (isLoading) {
     return (
       <View style={[styles.container, {backgroundColor: theme.background}]}>
-        <ScreenHeader title={t('profile.title')} showBack onBack={() => navigation.getParent()?.navigate('HomeTab' as never)} />
+        <ScreenHeader title={headerTitle} showBack onBack={handleBack} />
         <View style={styles.skeletons}>
           {[0, 1, 2, 3].map(i => <LoadingSkeleton key={i} height={120} style={styles.skeleton} />)}
         </View>
@@ -59,7 +84,7 @@ export default function ProfileScreen() {
   if (!profile) {
     return (
       <View style={[styles.container, {backgroundColor: theme.background}]}>
-        <ScreenHeader title={t('profile.title')} showBack onBack={() => navigation.getParent()?.navigate('HomeTab' as never)} />
+        <ScreenHeader title={headerTitle} showBack onBack={handleBack} />
         <View style={styles.center}>
           <Text style={{color: theme.textSecondary}}>{t('common.noData')}</Text>
         </View>
@@ -69,7 +94,7 @@ export default function ProfileScreen() {
 
   return (
     <View style={[styles.container, {backgroundColor: theme.background}]}>
-      <ScreenHeader title={t('profile.title')} showBack onBack={() => navigation.getParent()?.navigate('HomeTab' as never)} />
+      <ScreenHeader title={headerTitle} showBack onBack={handleBack} />
       <ScrollView
         contentContainerStyle={styles.content}
         refreshControl={<RefreshControl refreshing={false} onRefresh={refetch} />}>
@@ -90,6 +115,9 @@ export default function ProfileScreen() {
           <View style={[styles.badgePill, {backgroundColor: colors.primary + '15'}]}>
             <Text style={[styles.badgePillText, {color: colors.primary}]}>{profile.badge_id}</Text>
           </View>
+          {!isViewingOther && roleLabel ? (
+            <Text style={[styles.roleLabel, {color: theme.textSecondary}]}>{'· '}{roleLabel}</Text>
+          ) : null}
         </View>
 
         {/* Personal */}
@@ -194,6 +222,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   badgePillText: {fontSize: fontSize.xs, fontWeight: '700'},
+  roleLabel: {fontSize: fontSize.xs, marginTop: 2},
 
   sectionTitle: {fontSize: fontSize.lg, fontWeight: '700'},
   card: {gap: spacing.sm},

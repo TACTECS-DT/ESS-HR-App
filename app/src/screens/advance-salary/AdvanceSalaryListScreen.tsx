@@ -136,6 +136,9 @@ export default function AdvanceSalaryListScreen() {
               </Text>
               <StatusChip status={item.status} label={t(`common.status.${item.status}`)} />
             </View>
+            <Text style={[styles.employee, {color: theme.textSecondary}]}>
+              👤 {item.employee}
+            </Text>
             <Text style={[styles.amount, {color: colors.primary}]}>
               {item.amount.toLocaleString()} {t('common.sar')}
             </Text>
@@ -177,6 +180,7 @@ const styles = StyleSheet.create({
   cardTop: {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'},
   itemTitle: {fontSize: fontSize.md, fontWeight: '700', flex: 1, marginRight: spacing.sm},
   amount: {fontSize: fontSize.lg, fontWeight: '700'},
+  employee: {fontSize: fontSize.xs},
   detail: {fontSize: fontSize.sm},
   skeletons: {padding: spacing.md, gap: spacing.sm},
   skeleton: {borderRadius: radius.md},

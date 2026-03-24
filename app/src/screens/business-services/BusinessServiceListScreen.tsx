@@ -114,6 +114,9 @@ export default function BusinessServiceListScreen() {
               </Text>
               <StatusChip status={item.status} label={t(`common.status.${item.status}`)} />
             </View>
+            <Text style={[styles.employee, {color: theme.textSecondary}]}>
+              👤 {isAr ? item.employee_ar : item.employee}
+            </Text>
             <Text style={[styles.detail, {color: theme.textSecondary}]}>
               {isAr ? item.service_type_ar : item.service_type}
               {item.requested_date ? `  ·  ${item.requested_date}` : ''}
@@ -142,6 +145,7 @@ const styles = StyleSheet.create({
   card: {borderRadius: radius.md, borderWidth: 1, padding: spacing.md, gap: spacing.xs},
   cardTop: {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'},
   serviceType: {fontSize: fontSize.md, fontWeight: '700', flex: 1, marginRight: spacing.sm},
+  employee: {fontSize: fontSize.xs},
   detail: {fontSize: fontSize.sm},
   reason: {fontSize: fontSize.xs},
   skeletons: {padding: spacing.md, gap: spacing.sm},

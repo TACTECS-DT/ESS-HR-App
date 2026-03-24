@@ -7,6 +7,8 @@ import apiClient from '../../api/client';
 import {isApiSuccess} from '../../types/api';
 import ScreenHeader from '../../components/common/ScreenHeader';
 import {useTheme} from '../../hooks/useTheme';
+import {useRBAC} from '../../hooks/useRBAC';
+import AccessDenied from '../../components/common/AccessDenied';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {TeamMember, TeamMemberStatus} from '../../api/mocks/leave.mock';
 
@@ -43,14 +45,21 @@ export default function LeaveTeamBalanceScreen() {
   const theme = useTheme();
   const isAr = i18n.language === 'ar';
   const [viewMode, setViewMode] = useState<ViewMode>('status');
+  const {canViewTeamLeaveBalances} = useRBAC();
 
+  // Hook must be called unconditionally — disabled when no access
   const {data: team} = useQuery({
     queryKey: ['team-leave-balances'],
+    enabled: canViewTeamLeaveBalances,
     queryFn: async () => {
       const res = await apiClient.get('/leave/team-balances');
       return isApiSuccess(res.data) ? (res.data.data as TeamMember[]) : [];
     },
   });
+
+  if (!canViewTeamLeaveBalances) {
+    return <AccessDenied />;
+  }
 
   const members = team ?? [];
 

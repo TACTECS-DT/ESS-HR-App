@@ -4,6 +4,9 @@ export type AdvanceSalaryStatus = 'draft' | 'pending' | 'approved' | 'refused' |
 
 export interface AdvanceSalary {
   id: number;
+  employee_id: number;
+  employee: string;
+  employee_ar: string;
   title: string;
   amount: number;
   max_allowed: number;
@@ -24,6 +27,9 @@ export const MOCK_ADVANCE_SALARIES: ApiSuccess<AdvanceSalary[]> = {
   data: [
     {
       id: 601,
+      employee_id: 100,
+      employee: 'Ahmed Al-Farsi',
+      employee_ar: 'أحمد الفارسي',
       title: 'Advance - February 2026',
       amount: 3000,
       max_allowed: 5000,
@@ -38,6 +44,9 @@ export const MOCK_ADVANCE_SALARIES: ApiSuccess<AdvanceSalary[]> = {
     },
     {
       id: 602,
+      employee_id: 100,
+      employee: 'Ahmed Al-Farsi',
+      employee_ar: 'أحمد الفارسي',
       title: 'Advance - January 2026',
       amount: 2000,
       max_allowed: 5000,
@@ -51,6 +60,9 @@ export const MOCK_ADVANCE_SALARIES: ApiSuccess<AdvanceSalary[]> = {
     },
     {
       id: 603,
+      employee_id: 100,
+      employee: 'Ahmed Al-Farsi',
+      employee_ar: 'أحمد الفارسي',
       title: 'Advance - March 2026',
       amount: 5000,
       max_allowed: 5000,
@@ -59,8 +71,41 @@ export const MOCK_ADVANCE_SALARIES: ApiSuccess<AdvanceSalary[]> = {
       request_date: '2026-03-10',
       approval_history: [],
     },
+    {
+      id: 604,
+      employee_id: 100,
+      employee: 'Ahmed Al-Farsi',
+      employee_ar: 'أحمد الفارسي',
+      title: 'Advance - March 2026 (Urgent)',
+      amount: 2500,
+      max_allowed: 5000,
+      basic_salary: 10000,
+      status: 'pending',
+      request_date: '2026-03-18',
+      reason: 'Urgent personal expenses',
+      approval_history: [
+        {step: 'Manager', approver: 'Khalid Nasser', status: 'pending'},
+      ],
+    },
+    // Subordinate Fatima (id=110) — visible to manager/hr/admin
+    {
+      id: 605,
+      employee_id: 110,
+      employee: 'Fatima Al-Zahra',
+      employee_ar: 'فاطمة الزهراء',
+      title: 'Advance - March 2026',
+      amount: 2000,
+      max_allowed: 4000,
+      basic_salary: 8000,
+      status: 'pending',
+      request_date: '2026-03-20',
+      reason: 'Emergency home repair',
+      approval_history: [
+        {step: 'Manager', approver: 'Khalid Al-Mansouri', status: 'pending'},
+      ],
+    },
   ],
-  pagination: {page: 1, pageSize: 10, total: 3, totalPages: 1},
+  pagination: {page: 1, pageSize: 10, total: 5, totalPages: 1},
 };
 
 export const MOCK_ADVANCE_SALARY_CREATE_SUCCESS: ApiSuccess<{id: number}> = {

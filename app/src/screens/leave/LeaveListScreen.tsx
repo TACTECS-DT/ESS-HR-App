@@ -19,7 +19,7 @@ import StatusChip from '../../components/common/StatusChip';
 import EmptyState from '../../components/common/EmptyState';
 import LoadingSkeleton from '../../components/common/LoadingSkeleton';
 import {useTheme} from '../../hooks/useTheme';
-import {useAppSelector} from '../../hooks/useAppSelector';
+import {useRBAC} from '../../hooks/useRBAC';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
 import type {LeaveRequest, LeaveBalance} from '../../api/mocks/leave.mock';
@@ -40,7 +40,7 @@ export default function LeaveListScreen() {
   const {t, i18n} = useTranslation();
   const theme = useTheme();
   const navigation = useNavigation<Nav>();
-  const user = useAppSelector(state => state.auth.user);
+  const {canViewTeamLeaveBalances} = useRBAC();
   const isAr = i18n.language === 'ar';
   const [tab, setTab] = useState<TabFilter>('my_leaves');
 
@@ -66,8 +66,6 @@ export default function LeaveListScreen() {
     if (tab === 'refused') {return r.status === 'refused';}
     return true;
   });
-
-  const isManager = user?.role === 'manager' || user?.role === 'hr' || user?.role === 'admin';
 
   if (reqLoading || balLoading) {
     return (
@@ -138,7 +136,7 @@ export default function LeaveListScreen() {
           })}
         </View>
 
-        {isManager ? (
+        {canViewTeamLeaveBalances ? (
           <TouchableOpacity
             style={[styles.teamBtn, {borderColor: theme.border, backgroundColor: theme.surface}]}
             onPress={() => navigation.navigate('LeaveTeamBalance')}>
@@ -170,6 +168,9 @@ export default function LeaveListScreen() {
                   </Text>
                   <StatusChip status={item.status} label={t(`common.status.${item.status}`)} />
                 </View>
+                <Text style={[styles.employee, {color: theme.textSecondary}]}>
+                  👤 {isAr ? item.employee_ar : item.employee}
+                </Text>
                 <Text style={[styles.dates, {color: theme.textSecondary}]}>
                   📅 {item.date_from} → {item.date_to}
                   {item.duration > 0 ? ` · ${item.duration}d` : ''}
@@ -249,6 +250,7 @@ const styles = StyleSheet.create({
   card: {borderRadius: radius.md, borderWidth: 1, padding: spacing.md, gap: spacing.xs},
   cardTop: {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'},
   leaveType: {fontSize: fontSize.md, fontWeight: '700'},
+  employee: {fontSize: fontSize.xs},
   dates: {fontSize: fontSize.sm},
   mode: {fontSize: fontSize.xs},
 

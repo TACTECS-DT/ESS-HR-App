@@ -20,6 +20,7 @@ import TextInput from '../../components/common/TextInput';
 import DatePickerField from '../../components/common/DatePickerField';
 import SelectField from '../../components/common/SelectField';
 import {useTheme} from '../../hooks/useTheme';
+import {useAppSelector} from '../../hooks/useAppSelector';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {ExpenseCategory} from '../../api/mocks/expense.mock';
 
@@ -33,6 +34,7 @@ export default function ExpenseCreateScreen() {
   const navigation = useNavigation();
   const queryClient = useQueryClient();
   const isAr = i18n.language === 'ar';
+  const user = useAppSelector(state => state.auth.user);
 
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const [description, setDescription] = useState('');
@@ -110,6 +112,14 @@ export default function ExpenseCreateScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScreenHeader title={t('expense.create')} showBack />
       <ScrollView contentContainerStyle={styles.content}>
+
+        {/* Employee (readonly) */}
+        <TextInput
+          label={t('common.employee')}
+          value={isAr ? (user?.name_ar ?? '') : (user?.name ?? '')}
+          onChangeText={() => {}}
+          editable={false}
+        />
 
         {/* Description */}
         <TextInput

@@ -20,6 +20,7 @@ import TextInput from '../../components/common/TextInput';
 import DatePickerField from '../../components/common/DatePickerField';
 import SelectField from '../../components/common/SelectField';
 import {useTheme} from '../../hooks/useTheme';
+import {useAppSelector} from '../../hooks/useAppSelector';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {ServiceType} from '../../api/mocks/business-services.mock';
 
@@ -29,6 +30,7 @@ export default function BusinessServiceCreateScreen() {
   const navigation = useNavigation();
   const queryClient = useQueryClient();
   const isAr = i18n.language === 'ar';
+  const user = useAppSelector(state => state.auth.user);
 
   const [serviceTitle, setServiceTitle] = useState('');
   const [selectedTypeId, setSelectedTypeId] = useState<number | null>(null);
@@ -80,6 +82,14 @@ export default function BusinessServiceCreateScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScreenHeader title={t('businessService.request')} showBack />
       <ScrollView contentContainerStyle={styles.content}>
+
+        {/* Employee (readonly) */}
+        <TextInput
+          label={t('common.employee')}
+          value={isAr ? (user?.name_ar ?? '') : (user?.name ?? '')}
+          onChangeText={() => {}}
+          editable={false}
+        />
 
         <TextInput
           label={`${t('businessService.serviceTitle')} *`}

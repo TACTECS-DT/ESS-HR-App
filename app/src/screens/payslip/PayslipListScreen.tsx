@@ -11,6 +11,7 @@ import ScreenHeader from '../../components/common/ScreenHeader';
 import StatusChip from '../../components/common/StatusChip';
 import EmptyState from '../../components/common/EmptyState';
 import {useTheme} from '../../hooks/useTheme';
+import {useAppSelector} from '../../hooks/useAppSelector';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
 import type {Payslip} from '../../api/mocks/payslip.mock';
@@ -35,6 +36,7 @@ export default function PayslipListScreen() {
   const {t, i18n} = useTranslation();
   const theme = useTheme();
   const navigation = useNavigation<Nav>();
+  const user = useAppSelector(state => state.auth.user);
   const isAr = i18n.language === 'ar';
   const currentYear = new Date().getFullYear();
 
@@ -102,6 +104,9 @@ export default function PayslipListScreen() {
               <View style={styles.info}>
                 <Text style={[styles.period, {color: theme.text}]}>
                   {monthNames[item.month - 1]} {item.year}
+                </Text>
+                <Text style={[styles.dateRange, {color: theme.textSecondary}]}>
+                  👤 {isAr ? (user?.name_ar ?? '') : (user?.name ?? '')}
                 </Text>
                 <Text style={[styles.dateRange, {color: theme.textSecondary}]}>
                   {dateRange(item, isAr)}

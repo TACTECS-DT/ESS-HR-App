@@ -25,6 +25,7 @@
     "date": "التاريخ",
     "sar": "ريال",
     "optional": "(اختياري)",
+    "employee": "الموظف",
     "statusLabel": "الحالة",
     "status": {
       "draft": "مسودة",
@@ -147,7 +148,20 @@
     "mapPreview": "معاينة الموقع - الموقع الحالي",
     "withinZone": "داخل النطاق المسموح (مكتب - 50م)",
     "moodQuestion": "كيف حالك اليوم؟",
-    "noCheckin": "لم يسجل حضور اليوم"
+    "noCheckin": "لم يسجل حضور اليوم",
+    "teamAttendance": "حضور الفريق",
+    "checkedIn": "حاضر",
+    "checkedOut": "انصرف",
+    "absent": "غائب",
+    "manualEntry": "إدخال يدوي",
+    "addManualEntry": "إضافة حضور",
+    "employeeLabel": "الموظف",
+    "selectEmployee": "اختر موظفاً",
+    "dateLabel": "التاريخ",
+    "checkInTime": "وقت الحضور",
+    "checkOutTime": "وقت الانصراف",
+    "manualEntrySuccess": "تم حفظ سجل الحضور.",
+    "fillRequired": "التاريخ ووقت الحضور مطلوبان."
   },
   "leave": {
     "title": "الإجازات",
@@ -188,6 +202,7 @@
     "noLimit": "بدون حد",
     "duration": "المدة",
     "managerActions": "إجراء المدير",
+    "hrActions": "إجراءات الموارد البشرية",
     "commentPlaceholder": "تعليق (اختياري)...",
     "actions": {
       "approve": "موافقة",
@@ -275,6 +290,12 @@
       "maxDuration": "الحد الأقصى للمدة: {{months}} أشهر",
       "maxAmount": "الحد الأقصى للمبلغ: {{amount}}",
       "minGap": "الحد الأدنى للفترة بين القروض: {{months}} أشهر"
+    },
+    "actions": {
+      "approve": "موافقة (مستوى المدير)",
+      "hrApprove": "موافقة (مستوى الموارد البشرية)",
+      "ceoApprove": "موافقة (مستوى الرئيس التنفيذي)",
+      "refuse": "رفض"
     }
   },
   "advanceSalary": {
@@ -383,6 +404,7 @@
     "project": "المشروع",
     "timesheet": "جدول الوقت",
     "assignedTo": "مسند إلى",
+    "assignTo": "تعيين إلى",
     "timeTracker": "متتبع الوقت",
     "todayTime": "اليوم",
     "addAttachment": "إضافة مرفق",
@@ -540,7 +562,8 @@
     "company": "الشركة",
     "hireDate": "تاريخ التوظيف",
     "contractType": "نوع العقد",
-    "basicSalary": "الراتب الأساسي"
+    "basicSalary": "الراتب الأساسي",
+    "directory": "دليل الموظفين"
   },
   "settings": {
     "title": "الإعدادات",
@@ -590,6 +613,11 @@
     "empty": "لا توجد إعلانات",
     "postedBy": "نشر بواسطة",
     "readMore": "اقرأ المزيد",
+    "create": "إعلان جديد",
+    "titleLabel": "العنوان",
+    "bodyLabel": "المحتوى",
+    "priorityLabel": "الأولوية",
+    "fillRequired": "يرجى تعبئة العنوان والمحتوى.",
     "priority": {
       "urgent": "عاجل",
       "info": "معلومة",

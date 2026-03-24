@@ -11,6 +11,7 @@ export interface PayslipLine {
 
 export interface Payslip {
   id: number;
+  employee_id: number;
   month: number;
   year: number;
   status: PayslipStatus;
@@ -28,6 +29,7 @@ export const MOCK_PAYSLIP_LIST: ApiSuccess<Payslip[]> = {
   data: [
     {
       id: 301,
+      employee_id: 100,
       month: 2, year: 2026, status: 'paid', gross: 15000, deductions: 1500, net: 13500, currency: 'SAR',
       earnings: [
         {code: 'BASIC', name: 'Basic Salary', name_ar: 'الراتب الأساسي', amount: 10000},
@@ -41,6 +43,7 @@ export const MOCK_PAYSLIP_LIST: ApiSuccess<Payslip[]> = {
     },
     {
       id: 302,
+      employee_id: 100,
       month: 1, year: 2026, status: 'paid', gross: 15000, deductions: 900, net: 14100, currency: 'SAR',
       earnings: [
         {code: 'BASIC', name: 'Basic Salary', name_ar: 'الراتب الأساسي', amount: 10000},
@@ -53,6 +56,7 @@ export const MOCK_PAYSLIP_LIST: ApiSuccess<Payslip[]> = {
     },
     {
       id: 303,
+      employee_id: 100,
       month: 3, year: 2026, status: 'draft', gross: 15000, deductions: 900, net: 14100, currency: 'SAR',
       earnings: [
         {code: 'BASIC', name: 'Basic Salary', name_ar: 'الراتب الأساسي', amount: 10000},

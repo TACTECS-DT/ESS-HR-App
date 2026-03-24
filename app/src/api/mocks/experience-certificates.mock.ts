@@ -4,6 +4,9 @@ export type CertificateStatus = 'draft' | 'pending' | 'approved' | 'refused';
 
 export interface ExperienceCertificate {
   id: number;
+  employee_id: number;
+  employee: string;
+  employee_ar: string;
   title: string;
   title_ar: string;
   directed_to: string;
@@ -21,6 +24,9 @@ export const MOCK_EXPERIENCE_CERTIFICATES: ApiSuccess<ExperienceCertificate[]> =
   data: [
     {
       id: 901,
+      employee_id: 100,
+      employee: 'Ahmed Al-Farsi',
+      employee_ar: 'أحمد الفارسي',
       title: 'Employment Certificate',
       title_ar: 'شهادة توظيف',
       directed_to: 'New Employer',
@@ -34,6 +40,9 @@ export const MOCK_EXPERIENCE_CERTIFICATES: ApiSuccess<ExperienceCertificate[]> =
     },
     {
       id: 902,
+      employee_id: 100,
+      employee: 'Ahmed Al-Farsi',
+      employee_ar: 'أحمد الفارسي',
       title: 'Work Experience Letter',
       title_ar: 'خطاب خبرة عمل',
       directed_to: 'Ministry of Labor',
@@ -47,6 +56,9 @@ export const MOCK_EXPERIENCE_CERTIFICATES: ApiSuccess<ExperienceCertificate[]> =
     },
     {
       id: 903,
+      employee_id: 100,
+      employee: 'Ahmed Al-Farsi',
+      employee_ar: 'أحمد الفارسي',
       title: 'Experience Certificate - Embassy',
       title_ar: 'شهادة خبرة - السفارة',
       directed_to: 'Embassy of UAE',
@@ -58,8 +70,25 @@ export const MOCK_EXPERIENCE_CERTIFICATES: ApiSuccess<ExperienceCertificate[]> =
       status: 'draft',
       approval_history: [],
     },
+    // HR officer sees all employees
+    {
+      id: 904,
+      employee_id: 112,
+      employee: 'Noor Mohamed',
+      employee_ar: 'نور محمد',
+      title: 'Employment Certificate',
+      title_ar: 'شهادة توظيف',
+      directed_to: 'Saudi Embassy',
+      directed_to_ar: 'السفارة السعودية',
+      required_date: '2026-04-10',
+      purpose: 'Visa application.',
+      purpose_ar: 'طلب تأشيرة.',
+      request_date: '2026-03-20',
+      status: 'pending',
+      approval_history: [{step: 'HR', approver: 'Sara Al-Amin', status: 'pending'}],
+    },
   ],
-  pagination: {page: 1, pageSize: 10, total: 3, totalPages: 1},
+  pagination: {page: 1, pageSize: 10, total: 4, totalPages: 1},
 };
 
 export const MOCK_CERTIFICATE_CREATE_SUCCESS: ApiSuccess<{id: number}> = {

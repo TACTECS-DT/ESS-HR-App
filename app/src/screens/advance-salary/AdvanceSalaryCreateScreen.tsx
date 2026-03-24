@@ -20,6 +20,7 @@ import TextInput from '../../components/common/TextInput';
 import StatusChip from '../../components/common/StatusChip';
 import LoadingSkeleton from '../../components/common/LoadingSkeleton';
 import {useTheme} from '../../hooks/useTheme';
+import {useAppSelector} from '../../hooks/useAppSelector';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {AdvanceSalary} from '../../api/mocks/advance-salary.mock';
 
@@ -34,6 +35,7 @@ export default function AdvanceSalaryCreateScreen() {
   const navigation = useNavigation();
   const queryClient = useQueryClient();
   const isAr = i18n.language === 'ar';
+  const user = useAppSelector(state => state.auth.user);
 
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');
@@ -116,6 +118,14 @@ export default function AdvanceSalaryCreateScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScreenHeader title={t('advanceSalary.title')} showBack />
       <ScrollView contentContainerStyle={styles.content}>
+
+        {/* Employee (readonly) */}
+        <TextInput
+          label={t('common.employee')}
+          value={isAr ? (user?.name_ar ?? '') : (user?.name ?? '')}
+          onChangeText={() => {}}
+          editable={false}
+        />
 
         {/* Max allowed info card */}
         {info ? (

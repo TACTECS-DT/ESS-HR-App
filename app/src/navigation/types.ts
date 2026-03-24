@@ -36,6 +36,8 @@ export type AttendanceStackParamList = {
   AttendanceHistory: undefined;
   AttendanceDailySheet: {date: string};
   AttendanceMonthlySheet: {year: number; month: number};
+  AttendanceTeam: undefined;
+  AttendanceManualEntry: undefined;
 };
 
 // ─── Leaves Stack ─────────────────────────────────────────────
@@ -99,7 +101,8 @@ export type MoreStackParamList = {
   PersonalNotes: undefined;
   Analytics: undefined;
   // Profile & Settings
-  Profile: undefined;
+  Profile: {employeeId?: number; employeeName?: string} | undefined;
+  EmployeeDirectory: undefined;
   Settings: undefined;
   // Chat
   ChatHR: undefined;

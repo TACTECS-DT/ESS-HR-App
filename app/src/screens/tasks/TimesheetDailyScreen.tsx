@@ -19,6 +19,7 @@ import Card from '../../components/common/Card';
 import LoadingSkeleton from '../../components/common/LoadingSkeleton';
 import EmptyState from '../../components/common/EmptyState';
 import {useTheme} from '../../hooks/useTheme';
+import {useAppSelector} from '../../hooks/useAppSelector';
 import {useNavigation} from '@react-navigation/native';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {TasksStackParamList} from '../../navigation/types';
@@ -31,10 +32,12 @@ type Route = RouteProp<TasksStackParamList, 'TimesheetDaily'>;
 const ENTRY_COLORS = [colors.primary, colors.success, colors.warning, colors.info];
 
 export default function TimesheetDailyScreen() {
-  const {t} = useTranslation();
+  const {t, i18n} = useTranslation();
   const theme = useTheme();
   const navigation = useNavigation<Nav>();
   const route = useRoute<Route>();
+  const user = useAppSelector(state => state.auth.user);
+  const isAr = i18n.language === 'ar';
   const targetDate = route.params?.date;
 
   const {data, isLoading, refetch} = useQuery({
@@ -73,6 +76,7 @@ export default function TimesheetDailyScreen() {
           <>
             {/* Day total card */}
             <View style={[styles.summaryBigCard, {backgroundColor: colors.primary}]}>
+              <Text style={styles.summaryEmployeeLabel}>👤 {isAr ? (user?.name_ar ?? '') : (user?.name ?? '')}</Text>
               <Text style={styles.summaryBigLabel}>{t('timesheets.totalHours')}</Text>
               <Text style={styles.summaryBigHours}>{dailyData.total_hours}h</Text>
               <Text style={styles.summaryBigSub}>{dailyData.entries.length} {t('tasks.entries')}</Text>
@@ -154,6 +158,7 @@ const styles = StyleSheet.create({
   container: {flex: 1},
   content: {padding: spacing.md, gap: spacing.md, paddingBottom: spacing.xl},
   summaryBigCard: {borderRadius: radius.xl, padding: spacing.xl, alignItems: 'center', gap: spacing.xs},
+  summaryEmployeeLabel: {color: 'rgba(255,255,255,0.9)', fontSize: fontSize.sm, fontWeight: '600'},
   summaryBigLabel: {color: 'rgba(255,255,255,0.8)', fontSize: fontSize.sm},
   summaryBigHours: {color: '#fff', fontSize: 52, fontWeight: '700'},
   summaryBigSub: {color: 'rgba(255,255,255,0.7)', fontSize: fontSize.xs},

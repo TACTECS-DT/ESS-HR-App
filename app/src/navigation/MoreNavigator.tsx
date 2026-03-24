@@ -16,7 +16,7 @@ import AdvanceSalaryListScreen from '../screens/advance-salary/AdvanceSalaryList
 import AdvanceSalaryCreateScreen from '../screens/advance-salary/AdvanceSalaryCreateScreen';
 import AdvanceSalaryDetailScreen from '../screens/advance-salary/AdvanceSalaryDetailScreen';
 // HR Letters
-import HRLetterListScreen from '../screens/hr-letters/HRLetterListScreen';
+import HRLetterListScreen from '../screens/hr-letters/HrLetterListScreen';
 import HRLetterCreateScreen from '../screens/hr-letters/HRLetterCreateScreen';
 import HRLetterDetailScreen from '../screens/hr-letters/HRLetterDetailScreen';
 // Document Requests
@@ -45,6 +45,7 @@ import PersonalNotesScreen from '../screens/more/PersonalNotesScreen';
 import AnalyticsScreen from '../screens/more/AnalyticsScreen';
 // Profile & Settings
 import ProfileScreen from '../screens/profile/ProfileScreen';
+import EmployeeDirectoryScreen from '../screens/profile/EmployeeDirectoryScreen';
 import SettingsScreen from '../screens/profile/SettingsScreen';
 // Chat
 import ChatHRScreen from '../screens/more/ChatHRScreen';
@@ -97,6 +98,7 @@ export default function MoreNavigator() {
       <Stack.Screen name="Analytics" component={AnalyticsScreen} />
       {/* Profile & Settings */}
       <Stack.Screen name="Profile" component={ProfileScreen} />
+      <Stack.Screen name="EmployeeDirectory" component={EmployeeDirectoryScreen} />
       <Stack.Screen name="Settings" component={SettingsScreen} />
       {/* Chat */}
       <Stack.Screen name="ChatHR" component={ChatHRScreen} />

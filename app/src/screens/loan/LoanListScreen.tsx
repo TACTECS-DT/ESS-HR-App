@@ -103,6 +103,9 @@ export default function LoanListScreen() {
               </View>
               <StatusChip status={item.status} label={t(`common.status.${item.status}`)} />
             </View>
+            <Text style={[styles.employee, {color: theme.textSecondary}]}>
+              👤 {item.employee}
+            </Text>
             <View style={[styles.installRow, {backgroundColor: theme.background, borderRadius: radius.sm}]}>
               <Text style={[styles.installLabel, {color: theme.textSecondary}]}>{t('loan.monthlyInstallment')}:</Text>
               <Text style={[styles.installAmount, {color: theme.text}]}>
@@ -147,6 +150,7 @@ const styles = StyleSheet.create({
   installRow: {flexDirection: 'row', justifyContent: 'space-between', padding: spacing.sm},
   installLabel: {fontSize: fontSize.sm},
   installAmount: {fontSize: fontSize.sm, fontWeight: '700'},
+  employee: {fontSize: fontSize.xs},
   detail: {fontSize: fontSize.xs},
   skeletons: {padding: spacing.md, gap: spacing.sm},
   skeleton: {borderRadius: radius.md},

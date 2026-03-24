@@ -11,6 +11,7 @@ import ScreenHeader from '../../components/common/ScreenHeader';
 import StatusChip from '../../components/common/StatusChip';
 import {useTheme} from '../../hooks/useTheme';
 import {useAppSelector} from '../../hooks/useAppSelector';
+import {useRBAC} from '../../hooks/useRBAC';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
 import type {ExperienceCertificate} from '../../api/mocks/experience-certificates.mock';
@@ -38,6 +39,7 @@ export default function ExperienceCertDetailScreen() {
   const route = useRoute<Route>();
   const queryClient = useQueryClient();
   const user = useAppSelector(state => state.auth.user);
+  const {canApproveHRRequests, canRefuseHRRequests, canResetLeave, canDeleteDraftLeave} = useRBAC();
   const isAr = i18n.language === 'ar';
   const {id} = route.params;
 
@@ -51,10 +53,10 @@ export default function ExperienceCertDetailScreen() {
 
   const cert = certs?.find(c => c.id === id);
 
-  const isManager = user?.role === 'manager' || user?.role === 'hr' || user?.role === 'admin';
-  const canApprove = isManager && cert?.status === 'pending';
-  const canReset = cert?.status === 'refused';
-  const canDelete = cert?.status === 'draft';
+  const canApprove = canApproveHRRequests && cert?.status === 'pending';
+  const canRefuse  = canRefuseHRRequests  && cert?.status === 'pending';
+  const canReset   = canResetLeave        && cert?.status === 'refused';
+  const canDelete  = canDeleteDraftLeave  && cert?.status === 'draft';
 
   const patchMutation = useMutation({
     mutationFn: async (action: string) => {
@@ -100,9 +102,7 @@ export default function ExperienceCertDetailScreen() {
             <StatusChip status={cert.status} label={t(`common.status.${cert.status}`)} />
           </View>
           <View style={[styles.divider, {borderColor: theme.border}]} />
-          {user?.name ? (
-            <InfoRow label={t('profile.name')} value={user.name} theme={theme} />
-          ) : null}
+          <InfoRow label={t('common.employee')} value={isAr ? cert.employee_ar : cert.employee} theme={theme} />
           <InfoRow label={t('expCert.directedTo')} value={cert.directed_to} theme={theme} />
           {cert.required_date ? (
             <InfoRow label={t('expCert.requiredDate')} value={cert.required_date} theme={theme} />
@@ -149,21 +149,25 @@ export default function ExperienceCertDetailScreen() {
           </>
         ) : null}
 
-        {/* Manager Actions */}
-        {canApprove ? (
+        {/* HR Actions */}
+        {(canApprove || canRefuse) ? (
           <View style={styles.actionRow}>
-            <TouchableOpacity
-              style={[styles.actionBtn, {backgroundColor: colors.success}]}
-              onPress={() => confirmAction('approve', t('leave.actions.approve'))}
-              disabled={patchMutation.isPending}>
-              <Text style={styles.actionBtnText}>{'✓ '}{t('leave.actions.approve')}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.actionBtn, {backgroundColor: colors.error}]}
-              onPress={() => confirmAction('refuse', t('leave.actions.refuse'))}
-              disabled={patchMutation.isPending}>
-              <Text style={styles.actionBtnText}>{'✗ '}{t('leave.actions.refuse')}</Text>
-            </TouchableOpacity>
+            {canApprove ? (
+              <TouchableOpacity
+                style={[styles.actionBtn, {backgroundColor: colors.success}]}
+                onPress={() => confirmAction('approve', t('leave.actions.approve'))}
+                disabled={patchMutation.isPending}>
+                <Text style={styles.actionBtnText}>{'✓ '}{t('leave.actions.approve')}</Text>
+              </TouchableOpacity>
+            ) : null}
+            {canRefuse ? (
+              <TouchableOpacity
+                style={[styles.actionBtn, {backgroundColor: colors.error}]}
+                onPress={() => confirmAction('refuse', t('leave.actions.refuse'))}
+                disabled={patchMutation.isPending}>
+                <Text style={styles.actionBtnText}>{'✗ '}{t('leave.actions.refuse')}</Text>
+              </TouchableOpacity>
+            ) : null}
           </View>
         ) : null}
 

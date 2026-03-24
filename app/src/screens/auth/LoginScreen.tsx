@@ -22,6 +22,15 @@ import {useAppDispatch} from '../../hooks/useAppDispatch';
 import {setCredentials} from '../../store/slices/authSlice';
 import {saveTokens} from '../../utils/secureStorage';
 import type {AuthStackParamList} from '../../navigation/types';
+import {ENV} from '../../config/env';
+import {
+  MOCK_USER_EMPLOYEE,
+  MOCK_USER_MANAGER,
+  MOCK_USER_HR,
+  MOCK_USER_ADMIN,
+  mockLoginAs,
+} from '../../api/mocks/auth.mock';
+import type {UserInfo} from '../../api/mocks/auth.mock';
 
 type Nav = StackNavigationProp<AuthStackParamList, 'Login'>;
 type Route = RouteProp<AuthStackParamList, 'Login'>;
@@ -38,6 +47,7 @@ export default function LoginScreen() {
   const {companyId, companyName} = route.params;
 
   const [mode, setMode] = useState<LoginMode>('badge');
+  const [quickLoading, setQuickLoading] = useState(false);
   const [badgeId, setBadgeId] = useState('');
   const [pin, setPin] = useState('');
   const [username, setUsername] = useState('');
@@ -46,6 +56,22 @@ export default function LoginScreen() {
   const [error, setError] = useState('');
 
   const isBadgeMode = mode === 'badge';
+
+  async function handleQuickLogin(mockUser: UserInfo) {
+    setQuickLoading(true);
+    const {data} = mockLoginAs(mockUser);
+    await saveTokens(data.tokens.access_token, data.tokens.refresh_token);
+    dispatch(
+      setCredentials({
+        accessToken: data.tokens.access_token,
+        refreshToken: data.tokens.refresh_token,
+        user: data.user,
+        companyId,
+        companyName,
+      }),
+    );
+    setQuickLoading(false);
+  }
 
   async function handleLogin() {
     setError('');
@@ -167,6 +193,30 @@ export default function LoginScreen() {
             </Text>
           </TouchableOpacity>
         </View>
+        {/* ── DEV: Quick Login (MOCK_MODE only) ── */}
+        {ENV.MOCK_MODE ? (
+          <View style={styles.quickLogin}>
+            <Text style={[styles.quickLoginLabel, {color: theme.textSecondary}]}>
+              DEV — Quick Login
+            </Text>
+            <View style={styles.quickLoginRow}>
+              {[
+                {user: MOCK_USER_EMPLOYEE, label: 'Employee', color: '#636366'},
+                {user: MOCK_USER_MANAGER,  label: 'Manager',  color: colors.primary},
+                {user: MOCK_USER_HR,       label: 'HR',       color: '#34C759'},
+                {user: MOCK_USER_ADMIN,    label: 'Admin',    color: '#FF3B30'},
+              ].map(({user, label, color}) => (
+                <TouchableOpacity
+                  key={label}
+                  style={[styles.quickBtn, {backgroundColor: color}]}
+                  onPress={() => handleQuickLogin(user)}
+                  disabled={quickLoading}>
+                  <Text style={styles.quickBtnText}>{label}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        ) : null}
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -202,4 +252,22 @@ const styles = StyleSheet.create({
   },
   error: {color: colors.error, marginBottom: spacing.md, fontSize: fontSize.sm},
   forgotBtn: {alignItems: 'center', marginTop: spacing.md},
+
+  quickLogin: {marginTop: spacing.xl},
+  quickLoginLabel: {
+    fontSize: fontSize.xs,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+    textAlign: 'center',
+    marginBottom: spacing.sm,
+  },
+  quickLoginRow: {flexDirection: 'row', gap: spacing.xs},
+  quickBtn: {
+    flex: 1,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.md,
+    alignItems: 'center',
+  },
+  quickBtnText: {color: '#fff', fontSize: fontSize.xs, fontWeight: '700'},
 });

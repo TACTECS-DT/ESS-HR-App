@@ -14,19 +14,22 @@ import {
   MOCK_LOGIN_SUCCESS,
   MOCK_LOGIN_INVALID,
   MOCK_REFRESH_SUCCESS,
+  MOCK_USERS_BY_BADGE,
+  mockLoginAs,
 } from './mocks/auth.mock';
 import {
   MOCK_ATTENDANCE_SUMMARY,
   MOCK_CHECK_IN,
   MOCK_CHECK_OUT,
   MOCK_ATTENDANCE_HISTORY,
+  MOCK_TEAM_ATTENDANCE,
 } from './mocks/attendance.mock';
 import {
   MOCK_LEAVE_TYPES,
   MOCK_LEAVE_BALANCES,
-  MOCK_LEAVE_REQUESTS,
   MOCK_LEAVE_CREATE_SUCCESS,
   MOCK_TEAM_LEAVE_BALANCES,
+  getLeaveRequestsForRole,
 } from './mocks/leave.mock';
 import {MOCK_PAYSLIP_LIST} from './mocks/payslip.mock';
 import {
@@ -64,7 +67,7 @@ import {
 } from './mocks/business-services.mock';
 import {MOCK_TASKS} from './mocks/tasks.mock';
 import {MOCK_TIMESHEETS, MOCK_LOG_TIME_SUCCESS} from './mocks/timesheets.mock';
-import {MOCK_PROFILE} from './mocks/profile.mock';
+import {MOCK_PROFILE, MOCK_EMPLOYEES, MOCK_PROFILES_BY_ID} from './mocks/profile.mock';
 import {MOCK_NOTIFICATIONS} from './mocks/notifications.mock';
 import {MOCK_ANNOUNCEMENTS} from './mocks/announcements.mock';
 import {MOCK_PENDING_APPROVALS, MOCK_APPROVAL_ACTION_SUCCESS} from './mocks/pending-approvals.mock';
@@ -80,6 +83,9 @@ function randomDelay(): number {
 }
 
 let mockInstance: MockAdapter | null = null;
+
+// Tracks the role of the currently logged-in mock user so handlers can scope data.
+let currentRole = 'employee';
 
 export function setupMocks(): void {
   if (!ENV.MOCK_MODE) {
@@ -102,7 +108,12 @@ export function setupMocks(): void {
     if (body.pin === '0000' || body.password === 'wrong') {
       return [401, MOCK_LOGIN_INVALID];
     }
-    return [200, MOCK_LOGIN_SUCCESS];
+    // Route to the correct mock user by badge_id so each role can be tested
+    const badgeId: string | undefined = body.badge_id;
+    const matchedUser = badgeId ? MOCK_USERS_BY_BADGE[badgeId] : undefined;
+    const loggedInUser = matchedUser ?? MOCK_LOGIN_SUCCESS.data.user;
+    currentRole = loggedInUser.role;
+    return [200, matchedUser ? mockLoginAs(matchedUser) : MOCK_LOGIN_SUCCESS];
   });
 
   mockInstance.onPost('/auth/refresh').reply(200, MOCK_REFRESH_SUCCESS);
@@ -113,11 +124,16 @@ export function setupMocks(): void {
   mockInstance.onPost('/attendance/check-in').reply(200, MOCK_CHECK_IN);
   mockInstance.onPost('/attendance/check-out').reply(200, MOCK_CHECK_OUT);
   mockInstance.onGet('/attendance/history').reply(200, MOCK_ATTENDANCE_HISTORY);
+  mockInstance.onGet('/attendance/team').reply(200, MOCK_TEAM_ATTENDANCE);
+  mockInstance.onPost('/attendance/manual').reply(201, {success: true, data: null});
 
   // ─── Leave ───────────────────────────────────────────────────
   mockInstance.onGet('/leave/types').reply(200, MOCK_LEAVE_TYPES);
   mockInstance.onGet('/leave/balances').reply(200, MOCK_LEAVE_BALANCES);
-  mockInstance.onGet('/leave/requests').reply(200, MOCK_LEAVE_REQUESTS);
+  mockInstance.onGet('/leave/requests').reply(() => {
+    const data = getLeaveRequestsForRole(currentRole);
+    return [200, {success: true, data, pagination: {page: 1, pageSize: 20, total: data.length, totalPages: 1}}];
+  });
   mockInstance.onPost('/leave/requests').reply(201, MOCK_LEAVE_CREATE_SUCCESS);
   mockInstance.onPatch(new RegExp('/leave/requests/\\d+')).reply(200, {success: true, data: null});
   mockInstance.onDelete(new RegExp('/leave/requests/\\d+')).reply(200, {success: true, data: null});
@@ -145,6 +161,7 @@ export function setupMocks(): void {
   mockInstance.onGet('/loans/rules').reply(200, MOCK_LOAN_RULES);
   mockInstance.onGet('/loans').reply(200, MOCK_LOANS);
   mockInstance.onPost('/loans').reply(201, MOCK_LOAN_CREATE_SUCCESS);
+  mockInstance.onPatch(new RegExp('/loans/\\d+')).reply(200, {success: true, data: null});
 
   // ─── Advance Salary ──────────────────────────────────────────
   mockInstance.onGet('/advance-salary/info').reply(200, MOCK_ADVANCE_SALARY_INFO);
@@ -189,7 +206,14 @@ export function setupMocks(): void {
   mockInstance.onDelete(new RegExp('/timesheets/\\d+')).reply(200, {success: true, data: null});
 
   // ─── Profile ─────────────────────────────────────────────────
-  mockInstance.onGet('/profile').reply(200, MOCK_PROFILE);
+  mockInstance.onGet('/profile').reply(config => {
+    const employeeId = config.params?.employee_id;
+    if (employeeId && MOCK_PROFILES_BY_ID[employeeId]) {
+      return [200, {success: true, data: MOCK_PROFILES_BY_ID[employeeId]}];
+    }
+    return [200, MOCK_PROFILE];
+  });
+  mockInstance.onGet('/employees').reply(200, MOCK_EMPLOYEES);
 
   // ─── Notifications ───────────────────────────────────────────
   mockInstance.onGet('/notifications').reply(200, MOCK_NOTIFICATIONS);
@@ -198,6 +222,7 @@ export function setupMocks(): void {
 
   // ─── Announcements ───────────────────────────────────────────
   mockInstance.onGet('/announcements').reply(200, MOCK_ANNOUNCEMENTS);
+  mockInstance.onPost('/announcements').reply(201, {success: true, data: null});
 
   // ─── Pending Approvals ────────────────────────────────────────
   mockInstance.onGet('/pending-approvals').reply(200, MOCK_PENDING_APPROVALS);

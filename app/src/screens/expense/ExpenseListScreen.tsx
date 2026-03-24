@@ -89,6 +89,9 @@ export default function ExpenseListScreen() {
                 <Text style={[styles.sub, {color: theme.textSecondary}]}>
                   {item.date} {'|'} {isAr ? item.category_ar : item.category}
                 </Text>
+                <Text style={[styles.employee, {color: theme.textSecondary}]}>
+                  👤 {isAr ? item.employee_ar : item.employee}
+                </Text>
               </View>
               <View style={styles.right}>
                 <Text style={[styles.amount, {color: theme.text}]}>
@@ -133,6 +136,7 @@ const styles = StyleSheet.create({
   right: {alignItems: 'flex-end', gap: spacing.xs},
   name: {fontSize: fontSize.sm, fontWeight: '600'},
   sub: {fontSize: fontSize.xs},
+  employee: {fontSize: fontSize.xs},
   amount: {fontSize: fontSize.sm, fontWeight: '700'},
 
   fab: {

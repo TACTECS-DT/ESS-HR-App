@@ -10,6 +10,9 @@ export interface ServiceType {
 
 export interface BusinessService {
   id: number;
+  employee_id: number;
+  employee: string;
+  employee_ar: string;
   title: string;
   title_ar: string;
   service_type: string;
@@ -39,6 +42,9 @@ export const MOCK_BUSINESS_SERVICES: ApiSuccess<BusinessService[]> = {
   data: [
     {
       id: 1001,
+      employee_id: 100,
+      employee: 'Ahmed Al-Farsi',
+      employee_ar: 'أحمد الفارسي',
       title: 'Business Card Request',
       title_ar: 'طلب بطاقة عمل',
       service_type: 'Business Card',
@@ -52,6 +58,9 @@ export const MOCK_BUSINESS_SERVICES: ApiSuccess<BusinessService[]> = {
     },
     {
       id: 1002,
+      employee_id: 100,
+      employee: 'Ahmed Al-Farsi',
+      employee_ar: 'أحمد الفارسي',
       title: 'Laptop Replacement',
       title_ar: 'استبدال الحاسوب المحمول',
       service_type: 'Laptop',
@@ -68,6 +77,9 @@ export const MOCK_BUSINESS_SERVICES: ApiSuccess<BusinessService[]> = {
     },
     {
       id: 1003,
+      employee_id: 100,
+      employee: 'Ahmed Al-Farsi',
+      employee_ar: 'أحمد الفارسي',
       title: 'Parking Permit Renewal',
       title_ar: 'تجديد تصريح وقوف السيارات',
       service_type: 'Parking Permit',
@@ -79,8 +91,41 @@ export const MOCK_BUSINESS_SERVICES: ApiSuccess<BusinessService[]> = {
       request_date: '2026-03-14',
       approval_history: [],
     },
+    // Subordinates — visible to manager/hr/admin
+    {
+      id: 1004,
+      employee_id: 110,
+      employee: 'Fatima Al-Zahra',
+      employee_ar: 'فاطمة الزهراء',
+      title: 'SIM Card Request',
+      title_ar: 'طلب شريحة اتصال',
+      service_type: 'SIM Card',
+      service_type_ar: 'شريحة اتصال',
+      reason: 'Need corporate SIM for business trips',
+      reason_ar: 'بحاجة إلى شريحة للسفر الرسمي',
+      requested_date: '2026-03-28',
+      status: 'pending',
+      request_date: '2026-03-20',
+      approval_history: [{step: 'Manager', approver: 'Khalid Al-Mansouri', status: 'pending'}],
+    },
+    {
+      id: 1005,
+      employee_id: 111,
+      employee: 'Omar Al-Rashid',
+      employee_ar: 'عمر الراشد',
+      title: 'Access Card Replacement',
+      title_ar: 'استبدال بطاقة الدخول',
+      service_type: 'Access Card',
+      service_type_ar: 'بطاقة دخول',
+      reason: 'Lost access card',
+      reason_ar: 'فقدان بطاقة الدخول',
+      requested_date: '2026-03-22',
+      status: 'approved',
+      request_date: '2026-03-15',
+      approval_history: [{step: 'Manager', approver: 'Khalid Al-Mansouri', status: 'approved', date: '2026-03-16'}],
+    },
   ],
-  pagination: {page: 1, pageSize: 10, total: 3, totalPages: 1},
+  pagination: {page: 1, pageSize: 10, total: 5, totalPages: 1},
 };
 
 export const MOCK_SERVICE_CREATE_SUCCESS: ApiSuccess<{id: number}> = {

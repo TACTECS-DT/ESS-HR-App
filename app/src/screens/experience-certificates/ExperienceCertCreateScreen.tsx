@@ -18,13 +18,16 @@ import ScreenHeader from '../../components/common/ScreenHeader';
 import TextInput from '../../components/common/TextInput';
 import DatePickerField from '../../components/common/DatePickerField';
 import {useTheme} from '../../hooks/useTheme';
+import {useAppSelector} from '../../hooks/useAppSelector';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 
 export default function ExperienceCertCreateScreen() {
-  const {t} = useTranslation();
+  const {t, i18n} = useTranslation();
   const theme = useTheme();
   const navigation = useNavigation();
   const queryClient = useQueryClient();
+  const isAr = i18n.language === 'ar';
+  const user = useAppSelector(state => state.auth.user);
 
   const [certTitle, setCertTitle] = useState('');
   const [directedTo, setDirectedTo] = useState('');
@@ -64,6 +67,14 @@ export default function ExperienceCertCreateScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScreenHeader title={t('expCert.request')} showBack />
       <ScrollView contentContainerStyle={styles.content}>
+
+        {/* Employee (readonly) */}
+        <TextInput
+          label={t('common.employee')}
+          value={isAr ? (user?.name_ar ?? '') : (user?.name ?? '')}
+          onChangeText={() => {}}
+          editable={false}
+        />
 
         <TextInput
           label={`${t('expCert.certTitle')} *`}

@@ -114,6 +114,9 @@ export default function DocumentRequestListScreen() {
               </Text>
               <StatusChip status={item.status} label={t(`common.status.${item.status}`)} />
             </View>
+            <Text style={[styles.employee, {color: theme.textSecondary}]}>
+              👤 {isAr ? item.employee_ar : item.employee}
+            </Text>
             {item.return_date ? (
               <Text style={[styles.detail, {color: theme.textSecondary}]}>
                 {t('documentRequest.returnDate')}: {item.return_date}
@@ -148,6 +151,7 @@ const styles = StyleSheet.create({
   card: {borderRadius: radius.md, borderWidth: 1, padding: spacing.md, gap: spacing.xs},
   cardTop: {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'},
   docType: {fontSize: fontSize.md, fontWeight: '700', flex: 1, marginRight: spacing.sm},
+  employee: {fontSize: fontSize.xs},
   detail: {fontSize: fontSize.sm},
   reason: {fontSize: fontSize.xs},
   skeletons: {padding: spacing.md, gap: spacing.sm},

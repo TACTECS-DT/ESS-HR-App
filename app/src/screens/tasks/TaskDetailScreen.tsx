@@ -21,11 +21,13 @@ import Button from '../../components/common/Button';
 import {useTheme} from '../../hooks/useTheme';
 import {useAppDispatch} from '../../hooks/useAppDispatch';
 import {useAppSelector} from '../../hooks/useAppSelector';
+import {useRBAC} from '../../hooks/useRBAC';
 import {startTimer, stopTimer, resumeTimer} from '../../store/slices/timerSlice';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {TasksStackParamList} from '../../navigation/types';
 import type {Task, TaskStage} from '../../api/mocks/tasks.mock';
 import type {DailyTimesheetSummary} from '../../api/mocks/timesheets.mock';
+import type {EmployeeListItem} from '../../api/mocks/profile.mock';
 
 type Route = RouteProp<TasksStackParamList, 'TaskDetail'>;
 type Nav = StackNavigationProp<TasksStackParamList>;
@@ -40,15 +42,19 @@ const PRIORITY_COLORS: Record<string, string> = {
 };
 
 export default function TaskDetailScreen() {
-  const {t} = useTranslation();
+  const {t, i18n} = useTranslation();
   const theme = useTheme();
   const route = useRoute<Route>();
   const navigation = useNavigation<Nav>();
   const dispatch = useAppDispatch();
   const queryClient = useQueryClient();
   const timerState = useAppSelector(state => state.timer);
+  const user = useAppSelector(state => state.auth.user);
+  const isAr = i18n.language === 'ar';
+  const {canAssignTasks} = useRBAC();
   const {id} = route.params;
   const [stageDropdownOpen, setStageDropdownOpen] = useState(false);
+  const [assignDropdownOpen, setAssignDropdownOpen] = useState(false);
 
   const {data: tasks} = useQuery({
     queryKey: ['tasks'],
@@ -80,9 +86,27 @@ export default function TaskDetailScreen() {
     .filter(e => e.task_id === id)
     .reduce((sum, e) => sum + e.hours, 0);
 
+  const {data: employees} = useQuery({
+    queryKey: ['employees'],
+    enabled: canAssignTasks,
+    queryFn: async () => {
+      const res = await apiClient.get('/employees');
+      return isApiSuccess(res.data) ? (res.data.data as EmployeeListItem[]) : [];
+    },
+  });
+
   const stageMutation = useMutation({
     mutationFn: async (stage: TaskStage) => {
       await apiClient.patch(`/tasks/${id}`, {stage});
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: ['tasks']});
+    },
+  });
+
+  const assignMutation = useMutation({
+    mutationFn: async (assignee: string) => {
+      await apiClient.patch(`/tasks/${id}`, {assigned_to: assignee});
     },
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['tasks']});
@@ -126,6 +150,11 @@ export default function TaskDetailScreen() {
         <Card style={styles.card}>
           <Text style={[styles.taskName, {color: theme.text}]}>{task.name}</Text>
           <Text style={[styles.project, {color: theme.textSecondary}]}>{'📁 '}{task.project}</Text>
+
+          <View style={styles.row}>
+            <Text style={[styles.fieldLabel, {color: theme.textSecondary}]}>{t('common.employee')}</Text>
+            <Text style={[styles.fieldValue, {color: theme.text}]}>{isAr ? (user?.name_ar ?? '') : (user?.name ?? '')}</Text>
+          </View>
 
           <View style={styles.row}>
             <Text style={[styles.fieldLabel, {color: theme.textSecondary}]}>{t('tasks.priority.label')}</Text>
@@ -232,6 +261,53 @@ export default function TaskDetailScreen() {
             </View>
           </TouchableOpacity>
         </Modal>
+
+        {/* Assign To — manager/admin only */}
+        {canAssignTasks ? (
+          <>
+            <Text style={[styles.sectionTitle, {color: theme.text}]}>{t('tasks.assignTo', 'Assign To')}</Text>
+            <TouchableOpacity
+              style={[styles.stageSelector, {backgroundColor: theme.surface, borderColor: theme.border}]}
+              onPress={() => setAssignDropdownOpen(true)}>
+              <Text style={[styles.stageSelectorText, {color: theme.text}]}>{task.assigned_to}</Text>
+              <Text style={{color: theme.textSecondary}}>▾</Text>
+            </TouchableOpacity>
+            <Modal
+              visible={assignDropdownOpen}
+              transparent
+              animationType="fade"
+              onRequestClose={() => setAssignDropdownOpen(false)}>
+              <TouchableOpacity
+                style={styles.modalOverlay}
+                activeOpacity={1}
+                onPress={() => setAssignDropdownOpen(false)}>
+                <View style={[styles.dropdown, {backgroundColor: theme.surface, borderColor: theme.border}]}>
+                  {(employees ?? []).map(emp => (
+                    <TouchableOpacity
+                      key={emp.id}
+                      style={[
+                        styles.dropdownItem,
+                        {borderBottomColor: theme.border},
+                        task.assigned_to === emp.name && {backgroundColor: colors.primary + '22'},
+                      ]}
+                      onPress={() => {
+                        assignMutation.mutate(emp.name);
+                        setAssignDropdownOpen(false);
+                      }}>
+                      <Text style={{
+                        color: task.assigned_to === emp.name ? colors.primary : theme.text,
+                        fontSize: fontSize.md,
+                        fontWeight: task.assigned_to === emp.name ? '700' : '400',
+                      }}>
+                        {emp.name}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </TouchableOpacity>
+            </Modal>
+          </>
+        ) : null}
 
         {/* Attachments */}
         <Text style={[styles.sectionTitle, {color: theme.text}]}>{t('tasks.attachments')}</Text>

@@ -1,9 +1,9 @@
 import React from 'react';
-import {View, Text, StyleSheet, ScrollView} from 'react-native';
+import {View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity} from 'react-native';
 import {useTranslation} from 'react-i18next';
 import {useRoute} from '@react-navigation/native';
 import type {RouteProp} from '@react-navigation/stack';
-import {useQuery} from '@tanstack/react-query';
+import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query';
 
 import apiClient from '../../api/client';
 import {isApiSuccess} from '../../types/api';
@@ -11,6 +11,7 @@ import ScreenHeader from '../../components/common/ScreenHeader';
 import Card from '../../components/common/Card';
 import StatusChip from '../../components/common/StatusChip';
 import {useTheme} from '../../hooks/useTheme';
+import {useRBAC} from '../../hooks/useRBAC';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
 import type {Loan} from '../../api/mocks/loan.mock';
@@ -21,6 +22,8 @@ export default function LoanDetailScreen() {
   const {t} = useTranslation();
   const theme = useTheme();
   const route = useRoute<Route>();
+  const queryClient = useQueryClient();
+  const {canApproveManagerLoan, canApproveHRLoan, canApproveCEOLoan, canRefuseLoan} = useRBAC();
   const {id} = route.params;
 
   const {data: loans} = useQuery({
@@ -32,6 +35,30 @@ export default function LoanDetailScreen() {
   });
 
   const loan = loans?.find(l => l.id === id);
+
+  // 3-level approval chain: Manager → HR → CEO (Admin)
+  const canManagerApprove = canApproveManagerLoan && loan?.status === 'pending';
+  const canHRApprove      = canApproveHRLoan      && loan?.status === 'manager_approved';
+  const canCEOApprove     = canApproveCEOLoan     && loan?.status === 'hr_approved';
+  const canApprove        = canManagerApprove || canHRApprove || canCEOApprove;
+  const canRefuse         = canRefuseLoan && ['pending', 'manager_approved', 'hr_approved'].includes(loan?.status ?? '');
+
+  const patchMutation = useMutation({
+    mutationFn: async (action: string) => {
+      await apiClient.patch(`/loans/${id}`, {action});
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: ['loans']});
+    },
+    onError: () => Alert.alert(t('common.error')),
+  });
+
+  function confirmAction(action: string, label: string) {
+    Alert.alert(label, `${t('common.confirm')}?`, [
+      {text: t('common.cancel'), style: 'cancel'},
+      {text: label, onPress: () => patchMutation.mutate(action)},
+    ]);
+  }
 
   if (!loan) {
     return (
@@ -66,6 +93,10 @@ export default function LoanDetailScreen() {
             <StatusChip status={loan.status} label={t(`common.status.${loan.status}`)} />
           </View>
           <View style={[styles.divider, {borderColor: theme.border}]} />
+          <View style={styles.detailRow}>
+            <Text style={[styles.detailLabel, {color: theme.textSecondary}]}>{t('common.employee')}</Text>
+            <Text style={[styles.detailValue, {color: theme.text}]}>{loan.employee}</Text>
+          </View>
           <View style={styles.detailRow}>
             <Text style={[styles.detailLabel, {color: theme.textSecondary}]}>{t('loan.monthly')}</Text>
             <Text style={[styles.detailValue, {color: theme.text}]}>
@@ -141,6 +172,44 @@ export default function LoanDetailScreen() {
               ))}
             </Card>
           </>
+        ) : null}
+
+        {/* Approval Actions — shown per role and loan status */}
+        {(canApprove || canRefuse) ? (
+          <View style={styles.actionRow}>
+            {canManagerApprove ? (
+              <TouchableOpacity
+                style={[styles.actionBtn, {backgroundColor: colors.success}]}
+                onPress={() => confirmAction('approve', t('loan.actions.approve'))}
+                disabled={patchMutation.isPending}>
+                <Text style={styles.actionBtnText}>{'✓ '}{t('loan.actions.approve')}</Text>
+              </TouchableOpacity>
+            ) : null}
+            {canHRApprove ? (
+              <TouchableOpacity
+                style={[styles.actionBtn, {backgroundColor: colors.success}]}
+                onPress={() => confirmAction('hr_approve', t('loan.actions.hrApprove'))}
+                disabled={patchMutation.isPending}>
+                <Text style={styles.actionBtnText}>{'✓ '}{t('loan.actions.hrApprove')}</Text>
+              </TouchableOpacity>
+            ) : null}
+            {canCEOApprove ? (
+              <TouchableOpacity
+                style={[styles.actionBtn, {backgroundColor: colors.success}]}
+                onPress={() => confirmAction('ceo_approve', t('loan.actions.ceoApprove'))}
+                disabled={patchMutation.isPending}>
+                <Text style={styles.actionBtnText}>{'✓ '}{t('loan.actions.ceoApprove')}</Text>
+              </TouchableOpacity>
+            ) : null}
+            {canRefuse ? (
+              <TouchableOpacity
+                style={[styles.actionBtn, {backgroundColor: colors.error}]}
+                onPress={() => confirmAction('refuse', t('leave.actions.refuse'))}
+                disabled={patchMutation.isPending}>
+                <Text style={styles.actionBtnText}>{'✗ '}{t('leave.actions.refuse')}</Text>
+              </TouchableOpacity>
+            ) : null}
+          </View>
         ) : null}
 
         {loan.installments.length > 0 ? (
@@ -231,4 +300,7 @@ const styles = StyleSheet.create({
   summaryRow: {flexDirection: 'row', justifyContent: 'space-between', paddingTop: spacing.sm, borderTopWidth: StyleSheet.hairlineWidth, marginTop: spacing.xs},
   summaryLabel: {fontSize: fontSize.sm, fontWeight: '700'},
   summaryValue: {fontSize: fontSize.sm, fontWeight: '700'},
+  actionRow: {flexDirection: 'row', gap: spacing.sm},
+  actionBtn: {flex: 1, borderRadius: radius.md, paddingVertical: spacing.md, alignItems: 'center'},
+  actionBtnText: {color: '#fff', fontSize: fontSize.sm, fontWeight: '700'},
 });

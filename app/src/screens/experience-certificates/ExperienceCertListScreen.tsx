@@ -113,6 +113,9 @@ export default function ExperienceCertListScreen() {
               </Text>
               <StatusChip status={item.status} label={t(`common.status.${item.status}`)} />
             </View>
+            <Text style={[styles.employee, {color: theme.textSecondary}]}>
+              👤 {item.employee}
+            </Text>
             <Text style={[styles.detail, {color: theme.textSecondary}]}>
               {item.request_date}{'  ·  '}{item.directed_to}
             </Text>
@@ -140,6 +143,7 @@ const styles = StyleSheet.create({
   card: {borderRadius: radius.md, borderWidth: 1, padding: spacing.md, gap: spacing.xs},
   cardTop: {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'},
   directedTo: {fontSize: fontSize.md, fontWeight: '700', flex: 1, marginRight: spacing.sm},
+  employee: {fontSize: fontSize.xs},
   detail: {fontSize: fontSize.sm},
   skeletons: {padding: spacing.md, gap: spacing.sm},
   skeleton: {borderRadius: radius.md},

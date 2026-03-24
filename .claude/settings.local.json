@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pandoc --version)",
+      "Bash(wkhtmltopdf --version)",
+      "Bash(node -e \"require\\(''markdown-pdf''\\)\")",
+      "Bash(npm list:*)",
+      "Bash(pip install:*)",
+      "Bash(md2pdf ROLE_ACCESS.md ROLE_ACCESS.pdf)",
+      "Bash(npx tsc:*)",
+      "Bash(node -e \"require\\(''./src/i18n/en.json''\\)\")",
+      "Bash(node -e \"require\\(''./src/i18n/ar.json''\\)\")",
+      "Bash(curl -s \"http://localhost:8081/index.bundle?platform=android&dev=true\")",
+      "Bash(adb logcat:*)",
+      "Bash(netstat -ano)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"http://localhost:8081/index.bundle?platform=android&dev=true\")",
+      "Bash(taskkill /PID 4944 /F)",
+      "Bash(npx kill-port:*)",
+      "Bash(findstr \":8081\")",
+      "Read(//d/ESS-HR-App/**)",
+      "Bash(xargs -I{} taskkill /PID {} /F)",
+      "Bash(tasklist /FI 'IMAGENAME eq node.exe')",
+      "Bash(taskkill /IM node.exe /F)",
+      "Bash(findstr :8081)",
+      "Bash(taskkill /PID 26948 /F)",
+      "Bash(tasklist /FI \"PID eq 26948\")",
+      "Bash(cmd.exe /c \"tasklist /FI \"\"PID eq 26948\"\"\")",
+      "Bash(cmd.exe /c \"netstat -ano | findstr \"\":8081\"\"\")",
+      "Bash(cmd.exe /c \"netstat -ano | findstr LISTEN | findstr \"\":8081\"\"\")",
+      "Bash(cmd.exe /c \"netstat -ano | findstr LISTENING | findstr \"\":8081\"\"\")",
+      "Bash(cmd.exe /c \"taskkill /PID 26948 /F\")",
+      "Bash(cmd.exe /c \"taskkill /IM node.exe /F 2>&1\")",
+      "Bash(cmd.exe /c \"taskkill /IM node.exe /F\")",
+      "Bash(grep -A 5 'Employee \\(readonly\\)' /d/ESS-HR-App/app/src/screens/*/*.tsx)"
+    ]
+  }
+}

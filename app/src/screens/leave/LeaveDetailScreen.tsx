@@ -11,6 +11,7 @@ import ScreenHeader from '../../components/common/ScreenHeader';
 import StatusChip from '../../components/common/StatusChip';
 import {useTheme} from '../../hooks/useTheme';
 import {useAppSelector} from '../../hooks/useAppSelector';
+import {useRBAC} from '../../hooks/useRBAC';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
 import type {LeaveRequest} from '../../api/mocks/leave.mock';
@@ -34,6 +35,7 @@ export default function LeaveDetailScreen() {
   const user = useAppSelector(state => state.auth.user);
   const isAr = i18n.language === 'ar';
   const {id} = route.params;
+  const {canApproveLeave, canRefuseLeave, canResetLeave, canDeleteDraftLeave, canValidateLeave} = useRBAC();
 
   const [comment, setComment] = useState('');
 
@@ -53,10 +55,20 @@ export default function LeaveDetailScreen() {
     return colors.warning;
   }
 
-  const isManager = user?.role === 'manager' || user?.role === 'hr' || user?.role === 'admin';
-  const canApprove = isManager && request?.status === 'pending';
-  const canReset = request?.status === 'refused';
-  const canDelete = request?.status === 'draft';
+  const isOwnRequest = request?.employee_id === user?.id || !request?.employee_id;
+  // 1st-level approve (Manager): only when pending
+  const canApprove = canApproveLeave && request?.status === 'pending';
+  // 2nd-level validate (HR Officer): only when manager has already approved
+  const canValidate = canValidateLeave && request?.status === 'approved';
+  // Refuse: manager can refuse pending; HR/Admin can also refuse manager-approved
+  const canRefuse = canRefuseLeave && (
+    request?.status === 'pending' ||
+    (request?.status === 'approved' && canValidateLeave)
+  );
+  // Reset: role must have permission. Employees can only reset their own.
+  const canReset = canResetLeave && request?.status === 'refused' &&
+    (isOwnRequest || !isOwnRequest); // managers can reset any; employees only own (isOwnRequest)
+  const canDelete = canDeleteDraftLeave && request?.status === 'draft';
 
   const patchMutation = useMutation({
     mutationFn: async (action: string) => {
@@ -100,6 +112,7 @@ export default function LeaveDetailScreen() {
             <StatusChip status={request.status} label={t(`common.status.${request.status}`)} />
           </View>
           <View style={[styles.divider, {borderColor: theme.border}]} />
+          <InfoRow label={t('common.employee')} value={isAr ? request.employee_ar : request.employee} theme={theme} />
           <InfoRow label={t('leave.dateFrom')} value={request.date_from} theme={theme} />
           <InfoRow label={t('leave.dateTo')} value={request.date_to} theme={theme} />
           <InfoRow label={t('leave.duration')} value={`${request.duration} ${t('leave.days')}`} theme={theme} />
@@ -146,25 +159,37 @@ export default function LeaveDetailScreen() {
           })}
         </View>
 
-        {/* Manager Actions */}
-        {canApprove ? (
+        {/* Approval Actions */}
+        {(canApprove || canValidate || canRefuse) ? (
           <View style={[styles.actionsCard, {backgroundColor: theme.surface, borderColor: colors.primary}]}>
             <Text style={[styles.actionsTitle, {color: theme.text}]}>
-              {t('leave.managerActions')}
+              {canValidate ? t('leave.hrActions', 'HR Actions') : t('leave.managerActions')}
             </Text>
             <View style={styles.actionBtns}>
-              <TouchableOpacity
-                style={[styles.actionBtn, {backgroundColor: colors.success}]}
-                onPress={() => confirmAction('approve', t('leave.actions.approve'))}
-                disabled={patchMutation.isPending}>
-                <Text style={styles.actionBtnText}>{'✓ '}{t('leave.actions.approve')}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.actionBtn, {backgroundColor: colors.error}]}
-                onPress={() => confirmAction('refuse', t('leave.actions.refuse'))}
-                disabled={patchMutation.isPending}>
-                <Text style={styles.actionBtnText}>{'✗ '}{t('leave.actions.refuse')}</Text>
-              </TouchableOpacity>
+              {canApprove ? (
+                <TouchableOpacity
+                  style={[styles.actionBtn, {backgroundColor: colors.success}]}
+                  onPress={() => confirmAction('approve', t('leave.actions.approve'))}
+                  disabled={patchMutation.isPending}>
+                  <Text style={styles.actionBtnText}>{'✓ '}{t('leave.actions.approve')}</Text>
+                </TouchableOpacity>
+              ) : null}
+              {canValidate ? (
+                <TouchableOpacity
+                  style={[styles.actionBtn, {backgroundColor: colors.primary}]}
+                  onPress={() => confirmAction('validate', t('leave.actions.validate'))}
+                  disabled={patchMutation.isPending}>
+                  <Text style={styles.actionBtnText}>{'✓✓ '}{t('leave.actions.validate')}</Text>
+                </TouchableOpacity>
+              ) : null}
+              {canRefuse ? (
+                <TouchableOpacity
+                  style={[styles.actionBtn, {backgroundColor: colors.error}]}
+                  onPress={() => confirmAction('refuse', t('leave.actions.refuse'))}
+                  disabled={patchMutation.isPending}>
+                  <Text style={styles.actionBtnText}>{'✗ '}{t('leave.actions.refuse')}</Text>
+                </TouchableOpacity>
+              ) : null}
             </View>
             <TextInput
               style={[styles.commentInput, {borderColor: theme.border, color: theme.text, backgroundColor: theme.background}]}

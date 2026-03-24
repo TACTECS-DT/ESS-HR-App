@@ -15,6 +15,8 @@ import {isApiSuccess} from '../../types/api';
 import ScreenHeader from '../../components/common/ScreenHeader';
 import LoadingSkeleton from '../../components/common/LoadingSkeleton';
 import {useTheme} from '../../hooks/useTheme';
+import {useRBAC} from '../../hooks/useRBAC';
+import AccessDenied from '../../components/common/AccessDenied';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {AnalyticsData} from '../../api/mocks/analytics.mock';
 
@@ -57,14 +59,21 @@ export default function AnalyticsScreen() {
   const theme = useTheme();
   const isAr = i18n.language === 'ar';
   const [period, setPeriod] = useState<Period>('this_month');
+  const {canAccessAnalytics} = useRBAC();
 
+  // Hook must be called unconditionally — disabled when no access
   const {data, isLoading, refetch, isRefetching} = useQuery({
     queryKey: ['analytics', period],
+    enabled: canAccessAnalytics,
     queryFn: async () => {
       const res = await apiClient.get(`/analytics?period=${period}`);
       return isApiSuccess(res.data) ? (res.data.data as AnalyticsData) : null;
     },
   });
+
+  if (!canAccessAnalytics) {
+    return <AccessDenied />;
+  }
 
   const periodTabs: Array<{key: Period; label: string}> = [
     {key: 'this_month', label: t('analytics.thisMonth')},

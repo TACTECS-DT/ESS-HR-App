@@ -10,6 +10,9 @@ export interface DocumentType {
 
 export interface DocumentRequest {
   id: number;
+  employee_id: number;
+  employee: string;
+  employee_ar: string;
   document_type: string;
   document_type_ar: string;
   return_date: string;
@@ -35,6 +38,9 @@ export const MOCK_DOCUMENT_REQUESTS: ApiSuccess<DocumentRequest[]> = {
   data: [
     {
       id: 801,
+      employee_id: 100,
+      employee: 'Ahmed Al-Farsi',
+      employee_ar: 'أحمد الفارسي',
       document_type: 'Passport',
       document_type_ar: 'جواز السفر',
       return_date: '2026-04-01',
@@ -45,6 +51,9 @@ export const MOCK_DOCUMENT_REQUESTS: ApiSuccess<DocumentRequest[]> = {
     },
     {
       id: 802,
+      employee_id: 100,
+      employee: 'Ahmed Al-Farsi',
+      employee_ar: 'أحمد الفارسي',
       document_type: 'National ID',
       document_type_ar: 'الهوية الوطنية',
       return_date: '2026-03-20',
@@ -55,6 +64,9 @@ export const MOCK_DOCUMENT_REQUESTS: ApiSuccess<DocumentRequest[]> = {
     },
     {
       id: 803,
+      employee_id: 100,
+      employee: 'Ahmed Al-Farsi',
+      employee_ar: 'أحمد الفارسي',
       document_type: 'Iqama',
       document_type_ar: 'الإقامة',
       return_date: '2026-04-10',
@@ -63,8 +75,22 @@ export const MOCK_DOCUMENT_REQUESTS: ApiSuccess<DocumentRequest[]> = {
       reason: 'Iqama renewal process',
       approval_history: [],
     },
+    // HR officer sees all employees
+    {
+      id: 804,
+      employee_id: 111,
+      employee: 'Omar Al-Rashid',
+      employee_ar: 'عمر الراشد',
+      document_type: 'Iqama',
+      document_type_ar: 'الإقامة',
+      return_date: '2026-04-15',
+      status: 'pending',
+      request_date: '2026-03-18',
+      reason: 'Iqama renewal',
+      approval_history: [{step: 'HR', approver: 'Sara Al-Amin', status: 'pending'}],
+    },
   ],
-  pagination: {page: 1, pageSize: 10, total: 3, totalPages: 1},
+  pagination: {page: 1, pageSize: 10, total: 4, totalPages: 1},
 };
 
 export const MOCK_DOCUMENT_REQUEST_CREATE_SUCCESS: ApiSuccess<{id: number}> = {

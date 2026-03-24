@@ -1,5 +1,18 @@
 import {ApiSuccess} from '../../types/api';
 
+export interface TeamAttendanceRecord {
+  employee_id: number;
+  employee_name: string;
+  employee_name_ar: string;
+  badge_id: string;
+  department: string;
+  department_ar: string;
+  status: 'checked_in' | 'checked_out' | 'absent';
+  check_in: string | null;
+  check_out: string | null;
+  worked_hours: number;
+}
+
 export type AttendanceStatus = 'checked_in' | 'checked_out';
 export type SheetStatus = 'draft' | 'confirmed' | 'done';
 export type DayStatus = 'present' | 'absent' | 'weekend' | 'public_holiday' | 'on_leave';
@@ -78,4 +91,17 @@ export const MOCK_ATTENDANCE_HISTORY: ApiSuccess<AttendanceRecord[]> = {
     {id: 1, date: '2026-03-01', check_in: null, check_out: null, worked_hours: 0, day_status: 'weekend', sheet_status: 'done'},
   ],
   pagination: {page: 1, pageSize: 18, total: 18, totalPages: 1},
+};
+
+export const MOCK_TEAM_ATTENDANCE: ApiSuccess<TeamAttendanceRecord[]> = {
+  success: true,
+  data: [
+    {employee_id: 100, employee_name: 'Employee',   employee_name_ar: 'موظف',        badge_id: 'employee', department: 'Operations',      department_ar: 'العمليات',        status: 'checked_in',  check_in: '08:32', check_out: null,    worked_hours: 3.5},
+    {employee_id: 101, employee_name: 'Manager',    employee_name_ar: 'مدير',         badge_id: 'manager',  department: 'Engineering',     department_ar: 'الهندسة',         status: 'checked_in',  check_in: '08:15', check_out: null,    worked_hours: 4.2},
+    {employee_id: 102, employee_name: 'HR',         employee_name_ar: 'موارد بشرية',  badge_id: 'hr',       department: 'Human Resources', department_ar: 'الموارد البشرية', status: 'checked_out', check_in: '08:45', check_out: '17:00', worked_hours: 8.25},
+    {employee_id: 103, employee_name: 'Admin',      employee_name_ar: 'مدير النظام',  badge_id: 'admin',    department: 'Administration',  department_ar: 'الإدارة',         status: 'checked_in',  check_in: '09:00', check_out: null,    worked_hours: 3.0},
+    {employee_id: 104, employee_name: 'Noor Salem', employee_name_ar: 'نور سالم',     badge_id: 'EMP-0104', department: 'Engineering',     department_ar: 'الهندسة',         status: 'absent',      check_in: null,    check_out: null,    worked_hours: 0},
+    {employee_id: 105, employee_name: 'Tariq Hani', employee_name_ar: 'طارق هاني',   badge_id: 'EMP-0105', department: 'Finance',         department_ar: 'المالية',         status: 'checked_out', check_in: '08:30', check_out: '17:30', worked_hours: 9.0},
+    {employee_id: 106, employee_name: 'Hessa Ali',  employee_name_ar: 'حصة علي',     badge_id: 'EMP-0106', department: 'Operations',      department_ar: 'العمليات',        status: 'checked_in',  check_in: '08:50', check_out: null,    worked_hours: 3.2},
+  ],
 };

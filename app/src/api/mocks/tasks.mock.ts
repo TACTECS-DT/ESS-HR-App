@@ -5,6 +5,7 @@ export type TaskStage = 'backlog' | 'in_progress' | 'review' | 'done';
 
 export interface Task {
   id: number;
+  employee_id: number;
   name: string;
   project: string;
   project_id: number;
@@ -23,6 +24,7 @@ export const MOCK_TASKS: ApiSuccess<Task[]> = {
     // ESS HR App project
     {
       id: 1101,
+      employee_id: 100,
       name: 'Implement leave module API',
       project: 'ESS HR App',
       project_id: 10,
@@ -36,6 +38,7 @@ export const MOCK_TASKS: ApiSuccess<Task[]> = {
     },
     {
       id: 1102,
+      employee_id: 100,
       name: 'Design attendance UI',
       project: 'ESS HR App',
       project_id: 10,
@@ -49,6 +52,7 @@ export const MOCK_TASKS: ApiSuccess<Task[]> = {
     },
     {
       id: 1103,
+      employee_id: 100,
       name: 'Write unit tests for auth',
       project: 'ESS HR App',
       project_id: 10,
@@ -62,6 +66,7 @@ export const MOCK_TASKS: ApiSuccess<Task[]> = {
     },
     {
       id: 1104,
+      employee_id: 100,
       name: 'Deploy to staging server',
       project: 'ESS HR App',
       project_id: 10,
@@ -76,6 +81,7 @@ export const MOCK_TASKS: ApiSuccess<Task[]> = {
     // Retail Portal project
     {
       id: 1105,
+      employee_id: 100,
       name: 'Mobile app onboarding flow',
       project: 'Retail Portal',
       project_id: 11,
@@ -89,6 +95,7 @@ export const MOCK_TASKS: ApiSuccess<Task[]> = {
     },
     {
       id: 1106,
+      employee_id: 100,
       name: 'Dashboard widget redesign',
       project: 'Retail Portal',
       project_id: 11,
@@ -102,6 +109,7 @@ export const MOCK_TASKS: ApiSuccess<Task[]> = {
     },
     {
       id: 1107,
+      employee_id: 100,
       name: 'Payment gateway integration',
       project: 'Retail Portal',
       project_id: 11,

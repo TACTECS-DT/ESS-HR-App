@@ -21,6 +21,7 @@ import DatePickerField from '../../components/common/DatePickerField';
 import SelectField from '../../components/common/SelectField';
 import StatusChip from '../../components/common/StatusChip';
 import {useTheme} from '../../hooks/useTheme';
+import {useAppSelector} from '../../hooks/useAppSelector';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {HRLetter, SalaryType} from '../../api/mocks/hr-letters.mock';
 
@@ -35,6 +36,7 @@ export default function HRLetterCreateScreen() {
   const navigation = useNavigation();
   const queryClient = useQueryClient();
   const isAr = i18n.language === 'ar';
+  const user = useAppSelector(state => state.auth.user);
 
   const salaryTypeOptions = SALARY_TYPES.map(s => ({
     label: isAr ? s.ar : s.en,
@@ -93,6 +95,14 @@ export default function HRLetterCreateScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScreenHeader title={t('hrLetter.title')} showBack />
       <ScrollView contentContainerStyle={styles.content}>
+
+        {/* Employee (readonly) */}
+        <TextInput
+          label={t('common.employee')}
+          value={isAr ? (user?.name_ar ?? '') : (user?.name ?? '')}
+          onChangeText={() => {}}
+          editable={false}
+        />
 
         {/* New HR Letter section */}
         <Text style={[styles.sectionTitle, {color: theme.text}]}>{t('hrLetter.newRequest')}</Text>

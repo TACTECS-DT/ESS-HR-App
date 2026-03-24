@@ -10,6 +10,7 @@ import {isApiSuccess} from '../../types/api';
 import ScreenHeader from '../../components/common/ScreenHeader';
 import StatusChip from '../../components/common/StatusChip';
 import {useTheme} from '../../hooks/useTheme';
+import {useAppSelector} from '../../hooks/useAppSelector';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
 import type {Payslip, PayslipLine} from '../../api/mocks/payslip.mock';
@@ -36,6 +37,7 @@ export default function PayslipDetailScreen() {
   const {t, i18n} = useTranslation();
   const theme = useTheme();
   const route = useRoute<Route>();
+  const user = useAppSelector(state => state.auth.user);
   const {id} = route.params;
   const isAr = i18n.language === 'ar';
 
@@ -101,6 +103,10 @@ export default function PayslipDetailScreen() {
           </Text>
           <Text style={[styles.netLabel, {color: theme.textSecondary}]}>{t('payslip.net')}</Text>
           <View style={[styles.divider, {borderColor: theme.border}]} />
+          <View style={styles.summaryRow}>
+            <Text style={[styles.summaryLabel, {color: theme.textSecondary}]}>{t('common.employee')}</Text>
+            <Text style={[styles.summaryValue, {color: theme.text}]}>{isAr ? (user?.name_ar ?? '') : (user?.name ?? '')}</Text>
+          </View>
           <View style={styles.summaryRow}>
             <Text style={[styles.summaryLabel, {color: theme.textSecondary}]}>{t('payslip.period')}</Text>
             <Text style={[styles.summaryValue, {color: theme.text}]}>

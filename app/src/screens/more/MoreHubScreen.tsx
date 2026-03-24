@@ -14,6 +14,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 import {useTheme} from '../../hooks/useTheme';
 import {useAppDispatch} from '../../hooks/useAppDispatch';
+import {useRBAC} from '../../hooks/useRBAC';
 import {clearAuth} from '../../store/slices/authSlice';
 import {clearTokens} from '../../utils/secureStorage';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
@@ -26,6 +27,8 @@ interface ModuleItem {
   titleKey: string;
   route: keyof MoreStackParamList;
   color: string;
+  /** If set, item is hidden unless the role has this permission */
+  requiresPermission?: 'canAccessAnalytics' | 'canAccessTeamHours' | 'canViewOtherProfiles';
 }
 
 const SECTIONS: Array<{titleKey: string; items: ModuleItem[]}> = [
@@ -51,7 +54,7 @@ const SECTIONS: Array<{titleKey: string; items: ModuleItem[]}> = [
     items: [
       {icon: '✅', titleKey: 'tasks.title',         route: 'TaskList',        color: '#30B0C7'},
       {icon: '🕐', titleKey: 'timesheets.title',    route: 'TimesheetWeekly', color: '#636366'},
-      {icon: '👥', titleKey: 'teamHours.title',     route: 'TeamHours',       color: '#5856D6'},
+      {icon: '👥', titleKey: 'teamHours.title',     route: 'TeamHours',       color: '#5856D6', requiresPermission: 'canAccessTeamHours'},
       {icon: '⏱️', titleKey: 'timer.title',         route: 'Timer',           color: '#007AFF'},
       {icon: '📝', titleKey: 'tasks.logTime',       route: 'LogTime',         color: '#34C759'},
       {icon: '📎', titleKey: 'tasks.addAttachment', route: 'AddAttachment',   color: '#FF9500'},
@@ -61,15 +64,16 @@ const SECTIONS: Array<{titleKey: string; items: ModuleItem[]}> = [
     titleKey: 'more.personal',
     items: [
       {icon: '📝', titleKey: 'personalNotes.title', route: 'PersonalNotes', color: '#FF9F0A'},
-      {icon: '📊', titleKey: 'analytics.title',     route: 'Analytics',     color: '#30D158'},
+      {icon: '📊', titleKey: 'analytics.title',     route: 'Analytics',     color: '#30D158', requiresPermission: 'canAccessAnalytics'},
     ],
   },
   {
     titleKey: 'more.other',
     items: [
-      {icon: '💬', titleKey: 'chat.title',    route: 'ChatHR',   color: '#34C759'},
-      {icon: '👤', titleKey: 'profile.title', route: 'Profile',  color: '#007AFF'},
-      {icon: '⚙️', titleKey: 'settings.title',route: 'Settings', color: '#8E8E93'},
+      {icon: '💬', titleKey: 'chat.title',          route: 'ChatHR',            color: '#34C759'},
+      {icon: '👤', titleKey: 'profile.title',       route: 'Profile',           color: '#007AFF'},
+      {icon: '🗂️', titleKey: 'profile.directory',  route: 'EmployeeDirectory', color: '#5856D6', requiresPermission: 'canViewOtherProfiles'},
+      {icon: '⚙️', titleKey: 'settings.title',      route: 'Settings',          color: '#8E8E93'},
     ],
   },
 ];
@@ -80,6 +84,16 @@ export default function MoreHubScreen() {
   const navigation = useNavigation<Nav>();
   const dispatch = useAppDispatch();
   const insets = useSafeAreaInsets();
+  const rbac = useRBAC();
+
+  // Filter items within each section based on role permissions
+  const visibleSections = SECTIONS.map(section => ({
+    ...section,
+    items: section.items.filter(item => {
+      if (!item.requiresPermission) {return true;}
+      return rbac[item.requiresPermission] === true;
+    }),
+  })).filter(section => section.items.length > 0);
 
   async function handleLogout() {
     Alert.alert(t('settings.logout'), `${t('common.confirm')}?`, [
@@ -103,7 +117,7 @@ export default function MoreHubScreen() {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
-        {SECTIONS.map(section => (
+        {visibleSections.map(section => (
           <View key={section.titleKey}>
             <Text style={[styles.sectionHeader, {color: theme.textSecondary}]}>
               {t(section.titleKey)}
