@@ -14,6 +14,7 @@ import {useNavigation} from '@react-navigation/native';
 import {useMutation, useQueryClient} from '@tanstack/react-query';
 
 import apiClient from '../../api/client';
+import {API_MAP} from '../../api/apiMap';
 import ScreenHeader from '../../components/common/ScreenHeader';
 import TextInput from '../../components/common/TextInput';
 import DatePickerField from '../../components/common/DatePickerField';
@@ -36,7 +37,7 @@ export default function ExperienceCertCreateScreen() {
 
   const mutation = useMutation({
     mutationFn: async (isDraft: boolean) => {
-      const res = await apiClient.post('/experience-certificates', {
+      const res = await apiClient.post(API_MAP.certificates.list, {
         title: certTitle,
         directed_to: directedTo,
         required_date: requiredDate,

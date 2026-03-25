@@ -23,6 +23,7 @@ import {useTheme} from '../../hooks/useTheme';
 import {useAppSelector} from '../../hooks/useAppSelector';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {ExpenseCategory} from '../../api/mocks/expense.mock';
+import {API_MAP} from '../../api/apiMap';
 
 type Currency = 'SAR' | 'AED' | 'USD' | 'EUR';
 type PaymentMode = 'employee_paid' | 'company_paid';
@@ -61,7 +62,7 @@ export default function ExpenseCreateScreen() {
   const {data: categories} = useQuery({
     queryKey: ['expense-categories'],
     queryFn: async () => {
-      const res = await apiClient.get('/expenses/categories');
+      const res = await apiClient.get(API_MAP.expense.categories);
       return isApiSuccess(res.data) ? (res.data.data as ExpenseCategory[]) : [];
     },
   });
@@ -72,7 +73,7 @@ export default function ExpenseCreateScreen() {
 
   const mutation = useMutation({
     mutationFn: async (isDraft: boolean) => {
-      const res = await apiClient.post('/expenses', {
+      const res = await apiClient.post(API_MAP.expense.expenses, {
         category_id: selectedCategoryId,
         description,
         amount: parseFloat(amount),

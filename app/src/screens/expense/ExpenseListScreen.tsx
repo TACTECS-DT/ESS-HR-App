@@ -14,6 +14,7 @@ import {useTheme} from '../../hooks/useTheme';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
 import type {Expense} from '../../api/mocks/expense.mock';
+import {API_MAP} from '../../api/apiMap';
 
 type Nav = StackNavigationProp<RequestsStackParamList>;
 type Filter = 'my' | 'draft' | 'all';
@@ -29,7 +30,7 @@ export default function ExpenseListScreen() {
   const {data, isLoading, refetch} = useQuery({
     queryKey: ['expenses'],
     queryFn: async () => {
-      const res = await apiClient.get('/expenses');
+      const res = await apiClient.get(API_MAP.expense.expenses);
       return isApiSuccess(res.data) ? (res.data.data as Expense[]) : [];
     },
   });

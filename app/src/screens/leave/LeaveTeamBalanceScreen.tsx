@@ -11,6 +11,7 @@ import {useRBAC} from '../../hooks/useRBAC';
 import AccessDenied from '../../components/common/AccessDenied';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {TeamMember, TeamMemberStatus} from '../../api/mocks/leave.mock';
+import {API_MAP} from '../../api/apiMap';
 
 const STATUS_COLORS: Record<TeamMemberStatus, string> = {
   present: colors.success,
@@ -52,7 +53,7 @@ export default function LeaveTeamBalanceScreen() {
     queryKey: ['team-leave-balances'],
     enabled: canViewTeamLeaveBalances,
     queryFn: async () => {
-      const res = await apiClient.get('/leave/team-balances');
+      const res = await apiClient.get(API_MAP.leave.teamBalances);
       return isApiSuccess(res.data) ? (res.data.data as TeamMember[]) : [];
     },
   });

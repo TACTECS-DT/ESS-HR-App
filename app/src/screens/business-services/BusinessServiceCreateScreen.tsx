@@ -23,6 +23,7 @@ import {useTheme} from '../../hooks/useTheme';
 import {useAppSelector} from '../../hooks/useAppSelector';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {ServiceType} from '../../api/mocks/business-services.mock';
+import {API_MAP} from '../../api/apiMap';
 
 export default function BusinessServiceCreateScreen() {
   const {t, i18n} = useTranslation();
@@ -40,14 +41,14 @@ export default function BusinessServiceCreateScreen() {
   const {data: types} = useQuery({
     queryKey: ['service-types'],
     queryFn: async () => {
-      const res = await apiClient.get('/business-services/types');
+      const res = await apiClient.get(API_MAP.businessServices.types);
       return isApiSuccess(res.data) ? (res.data.data as ServiceType[]) : [];
     },
   });
 
   const mutation = useMutation({
     mutationFn: async (isDraft: boolean) => {
-      const res = await apiClient.post('/business-services', {
+      const res = await apiClient.post(API_MAP.businessServices.list, {
         title: serviceTitle,
         service_type_id: selectedTypeId,
         requested_date: wantedDate,

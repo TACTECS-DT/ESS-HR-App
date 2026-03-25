@@ -24,6 +24,7 @@ import LoadingSkeleton from '../../components/common/LoadingSkeleton';
 import {useTheme} from '../../hooks/useTheme';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {PersonalNote} from '../../api/mocks/personal-notes.mock';
+import {API_MAP} from '../../api/apiMap';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -61,7 +62,7 @@ export default function PersonalNotesScreen() {
   const {data, isLoading} = useQuery({
     queryKey: ['personal-notes'],
     queryFn: async () => {
-      const res = await apiClient.get('/personal-notes');
+      const res = await apiClient.get(API_MAP.personalNotes.list);
       return isApiSuccess(res.data) ? (res.data.data as PersonalNote[]) : [];
     },
   });
@@ -69,9 +70,9 @@ export default function PersonalNotesScreen() {
   const saveMutation = useMutation({
     mutationFn: async (note: {id?: number; title: string; content: string}) => {
       if (note.id) {
-        await apiClient.patch(`/personal-notes/${note.id}`, note);
+        await apiClient.patch(API_MAP.personalNotes.byId(note.id), note);
       } else {
-        await apiClient.post('/personal-notes', note);
+        await apiClient.post(API_MAP.personalNotes.list, note);
       }
     },
     onSuccess: () => {
@@ -86,7 +87,7 @@ export default function PersonalNotesScreen() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      await apiClient.delete(`/personal-notes/${id}`);
+      await apiClient.delete(API_MAP.personalNotes.byId(id));
     },
     onSuccess: () => queryClient.invalidateQueries({queryKey: ['personal-notes']}),
     onError: () => Alert.alert(t('common.error')),

@@ -17,6 +17,7 @@ import EmptyState from '../../components/common/EmptyState';
 import LoadingSkeleton from '../../components/common/LoadingSkeleton';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {AppNotification} from '../../api/mocks/notifications.mock';
+import {API_MAP} from '../../api/apiMap';
 
 const TYPE_ICONS: Record<AppNotification['type'], string> = {
   leave: '🏖',
@@ -44,13 +45,13 @@ export default function NotificationsScreen() {
   const {data, isLoading} = useQuery({
     queryKey: ['notifications'],
     queryFn: async () => {
-      const res = await apiClient.get('/notifications');
+      const res = await apiClient.get(API_MAP.notifications.list);
       return isApiSuccess(res.data) ? (res.data.data as AppNotification[]) : [];
     },
   });
 
   const markAllMutation = useMutation({
-    mutationFn: () => apiClient.post('/notifications/read-all'),
+    mutationFn: () => apiClient.post(API_MAP.notifications.markAllRead),
     onSuccess: () => qc.invalidateQueries({queryKey: ['notifications']}),
   });
 

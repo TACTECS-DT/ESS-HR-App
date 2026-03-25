@@ -23,6 +23,7 @@ import {useTheme} from '../../hooks/useTheme';
 import {useAppSelector} from '../../hooks/useAppSelector';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {AdvanceSalary} from '../../api/mocks/advance-salary.mock';
+import {API_MAP} from '../../api/apiMap';
 
 interface AdvanceSalaryInfo {
   basic_salary: number;
@@ -44,7 +45,7 @@ export default function AdvanceSalaryCreateScreen() {
   const {data: info, isLoading: infoLoading} = useQuery({
     queryKey: ['advance-salary-info'],
     queryFn: async () => {
-      const res = await apiClient.get('/advance-salary/info');
+      const res = await apiClient.get(API_MAP.advanceSalary.info);
       return isApiSuccess(res.data) ? (res.data.data as AdvanceSalaryInfo) : null;
     },
   });
@@ -52,14 +53,14 @@ export default function AdvanceSalaryCreateScreen() {
   const {data: recentList, isLoading: listLoading} = useQuery({
     queryKey: ['advance-salary'],
     queryFn: async () => {
-      const res = await apiClient.get('/advance-salary');
+      const res = await apiClient.get(API_MAP.advanceSalary.list);
       return isApiSuccess(res.data) ? (res.data.data as AdvanceSalary[]) : [];
     },
   });
 
   const mutation = useMutation({
     mutationFn: async () => {
-      const res = await apiClient.post('/advance-salary', {
+      const res = await apiClient.post(API_MAP.advanceSalary.list, {
         title,
         amount: parseFloat(amount),
         reason,

@@ -24,6 +24,7 @@ import {useTheme} from '../../hooks/useTheme';
 import {useAppSelector} from '../../hooks/useAppSelector';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {HRLetter, SalaryType} from '../../api/mocks/hr-letters.mock';
+import {API_MAP} from '../../api/apiMap';
 
 const SALARY_TYPES: {key: SalaryType; en: string; ar: string}[] = [
   {key: 'net', en: 'Net Salary', ar: 'صافي الراتب'},
@@ -52,14 +53,14 @@ export default function HRLetterCreateScreen() {
   const {data: previousList} = useQuery({
     queryKey: ['hr-letters'],
     queryFn: async () => {
-      const res = await apiClient.get('/hr-letters');
+      const res = await apiClient.get(API_MAP.hrLetters.list);
       return isApiSuccess(res.data) ? (res.data.data as HRLetter[]) : [];
     },
   });
 
   const mutation = useMutation({
     mutationFn: async () => {
-      const res = await apiClient.post('/hr-letters', {
+      const res = await apiClient.post(API_MAP.hrLetters.list, {
         title: letterTitle,
         directed_to: directedTo,
         required_date: requiredDate,

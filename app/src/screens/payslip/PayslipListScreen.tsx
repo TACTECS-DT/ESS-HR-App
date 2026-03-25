@@ -15,6 +15,7 @@ import {useAppSelector} from '../../hooks/useAppSelector';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
 import type {Payslip} from '../../api/mocks/payslip.mock';
+import {API_MAP} from '../../api/apiMap';
 
 type Nav = StackNavigationProp<RequestsStackParamList>;
 type Filter = 'all' | 'this_year' | 'last_year';
@@ -45,7 +46,7 @@ export default function PayslipListScreen() {
   const {data, isLoading, refetch} = useQuery({
     queryKey: ['payslips'],
     queryFn: async () => {
-      const res = await apiClient.get('/payslip');
+      const res = await apiClient.get(API_MAP.payslip.list);
       return isApiSuccess(res.data) ? (res.data.data as Payslip[]) : [];
     },
   });

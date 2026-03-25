@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Default Loan Config for the main company -->
+        <record id="hr_loan_config_main" model="hr.loan.config">
+            <field name="company_id" ref="base.main_company"/>
+            <field name="min_hiring_months">6</field>
+            <field name="max_duration_months">24</field>
+            <field name="min_gap_months">3</field>
+            <field name="max_amount_percentage">3.0</field>
+        </record>
+
+        <!-- Sequence for hr.loan -->
+        <record id="seq_hr_loan" model="ir.sequence">
+            <field name="name">HR Loan</field>
+            <field name="code">hr.loan</field>
+            <field name="prefix">LOAN/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Sequence for hr.advance.salary -->
+        <record id="seq_hr_advance_salary" model="ir.sequence">
+            <field name="name">HR Advance Salary</field>
+            <field name="code">hr.advance.salary</field>
+            <field name="prefix">ADV/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Sequence for hr.letter.request -->
+        <record id="seq_hr_letter_request" model="ir.sequence">
+            <field name="name">HR Letter Request</field>
+            <field name="code">hr.letter.request</field>
+            <field name="prefix">LTR/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Sequence for hr.document.request -->
+        <record id="seq_hr_document_request" model="ir.sequence">
+            <field name="name">HR Document Request</field>
+            <field name="code">hr.document.request</field>
+            <field name="prefix">DOC/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Sequence for hr.experience.certificate -->
+        <record id="seq_hr_experience_certificate" model="ir.sequence">
+            <field name="name">HR Experience Certificate</field>
+            <field name="code">hr.experience.certificate</field>
+            <field name="prefix">CERT/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Sequence for hr.business.service.request -->
+        <record id="seq_hr_business_service_request" model="ir.sequence">
+            <field name="name">HR Business Service Request</field>
+            <field name="code">hr.business.service.request</field>
+            <field name="prefix">BSR/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Demo business service types -->
+        <record id="bst_it_support" model="hr.business.service.type">
+            <field name="name">IT Support</field>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="active">True</field>
+        </record>
+
+        <record id="bst_facilities" model="hr.business.service.type">
+            <field name="name">Facilities &amp; Maintenance</field>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="active">True</field>
+        </record>
+
+        <record id="bst_transport" model="hr.business.service.type">
+            <field name="name">Transportation Request</field>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="active">True</field>
+        </record>
+
+    </data>
+</odoo>

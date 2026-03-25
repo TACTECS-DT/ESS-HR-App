@@ -18,6 +18,7 @@ import EmptyState from '../../components/common/EmptyState';
 import {useTheme} from '../../hooks/useTheme';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {AttendanceRecord} from '../../api/mocks/attendance.mock';
+import {API_MAP} from '../../api/apiMap';
 
 type FilterPeriod = 'this_month' | 'last_month' | 'custom';
 
@@ -50,7 +51,7 @@ export default function AttendanceHistoryScreen() {
   const {data, isLoading, refetch} = useQuery({
     queryKey: ['attendance-history'],
     queryFn: async () => {
-      const res = await apiClient.get('/attendance/history');
+      const res = await apiClient.get(API_MAP.attendance.history);
       return isApiSuccess(res.data) ? (res.data.data as AttendanceRecord[]) : [];
     },
   });

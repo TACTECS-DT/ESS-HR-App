@@ -27,6 +27,7 @@ import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {TasksStackParamList} from '../../navigation/types';
 import type {Task} from '../../api/mocks/tasks.mock';
 import type {DailyTimesheetSummary} from '../../api/mocks/timesheets.mock';
+import {API_MAP} from '../../api/apiMap';
 
 type Route = RouteProp<TasksStackParamList, 'LogTime'>;
 
@@ -64,7 +65,7 @@ export default function LogTimeScreen() {
   const {data: tasks} = useQuery({
     queryKey: ['tasks'],
     queryFn: async () => {
-      const res = await apiClient.get('/tasks');
+      const res = await apiClient.get(API_MAP.tasks.list);
       return isApiSuccess(res.data) ? (res.data.data as Task[]) : [];
     },
   });
@@ -83,7 +84,7 @@ export default function LogTimeScreen() {
   const {data: timesheets} = useQuery({
     queryKey: ['timesheets'],
     queryFn: async () => {
-      const res = await apiClient.get('/timesheets');
+      const res = await apiClient.get(API_MAP.tasks.timesheets);
       return isApiSuccess(res.data) ? (res.data.data as DailyTimesheetSummary[]) : [];
     },
   });
@@ -102,7 +103,7 @@ export default function LogTimeScreen() {
 
   const mutation = useMutation({
     mutationFn: async () => {
-      const res = await apiClient.post('/timesheets', {
+      const res = await apiClient.post(API_MAP.tasks.timesheets, {
         task_id: resolvedTaskId,
         date,
         hours: hoursNum,

@@ -14,6 +14,7 @@ import {useAppSelector} from '../../hooks/useAppSelector';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
 import type {Payslip, PayslipLine} from '../../api/mocks/payslip.mock';
+import {API_MAP} from '../../api/apiMap';
 
 type Route = RouteProp<RequestsStackParamList, 'PayslipDetail'>;
 
@@ -44,7 +45,7 @@ export default function PayslipDetailScreen() {
   const {data: payslips} = useQuery({
     queryKey: ['payslips'],
     queryFn: async () => {
-      const res = await apiClient.get('/payslip');
+      const res = await apiClient.get(API_MAP.payslip.list);
       return isApiSuccess(res.data) ? (res.data.data as Payslip[]) : [];
     },
   });

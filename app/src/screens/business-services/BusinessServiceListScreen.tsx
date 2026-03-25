@@ -22,6 +22,7 @@ import {useTheme} from '../../hooks/useTheme';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
 import type {BusinessService} from '../../api/mocks/business-services.mock';
+import {API_MAP} from '../../api/apiMap';
 
 type Nav = StackNavigationProp<RequestsStackParamList>;
 type Filter = 'all' | 'draft' | 'my_requests';
@@ -36,7 +37,7 @@ export default function BusinessServiceListScreen() {
   const {data, isLoading, refetch} = useQuery({
     queryKey: ['business-services'],
     queryFn: async () => {
-      const res = await apiClient.get('/business-services');
+      const res = await apiClient.get(API_MAP.businessServices.list);
       return isApiSuccess(res.data) ? (res.data.data as BusinessService[]) : [];
     },
   });

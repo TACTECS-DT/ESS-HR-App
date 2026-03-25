@@ -24,6 +24,7 @@ import {useTheme} from '../../hooks/useTheme';
 import {useAppSelector} from '../../hooks/useAppSelector';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {LoanRules} from '../../api/mocks/loan.mock';
+import {API_MAP} from '../../api/apiMap';
 
 type TransferMethod = 'bank_transfer' | 'cash' | 'cheque';
 
@@ -71,14 +72,14 @@ export default function LoanCreateScreen() {
   const {data: rules, isLoading} = useQuery({
     queryKey: ['loan-rules'],
     queryFn: async () => {
-      const res = await apiClient.get('/loans/rules');
+      const res = await apiClient.get(API_MAP.loan.rules);
       return isApiSuccess(res.data) ? (res.data.data as LoanRules) : null;
     },
   });
 
   const mutation = useMutation({
     mutationFn: async () => {
-      const res = await apiClient.post('/loans', {
+      const res = await apiClient.post(API_MAP.loan.loans, {
         title: loanTitle,
         amount: parseFloat(amount),
         payment_start: startDate,

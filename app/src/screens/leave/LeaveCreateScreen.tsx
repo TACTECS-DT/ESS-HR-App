@@ -23,6 +23,7 @@ import {useTheme} from '../../hooks/useTheme';
 import {useAppSelector} from '../../hooks/useAppSelector';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {LeaveType, LeaveBalance, LeaveMode} from '../../api/mocks/leave.mock';
+import {API_MAP} from '../../api/apiMap';
 
 type SegmentMode = 'full_day' | 'half_day' | 'hourly';
 
@@ -64,7 +65,7 @@ export default function LeaveCreateScreen() {
   const {data: types} = useQuery({
     queryKey: ['leave-types'],
     queryFn: async () => {
-      const res = await apiClient.get('/leave/types');
+      const res = await apiClient.get(API_MAP.leave.types);
       return isApiSuccess(res.data) ? (res.data.data as LeaveType[]) : [];
     },
   });
@@ -72,7 +73,7 @@ export default function LeaveCreateScreen() {
   const {data: balances} = useQuery({
     queryKey: ['leave-balances'],
     queryFn: async () => {
-      const res = await apiClient.get('/leave/balances');
+      const res = await apiClient.get(API_MAP.leave.balances);
       return isApiSuccess(res.data) ? (res.data.data as LeaveBalance[]) : [];
     },
   });
@@ -111,7 +112,7 @@ export default function LeaveCreateScreen() {
 
   const mutation = useMutation({
     mutationFn: async () => {
-      const res = await apiClient.post('/leave/requests', {
+      const res = await apiClient.post(API_MAP.leave.requests, {
         leave_type_id: selectedTypeId,
         mode: leaveMode,
         date_from: dateFrom,

@@ -21,6 +21,7 @@ import {startTimer, stopTimer, pauseTimer, resumeTimer, tickTimer} from '../../s
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {Task} from '../../api/mocks/tasks.mock';
 import type {DailyTimesheetSummary} from '../../api/mocks/timesheets.mock';
+import {API_MAP} from '../../api/apiMap';
 
 function formatTime(seconds: number): string {
   const h = Math.floor(seconds / 3600);
@@ -66,7 +67,7 @@ export default function TimerScreen() {
   const {data: tasks} = useQuery({
     queryKey: ['tasks'],
     queryFn: async () => {
-      const res = await apiClient.get('/tasks');
+      const res = await apiClient.get(API_MAP.tasks.list);
       return isApiSuccess(res.data) ? (res.data.data as Task[]) : [];
     },
   });
@@ -74,7 +75,7 @@ export default function TimerScreen() {
   const {data: timesheets} = useQuery({
     queryKey: ['timesheets'],
     queryFn: async () => {
-      const res = await apiClient.get('/timesheets');
+      const res = await apiClient.get(API_MAP.tasks.timesheets);
       return isApiSuccess(res.data) ? (res.data.data as DailyTimesheetSummary[]) : [];
     },
   });

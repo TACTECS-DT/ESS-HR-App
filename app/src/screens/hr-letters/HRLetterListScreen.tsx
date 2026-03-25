@@ -22,6 +22,7 @@ import {useTheme} from '../../hooks/useTheme';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
 import type {HRLetter} from '../../api/mocks/hr-letters.mock';
+import {API_MAP} from '../../api/apiMap';
 
 type Nav = StackNavigationProp<RequestsStackParamList>;
 type Filter = 'all' | 'draft' | 'my_requests';
@@ -35,7 +36,7 @@ export default function HRLetterListScreen() {
   const {data, isLoading, refetch} = useQuery({
     queryKey: ['hr-letters'],
     queryFn: async () => {
-      const res = await apiClient.get('/hr-letters');
+      const res = await apiClient.get(API_MAP.hrLetters.list);
       return isApiSuccess(res.data) ? (res.data.data as HRLetter[]) : [];
     },
   });

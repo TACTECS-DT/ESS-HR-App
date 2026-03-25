@@ -23,6 +23,7 @@ import {useTheme} from '../../hooks/useTheme';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {TasksStackParamList} from '../../navigation/types';
 import type {Task, TaskStage} from '../../api/mocks/tasks.mock';
+import {API_MAP} from '../../api/apiMap';
 
 type Nav = StackNavigationProp<TasksStackParamList>;
 
@@ -49,7 +50,7 @@ export default function TaskListScreen() {
   const {data, isLoading, refetch} = useQuery({
     queryKey: ['tasks'],
     queryFn: async () => {
-      const res = await apiClient.get('/tasks');
+      const res = await apiClient.get(API_MAP.tasks.list);
       return isApiSuccess(res.data) ? (res.data.data as Task[]) : [];
     },
   });

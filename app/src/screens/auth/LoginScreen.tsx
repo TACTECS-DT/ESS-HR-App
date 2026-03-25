@@ -31,6 +31,7 @@ import {
   mockLoginAs,
 } from '../../api/mocks/auth.mock';
 import type {UserInfo} from '../../api/mocks/auth.mock';
+import {API_MAP} from '../../api/apiMap';
 
 type Nav = StackNavigationProp<AuthStackParamList, 'Login'>;
 type Route = RouteProp<AuthStackParamList, 'Login'>;
@@ -81,7 +82,7 @@ export default function LoginScreen() {
         ? {badge_id: badgeId, pin, company_id: companyId}
         : {username, password, company_id: companyId};
 
-      const res = await apiClient.post('/auth/login', body);
+      const res = await apiClient.post(API_MAP.auth.login, body);
       const data = res.data;
       if (isApiSuccess(data)) {
         const {user, tokens} = data.data;

@@ -21,6 +21,7 @@ import {useRBAC} from '../../hooks/useRBAC';
 import AccessDenied from '../../components/common/AccessDenied';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {PendingApproval, ApprovalType} from '../../api/mocks/pending-approvals.mock';
+import {API_MAP} from '../../api/apiMap';
 
 type Filter = 'all' | 'leave' | 'expense' | 'loan' | 'other' | 'business_service' | 'hr_request';
 
@@ -89,14 +90,14 @@ export default function PendingApprovalsScreen() {
     queryKey: ['pending-approvals'],
     enabled: canAccessPendingApprovals,
     queryFn: async () => {
-      const res = await apiClient.get('/pending-approvals');
+      const res = await apiClient.get(API_MAP.pendingApprovals.list);
       return isApiSuccess(res.data) ? (res.data.data as PendingApproval[]) : [];
     },
   });
 
   const mutation = useMutation({
     mutationFn: async ({id, action}: {id: number; action: 'approve' | 'refuse'}) => {
-      const res = await apiClient.post(`/pending-approvals/${id}/action`, {action});
+      const res = await apiClient.post(API_MAP.pendingApprovals.action(id), {action});
       return res.data;
     },
     onSuccess: () => {

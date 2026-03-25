@@ -22,6 +22,7 @@ import {useTheme} from '../../hooks/useTheme';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
 import type {Loan, LoanRules} from '../../api/mocks/loan.mock';
+import {API_MAP} from '../../api/apiMap';
 
 type Nav = StackNavigationProp<RequestsStackParamList>;
 
@@ -33,7 +34,7 @@ export default function LoanListScreen() {
   const {data: rules} = useQuery({
     queryKey: ['loan-rules'],
     queryFn: async () => {
-      const res = await apiClient.get('/loans/rules');
+      const res = await apiClient.get(API_MAP.loan.rules);
       return isApiSuccess(res.data) ? (res.data.data as LoanRules) : null;
     },
   });
@@ -41,7 +42,7 @@ export default function LoanListScreen() {
   const {data, isLoading, refetch} = useQuery({
     queryKey: ['loans'],
     queryFn: async () => {
-      const res = await apiClient.get('/loans');
+      const res = await apiClient.get(API_MAP.loan.loans);
       return isApiSuccess(res.data) ? (res.data.data as Loan[]) : [];
     },
   });

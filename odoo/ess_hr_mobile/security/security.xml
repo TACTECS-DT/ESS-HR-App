@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data >
+
+
+        <record model="ir.module.category" id="ess_mobile_group_category">
+            <field name="name">Ess mobile</field>
+            <field name="sequence">10</field>
+        </record>
+
+    <record model="res.groups.privilege" id="ess_mobile_privilege">
+        <field name="name">Ess mobile Privilege</field>
+            <field name="category_id" ref="ess_mobile_group_category"/>
+        <field name="sequence">1</field>
+        </record>
+
+
+        <record id="ess_mobile_group" model="res.groups">
+            <field name="name">Ess mobile Group </field>
+            <field name="privilege_id" ref="ess_mobile_privilege"/>
+
+        </record>
+
+
+
+        </data>
+        </odoo>
+        

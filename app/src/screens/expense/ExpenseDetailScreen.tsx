@@ -16,6 +16,7 @@ import {useRBAC} from '../../hooks/useRBAC';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
 import type {Expense} from '../../api/mocks/expense.mock';
+import {API_MAP} from '../../api/apiMap';
 
 type Route = RouteProp<RequestsStackParamList, 'ExpenseDetail'>;
 
@@ -41,7 +42,7 @@ export default function ExpenseDetailScreen() {
   const {data: expenses} = useQuery({
     queryKey: ['expenses'],
     queryFn: async () => {
-      const res = await apiClient.get('/expenses');
+      const res = await apiClient.get(API_MAP.expense.expenses);
       return isApiSuccess(res.data) ? (res.data.data as Expense[]) : [];
     },
   });
@@ -54,7 +55,7 @@ export default function ExpenseDetailScreen() {
 
   const deleteMutation = useMutation({
     mutationFn: async () => {
-      await apiClient.delete(`/expenses/${id}`);
+      await apiClient.delete(API_MAP.expense.byId(id));
     },
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['expenses']});
@@ -65,7 +66,7 @@ export default function ExpenseDetailScreen() {
 
   const patchMutation = useMutation({
     mutationFn: async (action: string) => {
-      await apiClient.patch(`/expenses/${id}`, {action});
+      await apiClient.patch(API_MAP.expense.byId(id), {action});
     },
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['expenses']});

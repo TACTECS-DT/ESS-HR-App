@@ -15,6 +15,7 @@ import {useRBAC} from '../../hooks/useRBAC';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
 import type {BusinessService} from '../../api/mocks/business-services.mock';
+import {API_MAP} from '../../api/apiMap';
 
 type Route = RouteProp<RequestsStackParamList, 'BusinessServiceDetail'>;
 
@@ -46,7 +47,7 @@ export default function BusinessServiceDetailScreen() {
   const {data: services} = useQuery({
     queryKey: ['business-services'],
     queryFn: async () => {
-      const res = await apiClient.get('/business-services');
+      const res = await apiClient.get(API_MAP.businessServices.list);
       return isApiSuccess(res.data) ? (res.data.data as BusinessService[]) : [];
     },
   });
@@ -60,7 +61,7 @@ export default function BusinessServiceDetailScreen() {
 
   const patchMutation = useMutation({
     mutationFn: async (action: string) => {
-      await apiClient.patch(`/business-services/${id}`, {action});
+      await apiClient.patch(API_MAP.businessServices.byId(id), {action});
     },
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['business-services']});

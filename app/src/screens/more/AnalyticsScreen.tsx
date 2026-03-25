@@ -19,6 +19,7 @@ import {useRBAC} from '../../hooks/useRBAC';
 import AccessDenied from '../../components/common/AccessDenied';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {AnalyticsData} from '../../api/mocks/analytics.mock';
+import {API_MAP} from '../../api/apiMap';
 
 type Period = 'this_month' | 'last_month' | 'quarter' | 'year';
 
@@ -66,7 +67,7 @@ export default function AnalyticsScreen() {
     queryKey: ['analytics', period],
     enabled: canAccessAnalytics,
     queryFn: async () => {
-      const res = await apiClient.get(`/analytics?period=${period}`);
+      const res = await apiClient.get(API_MAP.analytics.summary, {params: {period}});
       return isApiSuccess(res.data) ? (res.data.data as AnalyticsData) : null;
     },
   });

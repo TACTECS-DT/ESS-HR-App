@@ -3,6 +3,7 @@
  * Attaches Bearer token to requests and handles 401 refresh.
  */
 import apiClient from './client';
+import {API_MAP} from './apiMap';
 import {store} from '../store';
 import {updateTokens, clearAuth} from '../store/slices/authSlice';
 import {saveTokens, clearTokens} from '../utils/secureStorage';
@@ -26,7 +27,7 @@ export function setupInterceptors(): void {
         originalRequest._retry = true;
         try {
           const refreshToken = store.getState().auth.refreshToken;
-          const response = await apiClient.post('/auth/refresh', {
+          const response = await apiClient.post(API_MAP.auth.refresh, {
             refresh_token: refreshToken,
           });
           const {access_token, refresh_token} = response.data.data;

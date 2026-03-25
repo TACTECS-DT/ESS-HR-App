@@ -16,6 +16,7 @@ import ScreenHeader from '../../components/common/ScreenHeader';
 import Card from '../../components/common/Card';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {AttendanceSummary} from '../../api/mocks/attendance.mock';
+import {API_MAP} from '../../api/apiMap';
 
 type DayStatus = 'present' | 'absent' | 'on_leave' | 'holiday' | 'weekend' | 'late' | 'future';
 
@@ -91,7 +92,7 @@ export default function CalendarScreen() {
   const {data: summaryData} = useQuery({
     queryKey: ['attendance-summary'],
     queryFn: async () => {
-      const res = await apiClient.get('/attendance/summary');
+      const res = await apiClient.get(API_MAP.attendance.summary);
       return isApiSuccess(res.data) ? (res.data.data as AttendanceSummary) : null;
     },
   });

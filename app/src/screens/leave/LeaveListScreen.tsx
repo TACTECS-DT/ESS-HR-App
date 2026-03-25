@@ -23,6 +23,7 @@ import {useRBAC} from '../../hooks/useRBAC';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
 import type {LeaveRequest, LeaveBalance} from '../../api/mocks/leave.mock';
+import {API_MAP} from '../../api/apiMap';
 
 type Nav = StackNavigationProp<RequestsStackParamList>;
 type TabFilter = 'my_leaves' | 'pending' | 'approved' | 'refused';
@@ -47,7 +48,7 @@ export default function LeaveListScreen() {
   const {data: requests, isLoading: reqLoading, refetch} = useQuery({
     queryKey: ['leave-requests'],
     queryFn: async () => {
-      const res = await apiClient.get('/leave/requests');
+      const res = await apiClient.get(API_MAP.leave.requests);
       return isApiSuccess(res.data) ? (res.data.data as LeaveRequest[]) : [];
     },
   });
@@ -55,7 +56,7 @@ export default function LeaveListScreen() {
   const {data: balances, isLoading: balLoading} = useQuery({
     queryKey: ['leave-balances'],
     queryFn: async () => {
-      const res = await apiClient.get('/leave/balances');
+      const res = await apiClient.get(API_MAP.leave.balances);
       return isApiSuccess(res.data) ? (res.data.data as LeaveBalance[]) : [];
     },
   });

@@ -20,6 +20,7 @@ import {useTheme} from '../../hooks/useTheme';
 import {useRBAC} from '../../hooks/useRBAC';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {EmployeeListItem} from '../../api/mocks/profile.mock';
+import {API_MAP} from '../../api/apiMap';
 
 export default function AttendanceManualEntryScreen() {
   const {t, i18n} = useTranslation();
@@ -38,14 +39,14 @@ export default function AttendanceManualEntryScreen() {
     queryKey: ['employees'],
     enabled: canManualEditAttendance,
     queryFn: async () => {
-      const res = await apiClient.get('/employees');
+      const res = await apiClient.get(API_MAP.employee.directory);
       return isApiSuccess(res.data) ? (res.data.data as EmployeeListItem[]) : [];
     },
   });
 
   const submitMutation = useMutation({
     mutationFn: async () => {
-      await apiClient.post('/attendance/manual', {
+      await apiClient.post(API_MAP.attendance.manual, {
         employee_id: selectedEmployee?.id,
         date,
         check_in: checkIn,

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ── Root menu under HR ────────────────────────────────────────────────
+         Parent: hr.menu_hr_root is the top-level "Employees" app menu.
+         If your Odoo instance uses a different ID, adjust parent accordingly.
+    ──────────────────────────────────────────────────────────────────────── -->
+    <menuitem
+        id="menu_ess_mobile_root"
+        name="ESS HR Mobile"
+        sequence="5"
+        groups="ess_mobile_group"/>
+
+    <!-- ── Monitoring sub-menu ──────────────────────────────────────────────── -->
+    <menuitem
+        id="menu_ess_monitoring"
+        name="Monitoring"
+        parent="menu_ess_mobile_root"
+        sequence="10"/>
+
+    <menuitem
+        id="menu_ess_api_logs"
+        name="All Requests"
+        parent="menu_ess_monitoring"
+        action="action_ess_api_log"
+        sequence="10"/>
+
+    <menuitem
+        id="menu_ess_employee_activity"
+        name="Employee Activity"
+        parent="menu_ess_monitoring"
+        action="action_ess_api_log_employee"
+        sequence="20"/>
+
+    <menuitem
+        id="menu_ess_error_monitor"
+        name="Error Monitor"
+        parent="menu_ess_monitoring"
+        action="action_ess_api_log_errors"
+        sequence="30"/>
+
+    <!-- ── Configuration sub-menu ──────────────────────────────────────────── -->
+    <menuitem
+        id="menu_ess_config"
+        name="Configuration"
+        parent="menu_ess_mobile_root"
+        sequence="90"
+        groups="base.group_system"/>
+
+    <menuitem
+        id="menu_ess_licenses"
+        name="License Keys"
+        parent="menu_ess_config"
+        action="action_ess_license"
+        sequence="10"
+        groups="base.group_system"/>
+
+</odoo>

@@ -20,6 +20,7 @@ import {useTheme} from '../../hooks/useTheme';
 import {useRBAC} from '../../hooks/useRBAC';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {TeamAttendanceRecord} from '../../api/mocks/attendance.mock';
+import {API_MAP} from '../../api/apiMap';
 
 const STATUS_COLOR: Record<string, string> = {
   checked_in:  colors.success,
@@ -38,7 +39,7 @@ export default function AttendanceTeamScreen() {
     queryKey: ['attendance-team'],
     enabled: canViewTeamAttendance,
     queryFn: async () => {
-      const res = await apiClient.get('/attendance/team');
+      const res = await apiClient.get(API_MAP.attendance.team);
       return isApiSuccess(res.data) ? (res.data.data as TeamAttendanceRecord[]) : [];
     },
   });

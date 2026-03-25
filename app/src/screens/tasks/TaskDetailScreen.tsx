@@ -28,6 +28,7 @@ import type {TasksStackParamList} from '../../navigation/types';
 import type {Task, TaskStage} from '../../api/mocks/tasks.mock';
 import type {DailyTimesheetSummary} from '../../api/mocks/timesheets.mock';
 import type {EmployeeListItem} from '../../api/mocks/profile.mock';
+import {API_MAP} from '../../api/apiMap';
 
 type Route = RouteProp<TasksStackParamList, 'TaskDetail'>;
 type Nav = StackNavigationProp<TasksStackParamList>;
@@ -59,7 +60,7 @@ export default function TaskDetailScreen() {
   const {data: tasks} = useQuery({
     queryKey: ['tasks'],
     queryFn: async () => {
-      const res = await apiClient.get('/tasks');
+      const res = await apiClient.get(API_MAP.tasks.list);
       return isApiSuccess(res.data) ? (res.data.data as Task[]) : [];
     },
   });
@@ -69,7 +70,7 @@ export default function TaskDetailScreen() {
   const {data: timesheets} = useQuery({
     queryKey: ['timesheets'],
     queryFn: async () => {
-      const res = await apiClient.get('/timesheets');
+      const res = await apiClient.get(API_MAP.tasks.timesheets);
       return isApiSuccess(res.data) ? (res.data.data as DailyTimesheetSummary[]) : [];
     },
   });
@@ -90,14 +91,14 @@ export default function TaskDetailScreen() {
     queryKey: ['employees'],
     enabled: canAssignTasks,
     queryFn: async () => {
-      const res = await apiClient.get('/employees');
+      const res = await apiClient.get(API_MAP.employee.directory);
       return isApiSuccess(res.data) ? (res.data.data as EmployeeListItem[]) : [];
     },
   });
 
   const stageMutation = useMutation({
     mutationFn: async (stage: TaskStage) => {
-      await apiClient.patch(`/tasks/${id}`, {stage});
+      await apiClient.patch(API_MAP.tasks.byId(id), {stage});
     },
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['tasks']});
@@ -106,7 +107,7 @@ export default function TaskDetailScreen() {
 
   const assignMutation = useMutation({
     mutationFn: async (assignee: string) => {
-      await apiClient.patch(`/tasks/${id}`, {assigned_to: assignee});
+      await apiClient.patch(API_MAP.tasks.byId(id), {assigned_to: assignee});
     },
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['tasks']});

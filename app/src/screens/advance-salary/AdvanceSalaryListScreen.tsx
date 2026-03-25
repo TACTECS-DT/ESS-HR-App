@@ -22,6 +22,7 @@ import {useTheme} from '../../hooks/useTheme';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
 import type {AdvanceSalary} from '../../api/mocks/advance-salary.mock';
+import {API_MAP} from '../../api/apiMap';
 
 type Nav = StackNavigationProp<RequestsStackParamList>;
 type Filter = 'all' | 'draft' | 'my_requests';
@@ -35,7 +36,7 @@ export default function AdvanceSalaryListScreen() {
   const {data: info} = useQuery({
     queryKey: ['advance-salary-info'],
     queryFn: async () => {
-      const res = await apiClient.get('/advance-salary/info');
+      const res = await apiClient.get(API_MAP.advanceSalary.info);
       return isApiSuccess(res.data) ? (res.data.data as {basic_salary: number; max_advance: number}) : null;
     },
   });
@@ -43,7 +44,7 @@ export default function AdvanceSalaryListScreen() {
   const {data, isLoading, refetch} = useQuery({
     queryKey: ['advance-salary'],
     queryFn: async () => {
-      const res = await apiClient.get('/advance-salary');
+      const res = await apiClient.get(API_MAP.advanceSalary.list);
       return isApiSuccess(res.data) ? (res.data.data as AdvanceSalary[]) : [];
     },
   });

@@ -14,6 +14,7 @@ import {useRBAC} from '../../hooks/useRBAC';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
 import type {AdvanceSalary} from '../../api/mocks/advance-salary.mock';
+import {API_MAP} from '../../api/apiMap';
 
 type Route = RouteProp<RequestsStackParamList, 'AdvanceSalaryDetail'>;
 
@@ -43,7 +44,7 @@ export default function AdvanceSalaryDetailScreen() {
   const {data: items} = useQuery({
     queryKey: ['advance-salary'],
     queryFn: async () => {
-      const res = await apiClient.get('/advance-salary');
+      const res = await apiClient.get(API_MAP.advanceSalary.list);
       return isApiSuccess(res.data) ? (res.data.data as AdvanceSalary[]) : [];
     },
   });
@@ -57,7 +58,7 @@ export default function AdvanceSalaryDetailScreen() {
 
   const patchMutation = useMutation({
     mutationFn: async (action: string) => {
-      await apiClient.patch(`/advance-salary/${id}`, {action});
+      await apiClient.patch(API_MAP.advanceSalary.byId(id), {action});
     },
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['advance-salary']});

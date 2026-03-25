@@ -1,0 +1,19 @@
+{
+    'name': 'ESS HR Mobile',
+    'version': '19.1',
+    'summary': 'API layer for ESS Mobile App — exposes HR data and actions over JSON-RPC',
+    'category': 'Human Resources',
+    'author': 'ESS',
+    'depends': ['hr', 'hr_attendance', 'hr_holidays', 'hr_payroll', 'hr_expense', 'project', 'account', 'analytic'],
+    'data': [
+        'security/security.xml',
+        'security/ir.model.access.csv',
+        'data/ess_data.xml',
+        'views/ess_license_views.xml',
+        'views/ess_api_log_views.xml',
+        'views/ess_menus.xml',
+    ],
+    'installable': True,
+    'application': False,
+    'license': 'LGPL-3',
+}

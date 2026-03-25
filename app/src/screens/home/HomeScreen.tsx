@@ -24,6 +24,7 @@ import {toggleLanguage} from '../../i18n/';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {LeaveBalance} from '../../api/mocks/leave.mock';
 import type {AppNotification} from '../../api/mocks/notifications.mock';
+import {API_MAP} from '../../api/apiMap';
 
 // ─── leave type → color ───────────────────────────────────────
 const LEAVE_COLORS = [colors.primary, colors.warning, colors.success, '#AF52DE', colors.info];
@@ -82,7 +83,7 @@ export default function HomeScreen() {
   const {data: balancesData, isLoading: balancesLoading, refetch: refetchBalances} = useQuery({
     queryKey: ['leave-balances'],
     queryFn: async () => {
-      const res = await apiClient.get('/leave/balances');
+      const res = await apiClient.get(API_MAP.leave.balances);
       return isApiSuccess(res.data) ? (res.data.data as LeaveBalance[]) : [];
     },
   });
@@ -90,7 +91,7 @@ export default function HomeScreen() {
   const {data: notificationsData, refetch: refetchNotifications} = useQuery({
     queryKey: ['notifications'],
     queryFn: async () => {
-      const res = await apiClient.get('/notifications');
+      const res = await apiClient.get(API_MAP.notifications.list);
       return isApiSuccess(res.data) ? (res.data.data as AppNotification[]) : [];
     },
   });

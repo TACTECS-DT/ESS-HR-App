@@ -24,6 +24,7 @@ import {useTheme} from '../../hooks/useTheme';
 import {useAppSelector} from '../../hooks/useAppSelector';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {DocumentType, DocumentRequest} from '../../api/mocks/document-requests.mock';
+import {API_MAP} from '../../api/apiMap';
 
 export default function DocumentRequestCreateScreen() {
   const {t, i18n} = useTranslation();
@@ -41,7 +42,7 @@ export default function DocumentRequestCreateScreen() {
   const {data: types} = useQuery({
     queryKey: ['document-types'],
     queryFn: async () => {
-      const res = await apiClient.get('/document-requests/types');
+      const res = await apiClient.get(API_MAP.documentRequests.types);
       return isApiSuccess(res.data) ? (res.data.data as DocumentType[]) : [];
     },
   });
@@ -49,14 +50,14 @@ export default function DocumentRequestCreateScreen() {
   const {data: prevRequests} = useQuery({
     queryKey: ['document-requests'],
     queryFn: async () => {
-      const res = await apiClient.get('/document-requests');
+      const res = await apiClient.get(API_MAP.documentRequests.list);
       return isApiSuccess(res.data) ? (res.data.data as DocumentRequest[]) : [];
     },
   });
 
   const mutation = useMutation({
     mutationFn: async (isDraft: boolean) => {
-      const res = await apiClient.post('/document-requests', {
+      const res = await apiClient.post(API_MAP.documentRequests.list, {
         title: requestTitle,
         document_type_id: selectedTypeId,
         return_date: returnDate,

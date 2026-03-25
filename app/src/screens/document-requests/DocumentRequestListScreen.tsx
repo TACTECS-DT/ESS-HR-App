@@ -22,6 +22,7 @@ import {useTheme} from '../../hooks/useTheme';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
 import type {DocumentRequest} from '../../api/mocks/document-requests.mock';
+import {API_MAP} from '../../api/apiMap';
 
 type Nav = StackNavigationProp<RequestsStackParamList>;
 type Filter = 'all' | 'draft' | 'my_requests';
@@ -36,7 +37,7 @@ export default function DocumentRequestListScreen() {
   const {data, isLoading, refetch} = useQuery({
     queryKey: ['document-requests'],
     queryFn: async () => {
-      const res = await apiClient.get('/document-requests');
+      const res = await apiClient.get(API_MAP.documentRequests.list);
       return isApiSuccess(res.data) ? (res.data.data as DocumentRequest[]) : [];
     },
   });

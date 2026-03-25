@@ -20,6 +20,7 @@ import {useTheme} from '../../hooks/useTheme';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {MoreStackParamList} from '../../navigation/types';
 import type {Task} from '../../api/mocks/tasks.mock';
+import {API_MAP} from '../../api/apiMap';
 
 type Route = RouteProp<MoreStackParamList, 'AddAttachment'>;
 
@@ -47,7 +48,7 @@ export default function AddAttachmentScreen() {
   const {data: tasks} = useQuery({
     queryKey: ['tasks'],
     queryFn: async () => {
-      const res = await apiClient.get('/tasks');
+      const res = await apiClient.get(API_MAP.tasks.list);
       return isApiSuccess(res.data) ? (res.data.data as Task[]) : [];
     },
   });
@@ -65,7 +66,7 @@ export default function AddAttachmentScreen() {
 
   const uploadMutation = useMutation({
     mutationFn: async () => {
-      await apiClient.post(`/tasks/${resolvedTaskId}/attachments`, {
+      await apiClient.post(API_MAP.tasks.attachments(resolvedTaskId), {
         file_name: fakeFileName,
         source: selectedOption,
       });

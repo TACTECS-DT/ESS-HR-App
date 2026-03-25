@@ -14,6 +14,7 @@ import {useRBAC} from '../../hooks/useRBAC';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
 import type {DocumentRequest} from '../../api/mocks/document-requests.mock';
+import {API_MAP} from '../../api/apiMap';
 
 type Route = RouteProp<RequestsStackParamList, 'DocumentRequestDetail'>;
 
@@ -44,7 +45,7 @@ export default function DocumentRequestDetailScreen() {
   const {data: requests} = useQuery({
     queryKey: ['document-requests'],
     queryFn: async () => {
-      const res = await apiClient.get('/document-requests');
+      const res = await apiClient.get(API_MAP.documentRequests.list);
       return isApiSuccess(res.data) ? (res.data.data as DocumentRequest[]) : [];
     },
   });
@@ -58,7 +59,7 @@ export default function DocumentRequestDetailScreen() {
 
   const patchMutation = useMutation({
     mutationFn: async (action: string) => {
-      await apiClient.patch(`/document-requests/${id}`, {action});
+      await apiClient.patch(API_MAP.documentRequests.byId(id), {action});
     },
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['document-requests']});

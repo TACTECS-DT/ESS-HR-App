@@ -23,6 +23,7 @@ import EmptyState from '../../components/common/EmptyState';
 import LoadingSkeleton from '../../components/common/LoadingSkeleton';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {Announcement, AnnouncementPriority} from '../../api/mocks/announcements.mock';
+import {API_MAP} from '../../api/apiMap';
 
 const PRIORITY_COLORS: Record<AnnouncementPriority, string> = {
   urgent: colors.error,
@@ -59,14 +60,14 @@ export default function AnnouncementsScreen() {
   const {data, isLoading} = useQuery({
     queryKey: ['announcements'],
     queryFn: async () => {
-      const res = await apiClient.get('/announcements');
+      const res = await apiClient.get(API_MAP.announcements.list);
       return isApiSuccess(res.data) ? (res.data.data as Announcement[]) : [];
     },
   });
 
   const createMutation = useMutation({
     mutationFn: async () => {
-      await apiClient.post('/announcements', {title: newTitle, body: newBody, priority: newPriority});
+      await apiClient.post(API_MAP.announcements.list, {title: newTitle, body: newBody, priority: newPriority});
     },
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['announcements']});

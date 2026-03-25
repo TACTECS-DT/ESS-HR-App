@@ -22,6 +22,7 @@ import {useTheme} from '../../hooks/useTheme';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
 import type {ExperienceCertificate} from '../../api/mocks/experience-certificates.mock';
+import {API_MAP} from '../../api/apiMap';
 
 type Nav = StackNavigationProp<RequestsStackParamList>;
 type Filter = 'all' | 'draft' | 'my_requests';
@@ -35,7 +36,7 @@ export default function ExperienceCertListScreen() {
   const {data, isLoading, refetch} = useQuery({
     queryKey: ['experience-certs'],
     queryFn: async () => {
-      const res = await apiClient.get('/experience-certificates');
+      const res = await apiClient.get(API_MAP.certificates.list);
       return isApiSuccess(res.data) ? (res.data.data as ExperienceCertificate[]) : [];
     },
   });

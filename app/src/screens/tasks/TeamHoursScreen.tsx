@@ -19,6 +19,7 @@ import {useRBAC} from '../../hooks/useRBAC';
 import AccessDenied from '../../components/common/AccessDenied';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {TeamHoursSummary, TeamMemberHours} from '../../api/mocks/team-hours.mock';
+import {API_MAP} from '../../api/apiMap';
 
 function ProgressBar({percent, color}: {percent: number; color: string}) {
   return (
@@ -91,7 +92,7 @@ export default function TeamHoursScreen() {
     queryKey: ['team-hours'],
     enabled: canAccessTeamHours,
     queryFn: async () => {
-      const res = await apiClient.get('/team-hours');
+      const res = await apiClient.get(API_MAP.team.hours);
       return isApiSuccess(res.data) ? (res.data.data as TeamHoursSummary) : null;
     },
   });

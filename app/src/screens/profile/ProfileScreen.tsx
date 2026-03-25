@@ -22,6 +22,7 @@ import {useTheme} from '../../hooks/useTheme';
 import {useRBAC} from '../../hooks/useRBAC';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {EmployeeProfile} from '../../api/mocks/profile.mock';
+import {API_MAP} from '../../api/apiMap';
 
 function ProfileRow({label, value, theme}: {label: string; value?: string; theme: ReturnType<typeof useTheme>}) {
   if (!value) {return null;}
@@ -53,7 +54,7 @@ export default function ProfileScreen() {
     queryKey: ['profile', employeeId ?? 'me'],
     enabled: accessAllowed,
     queryFn: async () => {
-      const res = await apiClient.get('/profile', {params: employeeId ? {employee_id: employeeId} : undefined});
+      const res = await apiClient.get(API_MAP.profile.me, {params: employeeId ? {employee_id: employeeId} : undefined});
       return isApiSuccess(res.data) ? (res.data.data as EmployeeProfile) : null;
     },
   });

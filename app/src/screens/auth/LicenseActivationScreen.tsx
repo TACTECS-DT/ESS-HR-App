@@ -19,6 +19,7 @@ import TextInput from '../../components/common/TextInput';
 import {useTheme} from '../../hooks/useTheme';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {AuthStackParamList} from '../../navigation/types';
+import {API_MAP} from '../../api/apiMap';
 
 type Nav = StackNavigationProp<AuthStackParamList, 'LicenseActivation'>;
 
@@ -47,7 +48,7 @@ export default function LicenseActivationScreen() {
     setLoading(true);
     setErrors({});
     try {
-      const res = await apiClient.post('/auth/validate-license', {
+      const res = await apiClient.post(API_MAP.auth.validateLicense, {
         license_key: licenseKey.trim(),
         company_url: companyUrl.trim(),
         database: database.trim(),

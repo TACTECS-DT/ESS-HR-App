@@ -14,6 +14,7 @@ import {useRBAC} from '../../hooks/useRBAC';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
 import type {HRLetter} from '../../api/mocks/hr-letters.mock';
+import {API_MAP} from '../../api/apiMap';
 
 type Route = RouteProp<RequestsStackParamList, 'HRLetterDetail'>;
 
@@ -43,7 +44,7 @@ export default function HRLetterDetailScreen() {
   const {data: letters} = useQuery({
     queryKey: ['hr-letters'],
     queryFn: async () => {
-      const res = await apiClient.get('/hr-letters');
+      const res = await apiClient.get(API_MAP.hrLetters.list);
       return isApiSuccess(res.data) ? (res.data.data as HRLetter[]) : [];
     },
   });
@@ -57,7 +58,7 @@ export default function HRLetterDetailScreen() {
 
   const patchMutation = useMutation({
     mutationFn: async (action: string) => {
-      await apiClient.patch(`/hr-letters/${id}`, {action});
+      await apiClient.patch(API_MAP.hrLetters.byId(id), {action});
     },
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['hr-letters']});

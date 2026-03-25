@@ -15,6 +15,7 @@ import {useRBAC} from '../../hooks/useRBAC';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
 import type {Loan} from '../../api/mocks/loan.mock';
+import {API_MAP} from '../../api/apiMap';
 
 type Route = RouteProp<RequestsStackParamList, 'LoanDetail'>;
 
@@ -29,7 +30,7 @@ export default function LoanDetailScreen() {
   const {data: loans} = useQuery({
     queryKey: ['loans'],
     queryFn: async () => {
-      const res = await apiClient.get('/loans');
+      const res = await apiClient.get(API_MAP.loan.loans);
       return isApiSuccess(res.data) ? (res.data.data as Loan[]) : [];
     },
   });
@@ -45,7 +46,7 @@ export default function LoanDetailScreen() {
 
   const patchMutation = useMutation({
     mutationFn: async (action: string) => {
-      await apiClient.patch(`/loans/${id}`, {action});
+      await apiClient.patch(API_MAP.loan.byId(id), {action});
     },
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['loans']});

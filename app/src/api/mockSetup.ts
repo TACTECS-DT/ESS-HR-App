@@ -6,6 +6,7 @@
 import MockAdapter from 'axios-mock-adapter';
 import apiClient from './client';
 import {ENV} from '../config/env';
+import {API_MAP, pathToRegex} from './apiMap';
 
 // Mock data
 import {
@@ -94,8 +95,8 @@ export function setupMocks(): void {
 
   mockInstance = new MockAdapter(apiClient, {delayResponse: randomDelay()});
 
-  // ─── Auth ───────────────────────────────────────────────────
-  mockInstance.onPost('/auth/validate-license').reply(config => {
+  // ─── Auth ───────────────────────────────────────────────────────────────
+  mockInstance.onPost(API_MAP.auth.validateLicense).reply(config => {
     const body = JSON.parse(config.data as string);
     if (body.license_key === 'INVALID') {
       return [400, MOCK_LICENSE_INVALID];
@@ -103,7 +104,7 @@ export function setupMocks(): void {
     return [200, MOCK_LICENSE_VALID];
   });
 
-  mockInstance.onPost('/auth/login').reply(config => {
+  mockInstance.onPost(API_MAP.auth.login).reply(config => {
     const body = JSON.parse(config.data as string);
     if (body.pin === '0000' || body.password === 'wrong') {
       return [401, MOCK_LOGIN_INVALID];
@@ -116,32 +117,32 @@ export function setupMocks(): void {
     return [200, matchedUser ? mockLoginAs(matchedUser) : MOCK_LOGIN_SUCCESS];
   });
 
-  mockInstance.onPost('/auth/refresh').reply(200, MOCK_REFRESH_SUCCESS);
-  mockInstance.onPost('/auth/logout').reply(200, {success: true});
+  mockInstance.onPost(API_MAP.auth.refresh).reply(200, MOCK_REFRESH_SUCCESS);
+  mockInstance.onPost(API_MAP.auth.logout).reply(200, {success: true});
 
-  // ─── Attendance ──────────────────────────────────────────────
-  mockInstance.onGet('/attendance/summary').reply(200, MOCK_ATTENDANCE_SUMMARY);
-  mockInstance.onPost('/attendance/check-in').reply(200, MOCK_CHECK_IN);
-  mockInstance.onPost('/attendance/check-out').reply(200, MOCK_CHECK_OUT);
-  mockInstance.onGet('/attendance/history').reply(200, MOCK_ATTENDANCE_HISTORY);
-  mockInstance.onGet('/attendance/team').reply(200, MOCK_TEAM_ATTENDANCE);
-  mockInstance.onPost('/attendance/manual').reply(201, {success: true, data: null});
+  // ─── Attendance ─────────────────────────────────────────────────────────
+  mockInstance.onGet(API_MAP.attendance.summary).reply(200, MOCK_ATTENDANCE_SUMMARY);
+  mockInstance.onPost(API_MAP.attendance.checkIn).reply(200, MOCK_CHECK_IN);
+  mockInstance.onPost(API_MAP.attendance.checkOut).reply(200, MOCK_CHECK_OUT);
+  mockInstance.onGet(API_MAP.attendance.history).reply(200, MOCK_ATTENDANCE_HISTORY);
+  mockInstance.onGet(API_MAP.attendance.team).reply(200, MOCK_TEAM_ATTENDANCE);
+  mockInstance.onPost(API_MAP.attendance.manual).reply(201, {success: true, data: null});
 
-  // ─── Leave ───────────────────────────────────────────────────
-  mockInstance.onGet('/leave/types').reply(200, MOCK_LEAVE_TYPES);
-  mockInstance.onGet('/leave/balances').reply(200, MOCK_LEAVE_BALANCES);
-  mockInstance.onGet('/leave/requests').reply(() => {
+  // ─── Leave ──────────────────────────────────────────────────────────────
+  mockInstance.onGet(API_MAP.leave.types).reply(200, MOCK_LEAVE_TYPES);
+  mockInstance.onGet(API_MAP.leave.balances).reply(200, MOCK_LEAVE_BALANCES);
+  mockInstance.onGet(API_MAP.leave.requests).reply(() => {
     const data = getLeaveRequestsForRole(currentRole);
     return [200, {success: true, data, pagination: {page: 1, pageSize: 20, total: data.length, totalPages: 1}}];
   });
-  mockInstance.onPost('/leave/requests').reply(201, MOCK_LEAVE_CREATE_SUCCESS);
-  mockInstance.onPatch(new RegExp('/leave/requests/\\d+')).reply(200, {success: true, data: null});
-  mockInstance.onDelete(new RegExp('/leave/requests/\\d+')).reply(200, {success: true, data: null});
-  mockInstance.onGet('/leave/team-balances').reply(200, MOCK_TEAM_LEAVE_BALANCES);
+  mockInstance.onPost(API_MAP.leave.requests).reply(201, MOCK_LEAVE_CREATE_SUCCESS);
+  mockInstance.onPatch(pathToRegex(API_MAP.leave.requestById(0))).reply(200, {success: true, data: null});
+  mockInstance.onDelete(pathToRegex(API_MAP.leave.requestById(0))).reply(200, {success: true, data: null});
+  mockInstance.onGet(API_MAP.leave.teamBalances).reply(200, MOCK_TEAM_LEAVE_BALANCES);
 
-  // ─── Payslip ─────────────────────────────────────────────────
-  mockInstance.onGet('/payslip').reply(200, MOCK_PAYSLIP_LIST);
-  mockInstance.onGet(new RegExp('/payslip/\\d+')).reply(config => {
+  // ─── Payslip ────────────────────────────────────────────────────────────
+  mockInstance.onGet(API_MAP.payslip.list).reply(200, MOCK_PAYSLIP_LIST);
+  mockInstance.onGet(pathToRegex(API_MAP.payslip.byId(0))).reply(config => {
     const id = Number(config.url?.split('/').pop());
     const found = MOCK_PAYSLIP_LIST.data.find(p => p.id === id);
     if (found) {
@@ -150,95 +151,95 @@ export function setupMocks(): void {
     return [404, {success: false, error: {code: 'NOT_FOUND', message: 'Payslip not found', message_ar: 'لم يتم العثور على قسيمة الراتب'}}];
   });
 
-  // ─── Expenses ────────────────────────────────────────────────
-  mockInstance.onGet('/expenses/categories').reply(200, MOCK_EXPENSE_CATEGORIES);
-  mockInstance.onGet('/expenses').reply(200, MOCK_EXPENSES);
-  mockInstance.onPost('/expenses').reply(201, MOCK_EXPENSE_CREATE_SUCCESS);
-  mockInstance.onPatch(new RegExp('/expenses/\\d+')).reply(200, {success: true, data: null});
-  mockInstance.onDelete(new RegExp('/expenses/\\d+')).reply(200, {success: true, data: null});
+  // ─── Expenses ───────────────────────────────────────────────────────────
+  mockInstance.onGet(API_MAP.expense.categories).reply(200, MOCK_EXPENSE_CATEGORIES);
+  mockInstance.onGet(API_MAP.expense.expenses).reply(200, MOCK_EXPENSES);
+  mockInstance.onPost(API_MAP.expense.expenses).reply(201, MOCK_EXPENSE_CREATE_SUCCESS);
+  mockInstance.onPatch(pathToRegex(API_MAP.expense.byId(0))).reply(200, {success: true, data: null});
+  mockInstance.onDelete(pathToRegex(API_MAP.expense.byId(0))).reply(200, {success: true, data: null});
 
-  // ─── Loans ───────────────────────────────────────────────────
-  mockInstance.onGet('/loans/rules').reply(200, MOCK_LOAN_RULES);
-  mockInstance.onGet('/loans').reply(200, MOCK_LOANS);
-  mockInstance.onPost('/loans').reply(201, MOCK_LOAN_CREATE_SUCCESS);
-  mockInstance.onPatch(new RegExp('/loans/\\d+')).reply(200, {success: true, data: null});
+  // ─── Loans ──────────────────────────────────────────────────────────────
+  mockInstance.onGet(API_MAP.loan.rules).reply(200, MOCK_LOAN_RULES);
+  mockInstance.onGet(API_MAP.loan.loans).reply(200, MOCK_LOANS);
+  mockInstance.onPost(API_MAP.loan.loans).reply(201, MOCK_LOAN_CREATE_SUCCESS);
+  mockInstance.onPatch(pathToRegex(API_MAP.loan.byId(0))).reply(200, {success: true, data: null});
 
-  // ─── Advance Salary ──────────────────────────────────────────
-  mockInstance.onGet('/advance-salary/info').reply(200, MOCK_ADVANCE_SALARY_INFO);
-  mockInstance.onGet('/advance-salary').reply(200, MOCK_ADVANCE_SALARIES);
-  mockInstance.onPost('/advance-salary').reply(201, MOCK_ADVANCE_SALARY_CREATE_SUCCESS);
-  mockInstance.onPatch(new RegExp('/advance-salary/\\d+')).reply(200, {success: true, data: null});
-  mockInstance.onDelete(new RegExp('/advance-salary/\\d+')).reply(200, {success: true, data: null});
+  // ─── Advance Salary ─────────────────────────────────────────────────────
+  mockInstance.onGet(API_MAP.advanceSalary.info).reply(200, MOCK_ADVANCE_SALARY_INFO);
+  mockInstance.onGet(API_MAP.advanceSalary.advances).reply(200, MOCK_ADVANCE_SALARIES);
+  mockInstance.onPost(API_MAP.advanceSalary.advances).reply(201, MOCK_ADVANCE_SALARY_CREATE_SUCCESS);
+  mockInstance.onPatch(pathToRegex(API_MAP.advanceSalary.byId(0))).reply(200, {success: true, data: null});
+  mockInstance.onDelete(pathToRegex(API_MAP.advanceSalary.byId(0))).reply(200, {success: true, data: null});
 
-  // ─── HR Letters ──────────────────────────────────────────────
-  mockInstance.onGet('/hr-letters').reply(200, MOCK_HR_LETTERS);
-  mockInstance.onPost('/hr-letters').reply(201, MOCK_HR_LETTER_CREATE_SUCCESS);
-  mockInstance.onPatch(new RegExp('/hr-letters/\\d+')).reply(200, {success: true, data: null});
-  mockInstance.onDelete(new RegExp('/hr-letters/\\d+')).reply(200, {success: true, data: null});
+  // ─── HR Letters ─────────────────────────────────────────────────────────
+  mockInstance.onGet(API_MAP.hrLetters.letters).reply(200, MOCK_HR_LETTERS);
+  mockInstance.onPost(API_MAP.hrLetters.letters).reply(201, MOCK_HR_LETTER_CREATE_SUCCESS);
+  mockInstance.onPatch(pathToRegex(API_MAP.hrLetters.byId(0))).reply(200, {success: true, data: null});
+  mockInstance.onDelete(pathToRegex(API_MAP.hrLetters.byId(0))).reply(200, {success: true, data: null});
 
-  // ─── Document Requests ───────────────────────────────────────
-  mockInstance.onGet('/document-requests/types').reply(200, MOCK_DOCUMENT_TYPES);
-  mockInstance.onGet('/document-requests').reply(200, MOCK_DOCUMENT_REQUESTS);
-  mockInstance.onPost('/document-requests').reply(201, MOCK_DOCUMENT_REQUEST_CREATE_SUCCESS);
-  mockInstance.onPatch(new RegExp('/document-requests/\\d+')).reply(200, {success: true, data: null});
-  mockInstance.onDelete(new RegExp('/document-requests/\\d+')).reply(200, {success: true, data: null});
+  // ─── Document Requests ──────────────────────────────────────────────────
+  mockInstance.onGet(API_MAP.documentRequests.types).reply(200, MOCK_DOCUMENT_TYPES);
+  mockInstance.onGet(API_MAP.documentRequests.requests).reply(200, MOCK_DOCUMENT_REQUESTS);
+  mockInstance.onPost(API_MAP.documentRequests.requests).reply(201, MOCK_DOCUMENT_REQUEST_CREATE_SUCCESS);
+  mockInstance.onPatch(pathToRegex(API_MAP.documentRequests.byId(0))).reply(200, {success: true, data: null});
+  mockInstance.onDelete(pathToRegex(API_MAP.documentRequests.byId(0))).reply(200, {success: true, data: null});
 
-  // ─── Experience Certificates ─────────────────────────────────
-  mockInstance.onGet('/experience-certificates').reply(200, MOCK_EXPERIENCE_CERTIFICATES);
-  mockInstance.onPost('/experience-certificates').reply(201, MOCK_CERTIFICATE_CREATE_SUCCESS);
-  mockInstance.onPatch(new RegExp('/experience-certificates/\\d+')).reply(200, {success: true, data: null});
-  mockInstance.onDelete(new RegExp('/experience-certificates/\\d+')).reply(200, {success: true, data: null});
+  // ─── Experience Certificates ────────────────────────────────────────────
+  mockInstance.onGet(API_MAP.certificates.certificates).reply(200, MOCK_EXPERIENCE_CERTIFICATES);
+  mockInstance.onPost(API_MAP.certificates.certificates).reply(201, MOCK_CERTIFICATE_CREATE_SUCCESS);
+  mockInstance.onPatch(pathToRegex(API_MAP.certificates.byId(0))).reply(200, {success: true, data: null});
+  mockInstance.onDelete(pathToRegex(API_MAP.certificates.byId(0))).reply(200, {success: true, data: null});
 
-  // ─── Business Services ───────────────────────────────────────
-  mockInstance.onGet('/business-services/types').reply(200, MOCK_SERVICE_TYPES);
-  mockInstance.onGet('/business-services').reply(200, MOCK_BUSINESS_SERVICES);
-  mockInstance.onPost('/business-services').reply(201, MOCK_SERVICE_CREATE_SUCCESS);
+  // ─── Business Services ──────────────────────────────────────────────────
+  mockInstance.onGet(API_MAP.businessServices.types).reply(200, MOCK_SERVICE_TYPES);
+  mockInstance.onGet(API_MAP.businessServices.requests).reply(200, MOCK_BUSINESS_SERVICES);
+  mockInstance.onPost(API_MAP.businessServices.requests).reply(201, MOCK_SERVICE_CREATE_SUCCESS);
 
-  // ─── Tasks ───────────────────────────────────────────────────
-  mockInstance.onGet('/tasks').reply(200, MOCK_TASKS);
-  mockInstance.onPatch(new RegExp('/tasks/\\d+')).reply(200, {success: true, data: null});
-  mockInstance.onPost(new RegExp('/tasks/\\d+/attachments')).reply(200, {success: true, data: null});
+  // ─── Tasks ──────────────────────────────────────────────────────────────
+  mockInstance.onGet(API_MAP.tasks.list).reply(200, MOCK_TASKS);
+  mockInstance.onPatch(pathToRegex(API_MAP.tasks.byId(0))).reply(200, {success: true, data: null});
+  mockInstance.onPost(pathToRegex(API_MAP.tasks.attachments(0))).reply(200, {success: true, data: null});
 
-  // ─── Timesheets ──────────────────────────────────────────────
-  mockInstance.onGet('/timesheets').reply(200, MOCK_TIMESHEETS);
-  mockInstance.onPost('/timesheets').reply(201, MOCK_LOG_TIME_SUCCESS);
-  mockInstance.onPatch(new RegExp('/timesheets/\\d+')).reply(200, {success: true, data: null});
-  mockInstance.onDelete(new RegExp('/timesheets/\\d+')).reply(200, {success: true, data: null});
+  // ─── Timesheets ─────────────────────────────────────────────────────────
+  mockInstance.onGet(API_MAP.timesheets.timesheets).reply(200, MOCK_TIMESHEETS);
+  mockInstance.onPost(API_MAP.timesheets.timesheets).reply(201, MOCK_LOG_TIME_SUCCESS);
+  mockInstance.onPatch(pathToRegex(API_MAP.timesheets.byId(0))).reply(200, {success: true, data: null});
+  mockInstance.onDelete(pathToRegex(API_MAP.timesheets.byId(0))).reply(200, {success: true, data: null});
 
-  // ─── Profile ─────────────────────────────────────────────────
-  mockInstance.onGet('/profile').reply(config => {
+  // ─── Employee / Profile ─────────────────────────────────────────────────
+  mockInstance.onGet(API_MAP.employee.profile).reply(config => {
     const employeeId = config.params?.employee_id;
     if (employeeId && MOCK_PROFILES_BY_ID[employeeId]) {
       return [200, {success: true, data: MOCK_PROFILES_BY_ID[employeeId]}];
     }
     return [200, MOCK_PROFILE];
   });
-  mockInstance.onGet('/employees').reply(200, MOCK_EMPLOYEES);
+  mockInstance.onGet(API_MAP.employee.directory).reply(200, MOCK_EMPLOYEES);
 
-  // ─── Notifications ───────────────────────────────────────────
-  mockInstance.onGet('/notifications').reply(200, MOCK_NOTIFICATIONS);
-  mockInstance.onPatch(new RegExp('/notifications/\\d+/read')).reply(200, {success: true, data: null});
-  mockInstance.onPost('/notifications/read-all').reply(200, {success: true, data: null});
+  // ─── Notifications ──────────────────────────────────────────────────────
+  mockInstance.onGet(API_MAP.notifications.list).reply(200, MOCK_NOTIFICATIONS);
+  mockInstance.onPatch(pathToRegex(API_MAP.notifications.markRead(0))).reply(200, {success: true, data: null});
+  mockInstance.onPost(API_MAP.notifications.markAllRead).reply(200, {success: true, data: null});
 
-  // ─── Announcements ───────────────────────────────────────────
-  mockInstance.onGet('/announcements').reply(200, MOCK_ANNOUNCEMENTS);
-  mockInstance.onPost('/announcements').reply(201, {success: true, data: null});
+  // ─── Announcements ──────────────────────────────────────────────────────
+  mockInstance.onGet(API_MAP.announcements.announcements).reply(200, MOCK_ANNOUNCEMENTS);
+  mockInstance.onPost(API_MAP.announcements.announcements).reply(201, {success: true, data: null});
 
-  // ─── Pending Approvals ────────────────────────────────────────
-  mockInstance.onGet('/pending-approvals').reply(200, MOCK_PENDING_APPROVALS);
-  mockInstance.onPost(new RegExp('/pending-approvals/\\d+/action')).reply(200, MOCK_APPROVAL_ACTION_SUCCESS);
+  // ─── Pending Approvals ──────────────────────────────────────────────────
+  mockInstance.onGet(API_MAP.pendingApprovals.list).reply(200, MOCK_PENDING_APPROVALS);
+  mockInstance.onPost(pathToRegex(API_MAP.pendingApprovals.action(0))).reply(200, MOCK_APPROVAL_ACTION_SUCCESS);
 
-  // ─── Personal Notes ───────────────────────────────────────────
-  mockInstance.onGet('/personal-notes').reply(200, MOCK_PERSONAL_NOTES);
-  mockInstance.onPost('/personal-notes').reply(201, MOCK_NOTE_CREATE_SUCCESS);
-  mockInstance.onPatch(new RegExp('/personal-notes/\\d+')).reply(200, {success: true, data: null});
-  mockInstance.onDelete(new RegExp('/personal-notes/\\d+')).reply(200, {success: true, data: null});
+  // ─── Personal Notes ─────────────────────────────────────────────────────
+  mockInstance.onGet(API_MAP.personalNotes.notes).reply(200, MOCK_PERSONAL_NOTES);
+  mockInstance.onPost(API_MAP.personalNotes.notes).reply(201, MOCK_NOTE_CREATE_SUCCESS);
+  mockInstance.onPatch(pathToRegex(API_MAP.personalNotes.byId(0))).reply(200, {success: true, data: null});
+  mockInstance.onDelete(pathToRegex(API_MAP.personalNotes.byId(0))).reply(200, {success: true, data: null});
 
-  // ─── Analytics ───────────────────────────────────────────────
-  mockInstance.onGet('/analytics').reply(200, MOCK_ANALYTICS);
+  // ─── Analytics ──────────────────────────────────────────────────────────
+  mockInstance.onGet(API_MAP.analytics.summary).reply(200, MOCK_ANALYTICS);
 
-  // ─── Team Hours ──────────────────────────────────────────────
-  mockInstance.onGet('/team-hours').reply(200, MOCK_TEAM_HOURS);
+  // ─── Team Hours ─────────────────────────────────────────────────────────
+  mockInstance.onGet(API_MAP.team.hours).reply(200, MOCK_TEAM_HOURS);
 }
 
 export function teardownMocks(): void {

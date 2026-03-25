@@ -15,6 +15,7 @@ import {useRBAC} from '../../hooks/useRBAC';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
 import type {LeaveRequest} from '../../api/mocks/leave.mock';
+import {API_MAP} from '../../api/apiMap';
 
 type Route = RouteProp<RequestsStackParamList, 'LeaveDetail'>;
 
@@ -42,7 +43,7 @@ export default function LeaveDetailScreen() {
   const {data: requests} = useQuery({
     queryKey: ['leave-requests'],
     queryFn: async () => {
-      const res = await apiClient.get('/leave/requests');
+      const res = await apiClient.get(API_MAP.leave.requests);
       return isApiSuccess(res.data) ? (res.data.data as LeaveRequest[]) : [];
     },
   });
@@ -72,7 +73,7 @@ export default function LeaveDetailScreen() {
 
   const patchMutation = useMutation({
     mutationFn: async (action: string) => {
-      await apiClient.patch(`/leave/requests/${id}`, {action, comment});
+      await apiClient.patch(API_MAP.leave.requestById(id), {action, comment});
     },
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['leave-requests']});

@@ -23,6 +23,7 @@ import {useAppSelector} from '../../hooks/useAppSelector';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {TasksStackParamList} from '../../navigation/types';
 import type {DailyTimesheetSummary} from '../../api/mocks/timesheets.mock';
+import {API_MAP} from '../../api/apiMap';
 
 type Nav = StackNavigationProp<TasksStackParamList>;
 type PeriodFilter = 'this_week' | 'last_week' | 'this_month' | 'custom';
@@ -65,7 +66,7 @@ export default function TimesheetWeeklyScreen() {
   const {data, isLoading, refetch, isRefetching} = useQuery({
     queryKey: ['timesheets'],
     queryFn: async () => {
-      const res = await apiClient.get('/timesheets');
+      const res = await apiClient.get(API_MAP.tasks.timesheets);
       return isApiSuccess(res.data) ? (res.data.data as DailyTimesheetSummary[]) : [];
     },
   });

@@ -9,6 +9,7 @@ import ScreenHeader from '../../components/common/ScreenHeader';
 import {useTheme} from '../../hooks/useTheme';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {AttendanceRecord, DayStatus, SheetStatus} from '../../api/mocks/attendance.mock';
+import {API_MAP} from '../../api/apiMap';
 
 const MONTH_NAMES_EN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const MONTH_NAMES_AR = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
@@ -56,7 +57,7 @@ export default function AttendanceMonthlySheetScreen() {
   const {data: history} = useQuery({
     queryKey: ['attendance-history'],
     queryFn: async () => {
-      const res = await apiClient.get('/attendance/history');
+      const res = await apiClient.get(API_MAP.attendance.history);
       return isApiSuccess(res.data) ? (res.data.data as AttendanceRecord[]) : [];
     },
   });

@@ -66,6 +66,9 @@ yarn-error.log
 # testing
 /coverage
 
+# Environment — never commit real credentials
+.env
+
 # Yarn
 .yarn/*
 !.yarn/patches

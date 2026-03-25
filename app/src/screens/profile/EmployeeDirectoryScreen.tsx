@@ -23,6 +23,7 @@ import {useRBAC} from '../../hooks/useRBAC';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {MoreStackParamList} from '../../navigation/types';
 import type {EmployeeListItem} from '../../api/mocks/profile.mock';
+import {API_MAP} from '../../api/apiMap';
 
 type Nav = StackNavigationProp<MoreStackParamList>;
 
@@ -49,7 +50,7 @@ export default function EmployeeDirectoryScreen() {
     queryKey: ['employees'],
     enabled: canViewOtherProfiles,
     queryFn: async () => {
-      const res = await apiClient.get('/employees');
+      const res = await apiClient.get(API_MAP.employee.directory);
       return isApiSuccess(res.data) ? (res.data.data as EmployeeListItem[]) : [];
     },
   });

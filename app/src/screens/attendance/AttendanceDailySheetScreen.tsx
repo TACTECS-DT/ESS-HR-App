@@ -14,6 +14,7 @@ import {useTheme} from '../../hooks/useTheme';
 import {spacing, fontSize, colors} from '../../config/theme';
 import type {AttendanceStackParamList} from '../../navigation/types';
 import type {AttendanceRecord} from '../../api/mocks/attendance.mock';
+import {API_MAP} from '../../api/apiMap';
 
 type Route = RouteProp<AttendanceStackParamList, 'AttendanceDailySheet'>;
 
@@ -26,7 +27,7 @@ export default function AttendanceDailySheetScreen() {
   const {data: history} = useQuery({
     queryKey: ['attendance-history'],
     queryFn: async () => {
-      const res = await apiClient.get('/attendance/history');
+      const res = await apiClient.get(API_MAP.attendance.history);
       return isApiSuccess(res.data) ? (res.data.data as AttendanceRecord[]) : [];
     },
   });

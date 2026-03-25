@@ -31,7 +31,19 @@
       "Bash(cmd.exe /c \"taskkill /PID 26948 /F\")",
       "Bash(cmd.exe /c \"taskkill /IM node.exe /F 2>&1\")",
       "Bash(cmd.exe /c \"taskkill /IM node.exe /F\")",
-      "Bash(grep -A 5 'Employee \\(readonly\\)' /d/ESS-HR-App/app/src/screens/*/*.tsx)"
+      "Bash(grep -A 5 'Employee \\(readonly\\)' /d/ESS-HR-App/app/src/screens/*/*.tsx)",
+      "Bash(python3 -c \":*)",
+      "Bash(ipconfig)",
+      "Bash(PGPASSWORD=odoo19 psql -U odoo19 -h localhost -p 5432 -c l)",
+      "Bash(PGPASSWORD=odoo19 psql -U odoo19 -h localhost -p 5432 -l)",
+      "Bash(\"/c/Program Files/PostgreSQL/16/bin/psql\" -U odoo19 -h localhost -p 5432 -l)",
+      "Bash(PGPASSWORD=odoo19 \"/c/Program Files/PostgreSQL/16/bin/psql\" -U odoo19 -h localhost -p 5432 -l -t)",
+      "Bash(grep -v \"^$\\\\|template\\\\|postgres\")",
+      "Bash(for db:*)",
+      "Bash(do)",
+      "Bash(echo \"=== $db ===\")",
+      "Bash(PGPASSWORD=odoo19 \"/c/Program Files/PostgreSQL/16/bin/psql\" -U odoo19 -h localhost -p 5432 -d \"$db\" -t -c \"SELECT state FROM ir_module_module WHERE name=''ess_hr_mobile'';\")",
+      "Bash(done)"
     ]
   }
 }
