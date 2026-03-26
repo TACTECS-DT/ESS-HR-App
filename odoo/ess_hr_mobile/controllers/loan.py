@@ -10,7 +10,7 @@ class LoanController(http.Controller):
     def rules(self):
         kw = get_body()
         return call_and_log(
-            '/ess/api/loans/rules', None,
+            '/ess/api/loans/rules',
             lambda: request.env['hr.loan'].sudo().get_loan_rules(kw.get('company_id')),
         )
 
@@ -20,11 +20,11 @@ class LoanController(http.Controller):
         employee_id = kw.get('employee_id')
         if request.httprequest.method == 'GET':
             return call_and_log(
-                '/ess/api/loans', employee_id,
+                '/ess/api/loans',
                 lambda: request.env['hr.loan'].sudo().get_loans(employee_id),
             )
         return call_and_log(
-            '/ess/api/loans', employee_id,
+            '/ess/api/loans',
             lambda: request.env['hr.loan'].sudo().create_loan(
                 employee_id,
                 kw.get('amount'),
@@ -38,7 +38,7 @@ class LoanController(http.Controller):
         kw = get_body()
         employee_id = kw.get('employee_id')
         return call_and_log(
-            '/ess/api/loans/<id>', employee_id,
+            '/ess/api/loans/<id>',
             lambda: request.env['hr.loan'].sudo().get_loan_detail(loan_id),
         )
 
@@ -47,7 +47,7 @@ class LoanController(http.Controller):
         kw = get_body()
         approver_employee_id = kw.get('approver_employee_id')
         return call_and_log(
-            '/ess/api/loans/approve', approver_employee_id,
+            '/ess/api/loans/approve',
             lambda: request.env['hr.loan'].sudo().approve_loan(kw.get('loan_id'), approver_employee_id),
         )
 
@@ -56,7 +56,7 @@ class LoanController(http.Controller):
         kw = get_body()
         approver_employee_id = kw.get('approver_employee_id')
         return call_and_log(
-            '/ess/api/loans/refuse', approver_employee_id,
+            '/ess/api/loans/refuse',
             lambda: request.env['hr.loan'].sudo().refuse_loan(
                 kw.get('loan_id'), approver_employee_id, kw.get('reason', ''),
             ),

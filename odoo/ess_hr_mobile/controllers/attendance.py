@@ -10,7 +10,7 @@ class AttendanceController(http.Controller):
         kw = get_body()
         employee_id = kw.get('employee_id')
         return call_and_log(
-            '/ess/api/attendance/summary', employee_id,
+            '/ess/api/attendance/summary',
             lambda: request.env['hr.attendance'].sudo().get_attendance_status(employee_id),
         )
 
@@ -19,7 +19,7 @@ class AttendanceController(http.Controller):
         kw = get_body()
         employee_id = kw.get('employee_id')
         return call_and_log(
-            '/ess/api/attendance/check-in', employee_id,
+            '/ess/api/attendance/check-in',
             lambda: request.env['hr.attendance'].sudo().ess_check_in(
                 employee_id,
                 kw.get('timestamp'),
@@ -34,7 +34,7 @@ class AttendanceController(http.Controller):
         kw = get_body()
         employee_id = kw.get('employee_id')
         return call_and_log(
-            '/ess/api/attendance/check-out', employee_id,
+            '/ess/api/attendance/check-out',
             lambda: request.env['hr.attendance'].sudo().ess_check_out(
                 employee_id,
                 kw.get('timestamp'),
@@ -48,7 +48,7 @@ class AttendanceController(http.Controller):
         kw = get_body()
         employee_id = kw.get('employee_id')
         return call_and_log(
-            '/ess/api/attendance/history', employee_id,
+            '/ess/api/attendance/history',
             lambda: request.env['hr.attendance'].sudo().get_attendance_history(
                 employee_id,
                 kw.get('date_from'),
@@ -63,7 +63,7 @@ class AttendanceController(http.Controller):
         kw = get_body()
         employee_id = kw.get('employee_id')
         return call_and_log(
-            '/ess/api/attendance/daily-sheet', employee_id,
+            '/ess/api/attendance/daily-sheet',
             lambda: request.env['hr.attendance'].sudo().get_daily_sheet(employee_id, kw.get('date')),
         )
 
@@ -72,7 +72,7 @@ class AttendanceController(http.Controller):
         kw = get_body()
         employee_id = kw.get('employee_id')
         return call_and_log(
-            '/ess/api/attendance/monthly-sheet', employee_id,
+            '/ess/api/attendance/monthly-sheet',
             lambda: request.env['hr.attendance'].sudo().get_monthly_sheet(
                 employee_id, kw.get('year'), kw.get('month'),
             ),
@@ -83,7 +83,7 @@ class AttendanceController(http.Controller):
         kw = get_body()
         manager_id = kw.get('employee_id')
         return call_and_log(
-            '/ess/api/attendance/team', manager_id,
+            '/ess/api/attendance/team',
             lambda: [],  # stub — team attendance view for manager
         )
 
@@ -92,6 +92,6 @@ class AttendanceController(http.Controller):
         kw = get_body()
         employee_id = kw.get('employee_id')
         return call_and_log(
-            '/ess/api/attendance/manual', employee_id,
+            '/ess/api/attendance/manual',
             lambda: {},  # stub — manual attendance entry for HR
         )

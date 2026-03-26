@@ -11,7 +11,7 @@ class NotificationsController(http.Controller):
         kw = get_body()
         employee_id = kw.get('employee_id')
         return call_and_log(
-            '/ess/api/notifications', employee_id,
+            '/ess/api/notifications',
             lambda: [],  # stub — no notification model yet
         )
 
@@ -20,7 +20,7 @@ class NotificationsController(http.Controller):
         kw = get_body()
         employee_id = kw.get('employee_id')
         return call_and_log(
-            '/ess/api/notifications/<id>/read', employee_id,
+            '/ess/api/notifications/<id>/read',
             lambda: {'id': notification_id, 'read': True},
         )
 
@@ -29,6 +29,6 @@ class NotificationsController(http.Controller):
         kw = get_body()
         employee_id = kw.get('employee_id')
         return call_and_log(
-            '/ess/api/notifications/read-all', employee_id,
+            '/ess/api/notifications/read-all',
             lambda: {'updated': 0},
         )

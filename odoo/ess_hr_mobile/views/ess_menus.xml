@@ -48,11 +48,27 @@
         groups="base.group_system"/>
 
     <menuitem
+        id="menu_ess_servers"
+        name="Servers"
+        parent="menu_ess_config"
+        action="action_ess_server"
+        sequence="10"
+        groups="base.group_system"/>
+
+    <menuitem
         id="menu_ess_licenses"
         name="License Keys"
         parent="menu_ess_config"
         action="action_ess_license"
-        sequence="10"
+        sequence="20"
+        groups="base.group_system"/>
+
+    <menuitem
+        id="menu_ess_employee_credentials"
+        name="Employee Credentials"
+        parent="menu_ess_config"
+        action="action_ess_employee_credential"
+        sequence="20"
         groups="base.group_system"/>
 
 </odoo>

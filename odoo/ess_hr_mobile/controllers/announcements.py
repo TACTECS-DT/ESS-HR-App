@@ -11,6 +11,6 @@ class AnnouncementsController(http.Controller):
         kw = get_body()
         employee_id = kw.get('employee_id')
         return call_and_log(
-            '/ess/api/announcements', employee_id,
+            '/ess/api/announcements',
             lambda: [],  # stub — no announcement model yet
         )

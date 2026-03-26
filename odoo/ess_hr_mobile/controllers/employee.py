@@ -11,7 +11,7 @@ class EmployeeController(http.Controller):
         kw = get_body()
         employee_id = kw.get('employee_id')
         return call_and_log(
-            '/ess/api/profile', employee_id,
+            '/ess/api/profile',
             lambda: request.env['hr.employee'].sudo().get_employee_profile(employee_id),
         )
 
@@ -20,7 +20,7 @@ class EmployeeController(http.Controller):
         kw = get_body()
         employee_id = kw.get('employee_id')
         return call_and_log(
-            '/ess/api/profile/contract', employee_id,
+            '/ess/api/profile/contract',
             lambda: request.env['hr.employee'].sudo().get_contract_summary(employee_id),
         )
 
@@ -29,6 +29,6 @@ class EmployeeController(http.Controller):
         kw = get_body()
         employee_id = kw.get('employee_id')
         return call_and_log(
-            '/ess/api/employees', employee_id,
+            '/ess/api/employees',
             lambda: [],  # stub — employee directory list
         )

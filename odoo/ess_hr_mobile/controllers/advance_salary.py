@@ -11,7 +11,7 @@ class AdvanceSalaryController(http.Controller):
         kw = get_body()
         employee_id = kw.get('employee_id')
         return call_and_log(
-            '/ess/api/advance-salary/info', employee_id,
+            '/ess/api/advance-salary/info',
             lambda: request.env['hr.advance.salary'].sudo().get_advance_salary_cap(employee_id),
         )
 
@@ -21,11 +21,11 @@ class AdvanceSalaryController(http.Controller):
         employee_id = kw.get('employee_id')
         if request.httprequest.method == 'GET':
             return call_and_log(
-                '/ess/api/advance-salary', employee_id,
+                '/ess/api/advance-salary',
                 lambda: request.env['hr.advance.salary'].sudo().get_advance_salaries(employee_id),
             )
         return call_and_log(
-            '/ess/api/advance-salary', employee_id,
+            '/ess/api/advance-salary',
             lambda: request.env['hr.advance.salary'].sudo().create_advance_salary(
                 employee_id, kw.get('amount'),
             ),
@@ -36,7 +36,7 @@ class AdvanceSalaryController(http.Controller):
         kw = get_body()
         employee_id = kw.get('employee_id')
         return call_and_log(
-            '/ess/api/advance-salary/<id>', employee_id,
+            '/ess/api/advance-salary/<id>',
             lambda: request.env['hr.advance.salary'].sudo().get_advance_salary_detail(advance_id),
         )
 
@@ -45,7 +45,7 @@ class AdvanceSalaryController(http.Controller):
         kw = get_body()
         manager_employee_id = kw.get('manager_employee_id')
         return call_and_log(
-            '/ess/api/advance-salary/approve', manager_employee_id,
+            '/ess/api/advance-salary/approve',
             lambda: request.env['hr.advance.salary'].sudo().approve_advance_salary(
                 kw.get('request_id'), manager_employee_id,
             ),
@@ -56,7 +56,7 @@ class AdvanceSalaryController(http.Controller):
         kw = get_body()
         manager_employee_id = kw.get('manager_employee_id')
         return call_and_log(
-            '/ess/api/advance-salary/refuse', manager_employee_id,
+            '/ess/api/advance-salary/refuse',
             lambda: request.env['hr.advance.salary'].sudo().refuse_advance_salary(
                 kw.get('request_id'), manager_employee_id, kw.get('reason', ''),
             ),
@@ -67,6 +67,6 @@ class AdvanceSalaryController(http.Controller):
         kw = get_body()
         employee_id = kw.get('employee_id')
         return call_and_log(
-            '/ess/api/advance-salary/reset', employee_id,
+            '/ess/api/advance-salary/reset',
             lambda: request.env['hr.advance.salary'].sudo().reset_advance_salary(kw.get('request_id')),
         )

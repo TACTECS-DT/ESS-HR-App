@@ -10,7 +10,7 @@ class ExpenseController(http.Controller):
     def categories(self):
         kw = get_body()
         return call_and_log(
-            '/ess/api/expenses/categories', None,
+            '/ess/api/expenses/categories',
             lambda: request.env['hr.expense'].sudo().get_expense_categories(),
         )
 
@@ -18,7 +18,7 @@ class ExpenseController(http.Controller):
     def currencies(self):
         kw = get_body()
         return call_and_log(
-            '/ess/api/expenses/currencies', None,
+            '/ess/api/expenses/currencies',
             lambda: request.env['hr.expense'].sudo().get_currencies(),
         )
 
@@ -26,7 +26,7 @@ class ExpenseController(http.Controller):
     def taxes(self):
         kw = get_body()
         return call_and_log(
-            '/ess/api/expenses/taxes', None,
+            '/ess/api/expenses/taxes',
             lambda: request.env['hr.expense'].sudo().get_purchase_taxes(kw.get('company_id')),
         )
 
@@ -36,11 +36,11 @@ class ExpenseController(http.Controller):
         employee_id = kw.get('employee_id')
         if request.httprequest.method == 'GET':
             return call_and_log(
-                '/ess/api/expenses', employee_id,
+                '/ess/api/expenses',
                 lambda: request.env['hr.expense'].sudo().get_expenses(employee_id, kw.get('state_filter')),
             )
         return call_and_log(
-            '/ess/api/expenses', employee_id,
+            '/ess/api/expenses',
             lambda: request.env['hr.expense'].sudo().create_expense(
                 employee_id,
                 kw.get('product_id'),
@@ -60,19 +60,19 @@ class ExpenseController(http.Controller):
         method = request.httprequest.method
         if method == 'GET':
             return call_and_log(
-                '/ess/api/expenses/<id>', employee_id,
+                '/ess/api/expenses/<id>',
                 lambda: request.env['hr.expense'].sudo().get_expense_detail(expense_id),
             )
         if method == 'PATCH':
             return call_and_log(
-                '/ess/api/expenses/<id>', employee_id,
+                '/ess/api/expenses/<id>',
                 lambda: request.env['hr.expense'].sudo().update_expense(
                     expense_id, kw.get('vals', {}),
                 ),
             )
         # DELETE
         return call_and_log(
-            '/ess/api/expenses/<id>', employee_id,
+            '/ess/api/expenses/<id>',
             lambda: request.env['hr.expense'].sudo().delete_expense(expense_id),
         )
 
@@ -81,7 +81,7 @@ class ExpenseController(http.Controller):
         kw = get_body()
         employee_id = kw.get('employee_id')
         return call_and_log(
-            '/ess/api/expenses/attach', employee_id,
+            '/ess/api/expenses/attach',
             lambda: request.env['hr.expense'].sudo().attach_file_to_expense(
                 kw.get('expense_id'), kw.get('filename'), kw.get('file_base64'),
             ),
@@ -92,6 +92,6 @@ class ExpenseController(http.Controller):
         kw = get_body()
         employee_id = kw.get('employee_id')
         return call_and_log(
-            '/ess/api/expenses/submit', employee_id,
+            '/ess/api/expenses/submit',
             lambda: request.env['hr.expense'].sudo().ess_submit_expense(kw.get('expense_id')),
         )

@@ -43,7 +43,8 @@
       "Bash(do)",
       "Bash(echo \"=== $db ===\")",
       "Bash(PGPASSWORD=odoo19 \"/c/Program Files/PostgreSQL/16/bin/psql\" -U odoo19 -h localhost -p 5432 -d \"$db\" -t -c \"SELECT state FROM ir_module_module WHERE name=''ess_hr_mobile'';\")",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(pip show:*)"
     ]
   }
 }

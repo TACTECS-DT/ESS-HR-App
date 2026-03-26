@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ── List view ───────────────────────────────────────────────────────── -->
+    <record id="view_ess_server_list" model="ir.ui.view">
+        <field name="name">ess.server.list</field>
+        <field name="model">ess.server</field>
+        <field name="arch" type="xml">
+            <list string="ESS Servers">
+                <field name="name"/>
+                <field name="url"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ── Form view ───────────────────────────────────────────────────────── -->
+    <record id="view_ess_server_form" model="ir.ui.view">
+        <field name="name">ess.server.form</field>
+        <field name="model">ess.server</field>
+        <field name="arch" type="xml">
+            <form string="ESS Server">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="url" placeholder="https://your-odoo.com"/>
+                        <field name="active"/>
+                    </group>
+                    <group string="Companies">
+                        <field name="company_ids" widget="many2many_tags" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ── Action window ───────────────────────────────────────────────────── -->
+    <record id="action_ess_server" model="ir.actions.act_window">
+        <field name="name">Servers</field>
+        <field name="res_model">ess.server</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

@@ -20,9 +20,10 @@ class HrLoanConfig(models.Model):
         help='Number of basic salary months allowed as maximum loan amount.',
     )
 
-    _sql_constraints = [
-        ('company_unique', 'UNIQUE(company_id)', 'Only one loan config per company is allowed.'),
-    ]
+    _company_unique = models.Constraint(
+        'UNIQUE(company_id)',
+        'Only one loan config per company is allowed.',
+    )
 
 
 class HrLoanInstallment(models.Model):

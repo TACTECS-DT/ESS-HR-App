@@ -11,7 +11,7 @@ class PersonalNotesController(http.Controller):
         kw = get_body()
         employee_id = kw.get('employee_id')
         return call_and_log(
-            '/ess/api/personal-notes', employee_id,
+            '/ess/api/personal-notes',
             lambda: [],  # stub — no personal notes model yet
         )
 
@@ -21,6 +21,6 @@ class PersonalNotesController(http.Controller):
         employee_id = kw.get('employee_id')
         method = request.httprequest.method
         return call_and_log(
-            '/ess/api/personal-notes/<id>', employee_id,
+            '/ess/api/personal-notes/<id>',
             lambda: {'id': note_id},
         )

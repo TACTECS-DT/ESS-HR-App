@@ -11,6 +11,6 @@ class TeamController(http.Controller):
         kw = get_body()
         employee_id = kw.get('employee_id')
         return call_and_log(
-            '/ess/api/team-hours', employee_id,
+            '/ess/api/team-hours',
             lambda: [],  # stub — team hours summary for manager
         )

@@ -6,7 +6,9 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
-  Image,
+  TouchableOpacity,
+  Modal,
+  Keyboard,
 } from 'react-native';
 import {useTranslation} from 'react-i18next';
 import {useNavigation} from '@react-navigation/native';
@@ -18,6 +20,8 @@ import Button from '../../components/common/Button';
 import TextInput from '../../components/common/TextInput';
 import {useTheme} from '../../hooks/useTheme';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
+import {useAppDispatch} from '../../hooks/useAppDispatch';
+import {setLicenseContext} from '../../store/slices/authSlice';
 import type {AuthStackParamList} from '../../navigation/types';
 import {API_MAP} from '../../api/apiMap';
 
@@ -27,42 +31,48 @@ export default function LicenseActivationScreen() {
   const {t} = useTranslation();
   const navigation = useNavigation<Nav>();
   const theme = useTheme();
+  const dispatch = useAppDispatch();
 
   const [licenseKey, setLicenseKey] = useState('');
-  const [companyUrl, setCompanyUrl] = useState('');
-  const [database, setDatabase] = useState('');
+  const [serverUrl, setServerUrl] = useState('');
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<{licenseKey?: string; companyUrl?: string; database?: string}>({});
+  const [error, setError] = useState('');   // single error string → shown in modal
 
-  const allFilled = licenseKey.trim() && companyUrl.trim() && database.trim();
+  const allFilled = licenseKey.trim() && serverUrl.trim();
 
   async function handleActivate() {
-    const newErrors: typeof errors = {};
-    if (!licenseKey.trim()) {newErrors.licenseKey = t('auth.errors.invalidLicense');}
-    if (!companyUrl.trim())  {newErrors.companyUrl  = t('common.error');}
-    if (!database.trim())    {newErrors.database    = t('common.error');}
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
+    // Local validation — show modal for empty fields too
+    if (!licenseKey.trim()) {
+      setError(t('auth.errors.invalidLicense'));
+      return;
+    }
+    if (!serverUrl.trim()) {
+      setError(t('common.error'));
       return;
     }
     setLoading(true);
-    setErrors({});
+    setError('');
     try {
       const res = await apiClient.post(API_MAP.auth.validateLicense, {
         license_key: licenseKey.trim(),
-        company_url: companyUrl.trim(),
-        database: database.trim(),
+        server_url: serverUrl.trim(),
       });
       const data = res.data;
       if (isApiSuccess(data)) {
+        dispatch(setLicenseContext({
+          licenseKey: licenseKey.trim(),
+          serverUrl: serverUrl.trim(),
+        }));
         navigation.navigate('CompanySelection', {companies: data.data.companies});
       } else {
-        setErrors({licenseKey: data.error.message});
+        setError(data.error.message);
       }
-    } catch {
-      setErrors({licenseKey: t('common.error')});
+    } catch (err: any) {
+      const msg = err?.response?.data?.error?.message;
+      setError(msg || t('common.error'));
     } finally {
       setLoading(false);
+      Keyboard.dismiss();
     }
   }
 
@@ -86,38 +96,26 @@ export default function LicenseActivationScreen() {
           </Text>
         </View>
 
-        {/* Form card */}
+        {/* Form card — no error props on inputs */}
         <View style={[styles.card, {backgroundColor: theme.surface, borderColor: theme.border}]}>
           <TextInput
             label={t('auth.licenseKey') + ' *'}
             placeholder={t('auth.licenseKeyPlaceholder')}
             value={licenseKey}
-            onChangeText={v => {setLicenseKey(v); setErrors(e => ({...e, licenseKey: undefined}));}}
+            onChangeText={v => { setLicenseKey(v); setError(''); }}
             autoCapitalize="characters"
             autoCorrect={false}
             keyboardType="default"
-            error={errors.licenseKey}
           />
 
           <TextInput
-            label={t('auth.companyUrl') + ' *'}
-            placeholder={t('auth.companyUrlPlaceholder')}
-            value={companyUrl}
-            onChangeText={v => {setCompanyUrl(v); setErrors(e => ({...e, companyUrl: undefined}));}}
+            label={t('auth.serverUrl') + ' *'}
+            placeholder={t('auth.serverUrlPlaceholder')}
+            value={serverUrl}
+            onChangeText={v => { setServerUrl(v); setError(''); }}
             autoCapitalize="none"
             autoCorrect={false}
             keyboardType="url"
-            error={errors.companyUrl}
-          />
-
-          <TextInput
-            label={t('auth.database') + ' *'}
-            placeholder={t('auth.databasePlaceholder')}
-            value={database}
-            onChangeText={v => {setDatabase(v); setErrors(e => ({...e, database: undefined}));}}
-            autoCapitalize="none"
-            autoCorrect={false}
-            error={errors.database}
           />
 
           <Button
@@ -134,6 +132,33 @@ export default function LicenseActivationScreen() {
           {t('auth.contactHR')}
         </Text>
       </ScrollView>
+
+      {/* ── Invalid license / server wizard ──────────────────────────────── */}
+      <Modal
+        visible={!!error}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setError('')}>
+        <TouchableOpacity
+          style={styles.overlay}
+          activeOpacity={1}
+          onPress={() => setError('')}>
+          <View style={[styles.errorDialog, {backgroundColor: theme.surface}]}>
+            <View style={styles.errorIconWrap}>
+              <Text style={styles.errorEmoji}>⚠️</Text>
+            </View>
+            <Text style={[styles.errorTitle, {color: theme.text}]}>
+              {t('auth.errors.invalidLicense')}
+            </Text>
+            <Text style={styles.errorBody}>{error}</Text>
+            <TouchableOpacity
+              style={styles.errorDismissBtn}
+              onPress={() => setError('')}>
+              <Text style={styles.errorDismissBtnLabel}>{t('common.close')}</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }
@@ -174,5 +199,63 @@ const styles = StyleSheet.create({
     fontSize: fontSize.xs,
     textAlign: 'center',
     lineHeight: 18,
+  },
+
+  // ── Error modal ────────────────────────────────────────────────────────
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: spacing.xl,
+  },
+  errorDialog: {
+    width: '100%',
+    borderRadius: radius.xl,
+    borderWidth: 2,
+    borderColor: colors.error,
+    padding: spacing.xl,
+    alignItems: 'center',
+    gap: spacing.sm,
+    shadowColor: colors.error,
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.18,
+    shadowRadius: 16,
+    elevation: 10,
+  },
+  errorIconWrap: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#FF3B3018',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: spacing.xs,
+  },
+  errorEmoji: {fontSize: 28},
+  errorTitle: {
+    fontSize: fontSize.lg,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+  errorBody: {
+    fontSize: fontSize.sm,
+    color: colors.error,
+    textAlign: 'center',
+    lineHeight: 20,
+    fontWeight: '500',
+  },
+  errorDismissBtn: {
+    marginTop: spacing.sm,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.xl,
+    borderRadius: radius.lg,
+    borderWidth: 1.5,
+    borderColor: colors.error,
+  },
+  errorDismissBtnLabel: {
+    color: colors.error,
+    fontWeight: '700',
+    fontSize: fontSize.md,
   },
 });

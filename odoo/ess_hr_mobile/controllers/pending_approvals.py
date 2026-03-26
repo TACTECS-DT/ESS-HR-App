@@ -11,7 +11,7 @@ class PendingApprovalsController(http.Controller):
         kw = get_body()
         employee_id = kw.get('employee_id')
         return call_and_log(
-            '/ess/api/pending-approvals', employee_id,
+            '/ess/api/pending-approvals',
             lambda: [],  # stub — aggregate pending items across modules
         )
 
@@ -20,6 +20,6 @@ class PendingApprovalsController(http.Controller):
         kw = get_body()
         employee_id = kw.get('employee_id')
         return call_and_log(
-            '/ess/api/pending-approvals/<id>/action', employee_id,
+            '/ess/api/pending-approvals/<id>/action',
             lambda: {'id': item_id, 'action': kw.get('action'), 'success': True},
         )

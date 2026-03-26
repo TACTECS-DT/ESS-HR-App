@@ -10,7 +10,7 @@ class AnalyticsController(http.Controller):
     def summary(self):
         kw = get_body()
         return call_and_log(
-            '/ess/api/analytics', None,
+            '/ess/api/analytics',
             lambda: {},  # stub — top-level analytics summary
         )
 
@@ -18,7 +18,7 @@ class AnalyticsController(http.Controller):
     def module_stats(self):
         kw = get_body()
         return call_and_log(
-            '/ess/api/analytics/module-stats', None,
+            '/ess/api/analytics/module-stats',
             lambda: request.env['ess.api.log'].sudo().get_module_stats(
                 kw.get('date_from'), kw.get('date_to'),
             ),
@@ -28,7 +28,7 @@ class AnalyticsController(http.Controller):
     def employee_activity(self):
         kw = get_body()
         return call_and_log(
-            '/ess/api/analytics/employee-activity', None,
+            '/ess/api/analytics/employee-activity',
             lambda: request.env['ess.api.log'].sudo().get_employee_activity(
                 kw.get('date_from'), kw.get('date_to'), kw.get('limit', 20),
             ),
@@ -38,7 +38,7 @@ class AnalyticsController(http.Controller):
     def hourly_distribution(self):
         kw = get_body()
         return call_and_log(
-            '/ess/api/analytics/hourly-distribution', None,
+            '/ess/api/analytics/hourly-distribution',
             lambda: request.env['ess.api.log'].sudo().get_hourly_distribution(
                 kw.get('date_from'), kw.get('date_to'),
             ),
@@ -48,7 +48,7 @@ class AnalyticsController(http.Controller):
     def error_summary(self):
         kw = get_body()
         return call_and_log(
-            '/ess/api/analytics/error-summary', None,
+            '/ess/api/analytics/error-summary',
             lambda: request.env['ess.api.log'].sudo().get_error_summary(
                 kw.get('date_from'), kw.get('date_to'),
             ),
@@ -58,7 +58,7 @@ class AnalyticsController(http.Controller):
     def daily_totals(self):
         kw = get_body()
         return call_and_log(
-            '/ess/api/analytics/daily-totals', None,
+            '/ess/api/analytics/daily-totals',
             lambda: request.env['ess.api.log'].sudo().get_daily_totals(
                 kw.get('date_from'), kw.get('date_to'),
             ),

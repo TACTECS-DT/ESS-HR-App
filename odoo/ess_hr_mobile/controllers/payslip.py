@@ -11,7 +11,7 @@ class PayslipController(http.Controller):
         kw = get_body()
         employee_id = kw.get('employee_id')
         return call_and_log(
-            '/ess/api/payslip', employee_id,
+            '/ess/api/payslip',
             lambda: request.env['hr.payslip'].sudo().get_payslips(
                 employee_id, kw.get('year'), kw.get('month'),
             ),
@@ -22,7 +22,7 @@ class PayslipController(http.Controller):
         kw = get_body()
         employee_id = kw.get('employee_id')
         return call_and_log(
-            '/ess/api/payslip/<id>', employee_id,
+            '/ess/api/payslip/<id>',
             lambda: request.env['hr.payslip'].sudo().get_payslip_detail(payslip_id),
         )
 
@@ -31,6 +31,6 @@ class PayslipController(http.Controller):
         kw = get_body()
         employee_id = kw.get('employee_id')
         return call_and_log(
-            '/ess/api/payslip/pdf', employee_id,
+            '/ess/api/payslip/pdf',
             lambda: request.env['hr.payslip'].sudo().get_payslip_pdf(kw.get('payslip_id')),
         )

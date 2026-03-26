@@ -1,4 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ess_server_user,ess.server user,model_ess_server,ess_hr_mobile.ess_mobile_group,1,0,0,0
+access_ess_server_system,ess.server system,model_ess_server,base.group_system,1,1,1,1
 access_ess_license_user,ess.license user,model_ess_license,ess_hr_mobile.ess_mobile_group,1,1,1,0
 access_ess_license_system,ess.license system,model_ess_license,base.group_system,1,1,1,1
 access_hr_loan_config_user,hr.loan.config user,model_hr_loan_config,ess_hr_mobile.ess_mobile_group,1,0,0,0
@@ -21,3 +23,5 @@ access_hr_business_service_request_user,hr.business.service.request user,model_h
 access_hr_business_service_request_system,hr.business.service.request system,model_hr_business_service_request,base.group_system,1,1,1,1
 access_ess_api_log_user,ess.api.log user,model_ess_api_log,ess_hr_mobile.ess_mobile_group,1,0,0,0
 access_ess_api_log_system,ess.api.log system,model_ess_api_log,base.group_system,1,1,1,1
+access_ess_employee_credential_user,ess.employee.credential user,model_ess_employee_credential,ess_hr_mobile.ess_mobile_group,1,1,1,0
+access_ess_employee_credential_system,ess.employee.credential system,model_ess_employee_credential,base.group_system,1,1,1,1

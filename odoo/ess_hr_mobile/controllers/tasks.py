@@ -19,7 +19,7 @@ class TasksController(http.Controller):
         kw = get_body()
         employee_id = kw.get('employee_id')
         return call_and_log(
-            '/ess/api/tasks', employee_id,
+            '/ess/api/tasks',
             lambda: request.env['project.task'].sudo().get_tasks(employee_id),
         )
 
@@ -29,12 +29,12 @@ class TasksController(http.Controller):
         employee_id = kw.get('employee_id')
         if request.httprequest.method == 'GET':
             return call_and_log(
-                '/ess/api/tasks/<id>', employee_id,
+                '/ess/api/tasks/<id>',
                 lambda: request.env['project.task'].sudo().get_task_detail(task_id),
             )
         # PATCH
         return call_and_log(
-            '/ess/api/tasks/<id>', employee_id,
+            '/ess/api/tasks/<id>',
             lambda: request.env['project.task'].sudo().update_task_stage(
                 task_id, kw.get('stage_id'),
             ),
@@ -46,12 +46,12 @@ class TasksController(http.Controller):
         employee_id = kw.get('employee_id')
         if request.httprequest.method == 'GET':
             return call_and_log(
-                '/ess/api/tasks/<id>/attachments', employee_id,
+                '/ess/api/tasks/<id>/attachments',
                 lambda: request.env['project.task'].sudo().get_task_attachments(task_id),
             )
         # POST
         return call_and_log(
-            '/ess/api/tasks/<id>/attachments', employee_id,
+            '/ess/api/tasks/<id>/attachments',
             lambda: request.env['project.task'].sudo().add_task_attachment(
                 task_id, kw.get('filename'), kw.get('file_base64'),
             ),
@@ -64,7 +64,7 @@ class TasksController(http.Controller):
         kw = get_body()
         employee_id = kw.get('employee_id')
         return call_and_log(
-            '/ess/api/timesheets/<id>', employee_id,
+            '/ess/api/timesheets/<id>',
             lambda: {'id': timesheet_id},  # stub — update/delete single timesheet entry
         )
 
@@ -74,11 +74,11 @@ class TasksController(http.Controller):
         employee_id = kw.get('employee_id')
         if request.httprequest.method == 'GET':
             return call_and_log(
-                '/ess/api/timesheets', employee_id,
+                '/ess/api/timesheets',
                 lambda: request.env['account.analytic.line'].sudo().get_timesheets(employee_id),
             )
         return call_and_log(
-            '/ess/api/timesheets', employee_id,
+            '/ess/api/timesheets',
             lambda: request.env['account.analytic.line'].sudo().log_timesheet(
                 employee_id,
                 kw.get('task_id'),
@@ -93,7 +93,7 @@ class TasksController(http.Controller):
         kw = get_body()
         employee_id = kw.get('employee_id')
         return call_and_log(
-            '/ess/api/timesheets/daily', employee_id,
+            '/ess/api/timesheets/daily',
             lambda: request.env['account.analytic.line'].sudo().get_daily_timesheet(
                 employee_id, kw.get('date'),
             ),
@@ -104,7 +104,7 @@ class TasksController(http.Controller):
         kw = get_body()
         employee_id = kw.get('employee_id')
         return call_and_log(
-            '/ess/api/timesheets/weekly', employee_id,
+            '/ess/api/timesheets/weekly',
             lambda: request.env['account.analytic.line'].sudo().get_weekly_timesheet(
                 employee_id, kw.get('week_start'),
             ),
