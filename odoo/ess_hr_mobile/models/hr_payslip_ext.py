@@ -86,7 +86,7 @@ class HrPayslipExt(models.Model):
         """Render and return the payslip PDF as a base64-encoded string."""
         try:
             report = self.env.ref('hr_payroll.action_report_payslip')
-            pdf_content, _ = self.env['ir.actions.report'].sudo()._render_qweb_pdf(
+            pdf_content, _pdf_type = self.env['ir.actions.report'].sudo()._render_qweb_pdf(
                 report, slip.ids
             )
             return base64.b64encode(pdf_content).decode('utf-8')

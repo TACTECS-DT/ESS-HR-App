@@ -1,6 +1,7 @@
 /**
  * Call this once after the Redux store is ready.
- * Attaches Bearer token to requests and handles 401 refresh.
+ * All auth headers are set in client.ts interceptor.
+ * This file handles 401 token refresh and retry only.
  */
 import apiClient from './client';
 import {API_MAP} from './apiMap';
@@ -9,15 +10,6 @@ import {updateTokens, clearAuth} from '../store/slices/authSlice';
 import {saveTokens, clearTokens} from '../utils/secureStorage';
 
 export function setupInterceptors(): void {
-  // Attach Bearer token to every request
-  apiClient.interceptors.request.use(config => {
-    const token = store.getState().auth.accessToken;
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  });
-
   // Handle 401: attempt token refresh, then retry
   apiClient.interceptors.response.use(
     response => response,

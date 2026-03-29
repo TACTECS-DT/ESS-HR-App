@@ -26,8 +26,7 @@ class HrAttendanceExt(models.Model):
             'gps_latitude': latitude or 0.0,
             'gps_longitude': longitude or 0.0,
         }
-        if task_id:
-            vals['task_id'] = task_id
+        # task_id is not a field on hr.attendance in Odoo 19 — removed
         attendance = self._env_for_write(employee).create(vals)
         return self._format_attendance_record(attendance)
 
@@ -40,12 +39,13 @@ class HrAttendanceExt(models.Model):
             raise UserError(_('No open attendance found for this employee.'))
         check_out_dt = self._parse_timestamp(timestamp)
         env = self._env_for_write(employee)
-        env.browse(open_att.id).write({
+        record = env.browse(open_att.id)
+        record.write({
             'check_out': check_out_dt,
             'checkout_latitude': latitude or 0.0,
             'checkout_longitude': longitude or 0.0,
         })
-        return self._format_attendance_record(open_att)
+        return self._format_attendance_record(record)
 
     @api.model
     def get_attendance_status(self, employee_id):
@@ -67,6 +67,11 @@ class HrAttendanceExt(models.Model):
     def get_attendance_history(self, employee_id, date_from, date_to, page=1, page_size=20):
         """Return paginated attendance records between two dates."""
         employee = self._get_employee(employee_id)
+        today = fields.Date.today()
+        if not date_from:
+            date_from = str(today.replace(day=1))
+        if not date_to:
+            date_to = str(today)
         domain = [
             ('employee_id', '=', employee_id),
             ('check_in', '>=', date_from + ' 00:00:00'),
@@ -86,6 +91,8 @@ class HrAttendanceExt(models.Model):
     def get_daily_sheet(self, employee_id, date):
         """Return all attendance entries for an employee on the given date (YYYY-MM-DD)."""
         employee = self._get_employee(employee_id)
+        if not date:
+            date = str(fields.Date.today())
         domain = [
             ('employee_id', '=', employee_id),
             ('check_in', '>=', date + ' 00:00:00'),
@@ -99,6 +106,13 @@ class HrAttendanceExt(models.Model):
         """Return a list of day dicts with attendance status for the entire month."""
         import calendar
         employee = self._get_employee(employee_id)
+        today = fields.Date.today()
+        if not year:
+            year = today.year
+        if not month:
+            month = today.month
+        year = int(year)
+        month = int(month)
         _, days_in_month = calendar.monthrange(year, month)
         result = []
         for day in range(1, days_in_month + 1):
@@ -118,6 +132,59 @@ class HrAttendanceExt(models.Model):
                 'entries': len(day_records),
             })
         return result
+
+    @api.model
+    def get_team_attendance(self, manager_employee_id, attendance_date=None):
+        """Return attendance status for all direct reports of the manager on a given date."""
+        manager = self._get_employee(manager_employee_id)
+        team = self.env['hr.employee'].sudo().search([('parent_id', '=', manager_employee_id)])
+        target_date = attendance_date or fields.Date.today()
+        if isinstance(target_date, str):
+            from datetime import datetime as _dt
+            try:
+                target_date = _dt.strptime(target_date, '%Y-%m-%d').date()
+            except (ValueError, TypeError):
+                target_date = fields.Date.today()
+        result = []
+        for emp in team:
+            status = self._get_day_status(emp.id, target_date)
+            domain = [
+                ('employee_id', '=', emp.id),
+                ('check_in', '>=', target_date.strftime('%Y-%m-%d') + ' 00:00:00'),
+                ('check_in', '<=', target_date.strftime('%Y-%m-%d') + ' 23:59:59'),
+            ]
+            day_records = self.sudo().search(domain)
+            total_hours = sum(r.worked_hours for r in day_records if r.worked_hours)
+            open_att = self.sudo().search(
+                [('employee_id', '=', emp.id), ('check_out', '=', False)], limit=1
+            )
+            result.append({
+                'employee_id': emp.id,
+                'employee_name': emp.name,
+                'status': status,
+                'checked_in': bool(open_att),
+                'check_in_time': open_att.check_in.strftime('%Y-%m-%d %H:%M:%S') if open_att and open_att.check_in else False,
+                'total_hours': round(total_hours, 2),
+                'entries': len(day_records),
+            })
+        return result
+
+    @api.model
+    def create_manual_attendance(self, employee_id, check_in_str, check_out_str=None,
+                                  latitude=0.0, longitude=0.0):
+        """Create a manual attendance record (HR admin action). Returns attendance dict."""
+        employee = self._get_employee(employee_id)
+        check_in_dt = self._parse_timestamp(check_in_str)
+        vals = {
+            'employee_id': employee_id,
+            'check_in': check_in_dt,
+            'gps_latitude': latitude or 0.0,
+            'gps_longitude': longitude or 0.0,
+        }
+        if check_out_str:
+            vals['check_out'] = self._parse_timestamp(check_out_str)
+        attendance = self.sudo().create(vals)
+        return self._format_attendance_record(attendance)
 
     def _find_open_attendance(self, employee_id):
         """Find the open (no check_out) attendance record for an employee."""
@@ -172,24 +239,35 @@ class HrAttendanceExt(models.Model):
 
     def _format_attendance_record(self, att):
         """Format an hr.attendance record into a plain dict."""
+        try:
+            worked_hours = round(att.worked_hours or 0.0, 2)
+        except Exception:
+            worked_hours = 0.0
+        try:
+            checkout_lat = att.checkout_latitude
+            checkout_lon = att.checkout_longitude
+        except Exception:
+            checkout_lat = 0.0
+            checkout_lon = 0.0
         return {
             'id': att.id,
             'employee_id': att.employee_id.id,
             'employee_name': att.employee_id.name,
             'check_in': att.check_in.strftime('%Y-%m-%d %H:%M:%S') if att.check_in else False,
             'check_out': att.check_out.strftime('%Y-%m-%d %H:%M:%S') if att.check_out else False,
-            'worked_hours': round(att.worked_hours or 0.0, 2),
-            'gps_latitude': att.gps_latitude,
-            'gps_longitude': att.gps_longitude,
-            'checkout_latitude': att.checkout_latitude,
-            'checkout_longitude': att.checkout_longitude,
+            'worked_hours': worked_hours,
+            'gps_latitude': att.gps_latitude or 0.0,
+            'gps_longitude': att.gps_longitude or 0.0,
+            'checkout_latitude': checkout_lat,
+            'checkout_longitude': checkout_lon,
         }
 
     def _parse_timestamp(self, timestamp_str):
-        """Parse a timestamp string into a datetime object."""
-        for fmt in ('%Y-%m-%d %H:%M:%S', '%Y-%m-%dT%H:%M:%S', '%Y-%m-%dT%H:%M:%SZ'):
-            try:
-                return datetime.strptime(timestamp_str, fmt)
-            except (ValueError, TypeError):
-                continue
-        raise UserError(_('Invalid timestamp format: %s. Use YYYY-MM-DD HH:MM:SS.') % timestamp_str)
+        """Parse a timestamp string into a datetime object. Defaults to now if not provided."""
+        if timestamp_str:
+            for fmt in ('%Y-%m-%d %H:%M:%S', '%Y-%m-%dT%H:%M:%S', '%Y-%m-%dT%H:%M:%SZ'):
+                try:
+                    return datetime.strptime(timestamp_str, fmt)
+                except (ValueError, TypeError):
+                    continue
+        return fields.Datetime.now()

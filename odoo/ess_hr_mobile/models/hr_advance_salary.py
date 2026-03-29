@@ -32,11 +32,12 @@ class HrAdvanceSalary(models.Model):
     approved_date = fields.Date(string='Approval Date')
     request_date = fields.Date(string='Request Date', default=fields.Date.today)
 
-    @api.model
-    def create(self, vals):
-        if vals.get('name', 'New') == 'New':
-            vals['name'] = self.env['ir.sequence'].next_by_code('hr.advance.salary') or 'New'
-        return super().create(vals)
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get('name', 'New') == 'New':
+                vals['name'] = self.env['ir.sequence'].next_by_code('hr.advance.salary') or 'New'
+        return super().create(vals_list)
 
     @api.model
     def get_advance_salary_cap(self, employee_id):
@@ -59,6 +60,14 @@ class HrAdvanceSalary(models.Model):
             'state': 'submitted',
             'request_date': fields.Date.today(),
         })
+        return self._format_advance_record(advance)
+
+    @api.model
+    def get_advance_salary_detail(self, advance_id):
+        """Return a single advance salary request dict by ID."""
+        advance = self.sudo().browse(advance_id)
+        if not advance.exists():
+            raise UserError(_('Advance salary request not found.'))
         return self._format_advance_record(advance)
 
     @api.model
@@ -126,11 +135,14 @@ class HrAdvanceSalary(models.Model):
 
     def _get_basic_wage(self, employee):
         """Return the basic wage from the employee's active contract."""
-        contract = self.env['hr.contract'].sudo().search(
-            [('employee_id', '=', employee.id), ('state', 'in', ['open', 'draft'])],
-            order='date_start desc', limit=1,
-        )
-        return contract.wage if contract else 0.0
+        try:
+            contract = self.env['hr.contract'].sudo().search(
+                [('employee_id', '=', employee.id), ('state', 'in', ['open', 'draft'])],
+                order='date_start desc', limit=1,
+            )
+            return contract.wage if contract else 0.0
+        except KeyError:
+            return 0.0
 
     def _format_advance_record(self, advance):
         """Format an hr.advance.salary record into a plain dict."""

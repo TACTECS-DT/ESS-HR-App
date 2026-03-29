@@ -25,3 +25,9 @@ access_ess_api_log_user,ess.api.log user,model_ess_api_log,ess_hr_mobile.ess_mob
 access_ess_api_log_system,ess.api.log system,model_ess_api_log,base.group_system,1,1,1,1
 access_ess_employee_credential_user,ess.employee.credential user,model_ess_employee_credential,ess_hr_mobile.ess_mobile_group,1,1,1,0
 access_ess_employee_credential_system,ess.employee.credential system,model_ess_employee_credential,base.group_system,1,1,1,1
+access_ess_notification_user,ess.notification user,model_ess_notification,ess_hr_mobile.ess_mobile_group,1,1,1,0
+access_ess_notification_system,ess.notification system,model_ess_notification,base.group_system,1,1,1,1
+access_ess_announcement_user,ess.announcement user,model_ess_announcement,ess_hr_mobile.ess_mobile_group,1,0,0,0
+access_ess_announcement_system,ess.announcement system,model_ess_announcement,base.group_system,1,1,1,1
+access_ess_personal_note_user,ess.personal.note user,model_ess_personal_note,ess_hr_mobile.ess_mobile_group,1,1,1,1
+access_ess_personal_note_system,ess.personal.note system,model_ess_personal_note,base.group_system,1,1,1,1

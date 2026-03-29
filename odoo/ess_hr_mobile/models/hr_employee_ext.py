@@ -1,3 +1,4 @@
+import base64
 import hashlib
 import secrets
 from odoo import models, fields, api, _
@@ -68,6 +69,16 @@ class HrEmployeeExt(models.Model):
         }
 
     @api.model
+    def get_employee_by_user(self, user_id):
+        """Resolve an Odoo user ID to the matching employee profile."""
+        if not user_id:
+            raise UserError(_('user_id is required.'))
+        employee = self.sudo().search([('user_id', '=', int(user_id))], limit=1)
+        if not employee:
+            raise UserError(_('No employee linked to user ID %s.') % user_id)
+        return self._format_employee_profile(employee)
+
+    @api.model
     def get_employee_profile(self, employee_id):
         """Return the full profile dict for the given employee."""
         employee = self._get_employee(employee_id)
@@ -77,14 +88,44 @@ class HrEmployeeExt(models.Model):
     def get_contract_summary(self, employee_id):
         """Return the active contract summary dict for the given employee."""
         employee = self._get_employee(employee_id)
-        contract = self.env['hr.contract'].sudo().search(
-            [('employee_id', '=', employee_id), ('state', 'in', ['open', 'draft'])],
-            order='date_start desc',
-            limit=1,
-        )
+        try:
+            contract = self.env['hr.contract'].sudo().search(
+                [('employee_id', '=', employee_id), ('state', 'in', ['open', 'draft'])],
+                order='date_start desc',
+                limit=1,
+            )
+        except KeyError:
+            return {}
         if not contract:
             return {}
         return self._format_contract_summary(contract)
+
+    @api.model
+    def get_employee_directory(self, company_id=None, search=None):
+        """Return a summary list of all active employees for the company."""
+        domain = [('active', '=', True)]
+        if company_id:
+            domain.append(('company_id', '=', company_id))
+        if search:
+            domain.append(('name', 'ilike', search))
+        employees = self.sudo().search(domain, order='name asc')
+        result = []
+        for emp in employees:
+            dept_name = emp.department_id.name if emp.department_id else ''
+            job_title = emp.job_title or (emp.job_id.name if emp.job_id else '')
+            result.append({
+                'id': emp.id,
+                'name': emp.name,
+                'badge_id': emp.barcode or '',
+                'email': emp.work_email or '',
+                'department': dept_name,
+                'job_title': job_title,
+                'work_phone': emp.work_phone or '',
+                'mobile_phone': emp.mobile_phone or '',
+                'avatar': base64.b64encode(emp.image_128).decode('utf-8') if emp.image_128 else False,
+                'company_id': emp.company_id.id if emp.company_id else False,
+            })
+        return result
 
     @api.model
     def reset_mobile_pin(self, employee_id, new_pin):
@@ -98,7 +139,7 @@ class HrEmployeeExt(models.Model):
 
         # Update new credential table
         cred = self.env['ess.employee.credential'].sudo().get_or_create_for_employee(employee_id)
-        cred.set_pin(str(new_pin))
+        cred.write({'new_pin': str(new_pin)})
 
         # Keep legacy field in sync
         employee.sudo().write({'mobile_pin': self._hash_pin(str(new_pin))})
@@ -149,7 +190,7 @@ class HrEmployeeExt(models.Model):
             'department_ar': dept_name,      # extend when Arabic dept field exists
             'job_title': job_title,
             'job_title_ar': job_title,       # extend when Arabic job title field exists
-            'avatar': employee.image_128.decode('utf-8') if employee.image_128 else False,
+            'avatar': base64.b64encode(employee.image_128).decode('utf-8') if employee.image_128 else False,
             'role': 'employee',              # default; extend via ess_mobile_role field if needed
             'company_id': employee.company_id.id if employee.company_id else False,
             # ── Extra context (not in UserInfo but useful) ────────────────────

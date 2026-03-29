@@ -49,3 +49,12 @@ class AuthController(http.Controller):
     def logout(self):
         # Direct Odoo mode is stateless — nothing to invalidate
         return call_and_log('/ess/api/auth/logout', lambda: {'logged_out': True})
+
+    @http.route('/ess/api/auth/by-user', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
+    def by_user(self):
+        kw = get_body()
+        odoo_user_id = kw.get('user_id')
+        return call_and_log(
+            '/ess/api/auth/by-user',
+            lambda: request.env['hr.employee'].sudo().get_employee_by_user(odoo_user_id),
+        )

@@ -4,7 +4,7 @@ Shared controller utilities — REST edition.
 Every controller route calls call_and_log() as its single entry point.
 This handles:
   - API key validation       (X-ESS-API-Key header vs ir.config_parameter)
-  - Auth context extraction  (get_request_context)
+  - Auth context extraction  (get_auth_context)
   - Request body parsing     (get_body)
   - Execution + error catch  (fn lambda)
   - JSON HTTP response       (json_ok / json_error)
@@ -15,11 +15,14 @@ Error status codes:
   401 — Unauthorized (bad API key)
   500 — Unexpected server error — generic message shown, real error logged
 
-Auth context headers (sent by the mobile app after login):
-  Authorization         — Bearer <access_token>
-  X-ESS-License-Key     — license key used to activate the app
-  X-ESS-Company-ID      — selected company ID (integer)
-  X-ESS-Employee-ID     — authenticated employee ID (integer)
+Auth context headers (sent by the mobile app with every request):
+  Authorization            — Bearer <access_token>
+  X-ESS-License-Key        — license key used to activate the app
+  X-ESS-Company-ID         — selected company ID (integer)
+  X-ESS-Employee-ID        — authenticated employee ID (integer)
+  X-ESS-Login-Mode         — 'badge' | 'username'
+  X-ESS-Login-Identifier   — badge_id or username (never password or pin)
+  X-ESS-Server-URL         — Odoo server URL the app is connected to
 
 API key setup (optional — skip for local dev):
   Odoo Settings → Technical → Parameters → System Parameters
@@ -34,7 +37,7 @@ import logging
 
 from odoo import http
 from odoo.http import request
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 _logger = logging.getLogger(__name__)
 
@@ -52,18 +55,21 @@ _PUBLIC_ENDPOINTS = {
 
 # ─── Auth context ─────────────────────────────────────────────────────────────
 
-def get_request_context() -> dict:
+def get_auth_context() -> dict:
     """
-    Extract the auth context that the mobile app sends with every request.
+    Extract the full auth context that the mobile app sends with every request.
 
     Returns a dict with:
-      access_token  — Bearer token (str, empty string if absent)
-      license_key   — license key used to activate (str)
-      company_id    — selected company ID (int or None)
-      employee_id   — authenticated employee ID (int or None)
-      login_mode    — 'badge' | 'username' | '' (str)
+      access_token       — Bearer token (str, empty string if absent)
+      license_key        — license key used to activate (str)
+      company_id         — selected company ID (int or None)
+      employee_id        — authenticated employee ID (int or None)
+      login_mode         — 'badge' | 'username' | '' (str)
+      login_identifier   — badge_id or username; never password or pin (str)
+      server_url         — Odoo server URL the app is connected to (str)
 
-    This is the single place to edit if the header names ever change.
+    This is the single place to edit if header names ever change.
+    All controllers call this via call_and_log — edit here, affects everywhere.
     """
     h = request.httprequest.headers
     raw_auth = h.get('Authorization', '')
@@ -74,7 +80,13 @@ def get_request_context() -> dict:
         'company_id': _to_int(h.get('X-ESS-Company-ID')),
         'employee_id': _to_int(h.get('X-ESS-Employee-ID')),
         'login_mode': h.get('X-ESS-Login-Mode', ''),
+        'login_identifier': h.get('X-ESS-Login-Identifier', ''),
+        'server_url': h.get('X-ESS-Server-URL', ''),
     }
+
+
+# Backward-compat alias — prefer get_auth_context() in new code
+get_request_context = get_auth_context
 
 
 def _to_int(value):
@@ -146,7 +158,7 @@ def call_and_log(endpoint: str, fn) -> http.Response:
     """
     Single entry point for every controller route:
       1. Validate API key
-      2. Extract auth context from headers (get_request_context)
+      2. Extract auth context from headers (get_auth_context)
       3. Execute fn()
       4. Return JSON HTTP response
       5. Log the call silently (never raises)
@@ -160,7 +172,7 @@ def call_and_log(endpoint: str, fn) -> http.Response:
     if not _validate_api_key():
         return json_error('Unauthorized', 401, 'UNAUTHORIZED')
 
-    ctx = get_request_context()
+    ctx = get_auth_context()
 
     # Require auth context on all endpoints except the public whitelist
     if endpoint not in _PUBLIC_ENDPOINTS:
@@ -175,7 +187,7 @@ def call_and_log(endpoint: str, fn) -> http.Response:
     try:
         result = fn()
         return json_ok(result)
-    except UserError as exc:
+    except (UserError, ValidationError) as exc:
         error_msg = str(exc).strip()
         return json_error(error_msg, 400, 'VALIDATION_ERROR')
     except Exception as exc:

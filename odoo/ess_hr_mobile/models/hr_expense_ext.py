@@ -27,12 +27,19 @@ class HrExpenseExt(models.Model):
     def get_currencies(self):
         """Return list of active currency dicts."""
         currencies = self.env['res.currency'].sudo().search([('active', '=', True)])
-        return [{
-            'id': c.id,
-            'name': c.name,
-            'symbol': c.symbol,
-            'rate': c.rate,
-        } for c in currencies]
+        result = []
+        for c in currencies:
+            try:
+                rate = c.rate
+            except Exception:
+                rate = 0.0
+            result.append({
+                'id': c.id,
+                'name': c.name,
+                'symbol': c.symbol,
+                'rate': rate,
+            })
+        return result
 
     @api.model
     def get_purchase_taxes(self, company_id):
@@ -59,15 +66,15 @@ class HrExpenseExt(models.Model):
         vals = {
             'employee_id': employee_id,
             'product_id': product_id,
-            'total_amount': total_amount,
+            'total_amount': float(total_amount) if total_amount else 0.0,
             'currency_id': currency_id,
             'payment_mode': payment_mode or 'own_account',
             'name': name or product.name,
-            'date': date,
+            'date': date or fields.Date.today(),
         }
         if tax_ids:
             vals['tax_ids'] = [(6, 0, tax_ids)]
-        expense = self._env_for_write(employee).create(vals)
+        expense = self.sudo().create(vals)
         return self._format_expense_record(expense)
 
     @api.model
@@ -89,6 +96,14 @@ class HrExpenseExt(models.Model):
             'mimetype': attachment.mimetype,
             'file_size': attachment.file_size,
         }
+
+    @api.model
+    def get_expense_detail(self, expense_id):
+        """Return a single expense record dict by ID."""
+        expense = self.sudo().browse(expense_id)
+        if not expense.exists():
+            raise UserError(_('Expense not found.'))
+        return self._format_expense_record(expense)
 
     @api.model
     def get_expenses(self, employee_id, state_filter=None):
@@ -128,21 +143,19 @@ class HrExpenseExt(models.Model):
 
     @api.model
     def ess_submit_expense(self, expense_id):
-        """Submit an expense by creating/adding to an expense sheet, then return sheet dict."""
+        """Submit a draft expense for approval and return the updated expense dict.
+
+        In Odoo 19 hr.expense.sheet was removed; submission is done directly via
+        action_submit() on the hr.expense record itself.
+        """
         expense = self.sudo().browse(expense_id)
         if not expense.exists():
             raise UserError(_('Expense not found.'))
         self._validate_expense_editable(expense)
         employee = expense.employee_id
-        sheet = self._create_expense_sheet(expense)
-        self._env_for_write(employee).browse(sheet.id).action_submit_sheet()
-        return {
-            'id': sheet.id,
-            'name': sheet.name,
-            'state': sheet.state,
-            'total_amount': sheet.total_amount,
-            'expense_ids': sheet.expense_ids.ids,
-        }
+        self._env_for_write(employee).browse(expense.id).action_submit()
+        expense.invalidate_recordset()
+        return self._format_expense_record(expense)
 
     def _validate_expense_editable(self, expense):
         """Raise UserError if the expense is not in draft state."""
@@ -151,6 +164,10 @@ class HrExpenseExt(models.Model):
 
     def _format_expense_record(self, expense):
         """Format an hr.expense record into a plain dict."""
+        # sheet_id was removed in Odoo 19; guard against missing field
+        sheet_id = False
+        if hasattr(expense, 'sheet_id') and expense.sheet_id:
+            sheet_id = expense.sheet_id.id
         return {
             'id': expense.id,
             'name': expense.name,
@@ -164,19 +181,7 @@ class HrExpenseExt(models.Model):
             'payment_mode': expense.payment_mode,
             'date': expense.date.strftime('%Y-%m-%d') if expense.date else False,
             'state': expense.state,
-            'sheet_id': expense.sheet_id.id if expense.sheet_id else False,
+            'sheet_id': sheet_id,
             'tax_ids': expense.tax_ids.ids,
         }
 
-    def _create_expense_sheet(self, expense):
-        """Create a new hr.expense.sheet for the given expense and return the sheet record."""
-        existing_sheet = expense.sheet_id
-        if existing_sheet:
-            return existing_sheet
-        sheet = self.env['hr.expense.sheet'].sudo().create({
-            'name': expense.name,
-            'employee_id': expense.employee_id.id,
-            'expense_line_ids': [(4, expense.id)],
-            'company_id': expense.company_id.id if expense.company_id else False,
-        })
-        return sheet

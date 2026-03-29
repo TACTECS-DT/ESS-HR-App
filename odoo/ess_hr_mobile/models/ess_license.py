@@ -1,3 +1,4 @@
+import base64
 import uuid
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
@@ -117,7 +118,7 @@ class EssLicense(models.Model):
                     'id': c.id,
                     'name': c.name,
                     'name_ar': c.name,
-                    'logo': c.logo.decode('utf-8') if c.logo else False,
+                    'logo': base64.b64encode(c.logo).decode('utf-8') if c.logo else False,
                     'currency': c.currency_id.name if c.currency_id else '',
                 })
         return result

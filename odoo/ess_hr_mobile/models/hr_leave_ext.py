@@ -103,6 +103,37 @@ class HrLeaveExt(models.Model):
         return result
 
     @api.model
+    def update_leave_request(self, leave_id, vals):
+        """Update a pending leave request (description/dates). Returns updated dict."""
+        leave = self.sudo().browse(leave_id)
+        if not leave.exists():
+            raise UserError(_('Leave request not found.'))
+        if leave.state not in ('confirm',):
+            raise UserError(_('Only pending leave requests can be updated.'))
+        employee = leave.employee_id
+        allowed = ['name']
+        write_vals = {k: v for k, v in vals.items() if k in allowed}
+        if write_vals:
+            self._env_for_write(employee).browse(leave.id).write(write_vals)
+        return self._format_leave_record(leave)
+
+    @api.model
+    def cancel_leave_request(self, leave_id):
+        """Cancel a leave request (refuse if approved, delete if in confirm). Returns True."""
+        leave = self.sudo().browse(leave_id)
+        if not leave.exists():
+            raise UserError(_('Leave request not found.'))
+        if leave.state in ('confirm', 'validate1'):
+            leave.sudo().action_refuse()
+        elif leave.state == 'validate':
+            leave.sudo().action_refuse()
+        elif leave.state == 'refuse':
+            pass  # already refused
+        else:
+            raise UserError(_('Cannot cancel a leave in state: %s') % leave.state)
+        return True
+
+    @api.model
     def approve_leave(self, leave_id, manager_employee_id):
         """First-level approval of a leave request. Returns True."""
         leave = self.sudo().browse(leave_id)
@@ -132,24 +163,30 @@ class HrLeaveExt(models.Model):
 
     @api.model
     def validate_leave(self, leave_id, hr_employee_id):
-        """Second-level / HR validation of a leave request. Returns True."""
+        """Second-level / HR validation of a leave request. Returns True.
+
+        In Odoo 19 the public action is action_approve() for both approval levels.
+        """
         leave = self.sudo().browse(leave_id)
         if not leave.exists():
             raise UserError(_('Leave request not found.'))
         hr_employee = self._get_employee(hr_employee_id)
         if hr_employee.user_id:
-            leave.with_user(hr_employee.user_id).action_validate()
+            leave.with_user(hr_employee.user_id).action_approve()
         else:
-            leave.sudo().action_validate()
+            leave.sudo().action_approve()
         return True
 
     @api.model
     def reset_leave_to_draft(self, leave_id):
-        """Reset a leave request to draft state. Returns True."""
+        """Reset a leave request to pending-approval (confirm) state. Returns True.
+
+        Odoo 19 removed the 'draft' state; the initial/reset state is 'confirm'.
+        """
         leave = self.sudo().browse(leave_id)
         if not leave.exists():
             raise UserError(_('Leave request not found.'))
-        leave.sudo().action_draft()
+        leave.sudo().write({'state': 'confirm'})
         return True
 
     @api.model
@@ -182,14 +219,17 @@ class HrLeaveExt(models.Model):
     def _get_approval_history(self, leave):
         """Build approval step list from a leave record's message history."""
         history = []
-        for msg in leave.message_ids.sorted('date'):
-            if msg.subtype_id and msg.subtype_id.name in ('Leave Approved', 'Leave Refused', 'Leave Validated'):
-                history.append({
-                    'date': msg.date.strftime('%Y-%m-%d %H:%M:%S') if msg.date else False,
-                    'author': msg.author_id.name if msg.author_id else '',
-                    'action': msg.subtype_id.name,
-                    'body': msg.body or '',
-                })
+        try:
+            for msg in leave.message_ids.sorted('date'):
+                if msg.subtype_id and msg.subtype_id.name in ('Leave Approved', 'Leave Refused', 'Leave Validated'):
+                    history.append({
+                        'date': msg.date.strftime('%Y-%m-%d %H:%M:%S') if msg.date else False,
+                        'author': msg.author_id.name if msg.author_id else '',
+                        'action': msg.subtype_id.name,
+                        'body': msg.body or '',
+                    })
+        except Exception:
+            pass
         return history
 
     def _format_leave_record(self, leave):

@@ -1,5 +1,5 @@
 import base64
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
@@ -81,6 +81,18 @@ class ProjectTaskExt(models.Model):
 
     def _format_task_record(self, task):
         """Format an project.task into a full detail dict."""
+        try:
+            description = str(task.description) if task.description else ''
+        except Exception:
+            description = ''
+        try:
+            effective_hours = task.effective_hours or 0.0
+        except Exception:
+            effective_hours = 0.0
+        try:
+            kanban_state = task.kanban_state
+        except Exception:
+            kanban_state = 'normal'
         return {
             'id': task.id,
             'name': task.name,
@@ -90,12 +102,12 @@ class ProjectTaskExt(models.Model):
             'stage_name': task.stage_id.name if task.stage_id else '',
             'priority': task.priority,
             'date_deadline': task.date_deadline.strftime('%Y-%m-%d') if task.date_deadline else False,
-            'description': task.description or '',
-            'user_ids': task.user_ids.ids,
-            'tag_ids': task.tag_ids.ids,
-            'planned_hours': task.planned_hours or 0.0,
-            'effective_hours': task.effective_hours or 0.0,
-            'kanban_state': task.kanban_state,
+            'description': description,
+            'user_ids': task.user_ids.ids if hasattr(task, 'user_ids') else [],
+            'tag_ids': task.tag_ids.ids if hasattr(task, 'tag_ids') else [],
+            'planned_hours': (task.allocated_hours if hasattr(task, 'allocated_hours') else 0.0),
+            'effective_hours': effective_hours,
+            'kanban_state': kanban_state,
             'active': task.active,
         }
 
@@ -117,6 +129,73 @@ class ProjectTaskExt(models.Model):
 class AccountAnalyticLineExt(models.Model):
     _name = 'account.analytic.line'
     _inherit = ['account.analytic.line', 'ess.mixin']
+
+    @api.model
+    def get_timesheets(self, employee_id, date_from=None, date_to=None):
+        """Return a list of timesheet entries for the employee, optionally date-filtered."""
+        employee = self.env['hr.employee'].sudo().browse(employee_id)
+        if not employee.exists():
+            raise UserError(_('Employee not found.'))
+        domain = [('employee_id', '=', employee_id)]
+        if date_from:
+            domain.append(('date', '>=', date_from))
+        if date_to:
+            domain.append(('date', '<=', date_to))
+        lines = self.sudo().search(domain, order='date desc')
+        return [self._format_timesheet_record(l) for l in lines]
+
+    @api.model
+    def update_timesheet(self, timesheet_id, vals):
+        """Update a timesheet entry and return the updated dict."""
+        line = self.sudo().browse(timesheet_id)
+        if not line.exists():
+            raise UserError(_('Timesheet entry not found.'))
+        employee = line.employee_id
+        allowed = ['date', 'unit_amount', 'name', 'task_id']
+        write_vals = {k: v for k, v in vals.items() if k in allowed}
+        self._env_for_write(employee).browse(line.id).write(write_vals)
+        line.invalidate_recordset()
+        return self._format_timesheet_record(line)
+
+    @api.model
+    def delete_timesheet(self, timesheet_id):
+        """Delete a timesheet entry. Returns True."""
+        line = self.sudo().browse(timesheet_id)
+        if not line.exists():
+            raise UserError(_('Timesheet entry not found.'))
+        employee = line.employee_id
+        self._env_for_write(employee).browse(line.id).unlink()
+        return True
+
+    @api.model
+    def get_team_hours(self, manager_employee_id, date_from=None, date_to=None):
+        """Return total logged hours per employee for the manager's direct reports."""
+        manager = self.env['hr.employee'].sudo().browse(manager_employee_id)
+        if not manager.exists():
+            raise UserError(_('Employee not found.'))
+        team = self.env['hr.employee'].sudo().search([('parent_id', '=', manager_employee_id)])
+        if not team:
+            return []
+        team_ids = team.ids
+        domain = [('employee_id', 'in', team_ids)]
+        if date_from:
+            domain.append(('date', '>=', date_from))
+        if date_to:
+            domain.append(('date', '<=', date_to))
+        lines = self.sudo().search(domain)
+        # Group by employee
+        from collections import defaultdict
+        emp_hours = defaultdict(float)
+        for line in lines:
+            emp_hours[line.employee_id.id] += line.unit_amount or 0.0
+        result = []
+        for emp in team:
+            result.append({
+                'employee_id': emp.id,
+                'employee_name': emp.name,
+                'total_hours': round(emp_hours.get(emp.id, 0.0), 2),
+            })
+        return result
 
     @api.model
     def log_timesheet(self, employee_id, task_id, date, unit_amount, name):
@@ -162,6 +241,9 @@ class AccountAnalyticLineExt(models.Model):
         employee = self.env['hr.employee'].sudo().browse(employee_id)
         if not employee.exists():
             raise UserError(_('Employee not found.'))
+        if not week_start:
+            today = date.today()
+            week_start = (today - timedelta(days=today.weekday())).strftime('%Y-%m-%d')
         start_dt = datetime.strptime(week_start, '%Y-%m-%d').date()
         end_dt = start_dt + timedelta(days=6)
         domain = [

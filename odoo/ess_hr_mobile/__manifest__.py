@@ -4,7 +4,7 @@
     'summary': 'API layer for ESS Mobile App — exposes HR data and actions over JSON-RPC',
     'category': 'Human Resources',
     'author': 'ESS',
-    'depends': ['hr', 'hr_attendance', 'hr_holidays', 'hr_payroll', 'hr_expense', 'project', 'account', 'analytic'],
+    'depends': ['hr', 'hr_attendance', 'hr_holidays', 'hr_payroll', 'hr_expense', 'project', 'account', 'analytic', 'hr_timesheet'],
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',

@@ -8,7 +8,22 @@ so each group is clearly separated by comment blocks.
 from odoo import http
 from odoo.http import request
 
-from .utils import call_and_log, get_body
+from .utils import call_and_log, get_body, get_auth_context
+
+# Default document types used when none are configured in ir.config_parameter
+_DEFAULT_DOCUMENT_TYPES = [
+    'Passport', 'National ID', 'Salary Certificate', 'Employment Letter',
+    'Bank Letter', 'Experience Certificate', 'NOC Letter', 'Visa Copy',
+    'Medical Insurance Card', 'Driving License',
+]
+
+
+def _get_document_types(req):
+    """Return document type list from config or fallback defaults."""
+    param = req.env['ir.config_parameter'].sudo().get_param('ess.document.types', '')
+    if param:
+        return [t.strip() for t in param.split(',') if t.strip()]
+    return _DEFAULT_DOCUMENT_TYPES
 
 
 class HrServicesController(http.Controller):
@@ -18,7 +33,7 @@ class HrServicesController(http.Controller):
     @http.route('/ess/api/hr-letters', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
     def letters(self):
         kw = get_body()
-        employee_id = kw.get('employee_id')
+        employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
         if request.httprequest.method == 'GET':
             return call_and_log(
                 '/ess/api/hr-letters',
@@ -59,32 +74,34 @@ class HrServicesController(http.Controller):
     @http.route('/ess/api/hr-letters/approve', type='http', auth='none', methods=['POST'], csrf=False)
     def letter_approve(self):
         kw = get_body()
-        approver_employee_id = kw.get('approver_employee_id')
+        record_id = kw.get('letter_id') or kw.get('record_id')
+        approver_employee_id = kw.get('approver_employee_id') or get_auth_context().get('employee_id')
         return call_and_log(
             '/ess/api/hr-letters/approve',
             lambda: request.env['hr.letter.request'].sudo().approve_letter(
-                kw.get('record_id'), approver_employee_id,
+                record_id, approver_employee_id,
             ),
         )
 
     @http.route('/ess/api/hr-letters/refuse', type='http', auth='none', methods=['POST'], csrf=False)
     def letter_refuse(self):
         kw = get_body()
-        approver_employee_id = kw.get('approver_employee_id')
+        record_id = kw.get('letter_id') or kw.get('record_id')
+        approver_employee_id = kw.get('approver_employee_id') or get_auth_context().get('employee_id')
         return call_and_log(
             '/ess/api/hr-letters/refuse',
             lambda: request.env['hr.letter.request'].sudo().refuse_letter(
-                kw.get('record_id'), approver_employee_id, kw.get('reason', ''),
+                record_id, approver_employee_id, kw.get('reason', ''),
             ),
         )
 
     @http.route('/ess/api/hr-letters/reset', type='http', auth='none', methods=['POST'], csrf=False)
     def letter_reset(self):
         kw = get_body()
-        employee_id = kw.get('employee_id')
+        record_id = kw.get('letter_id') or kw.get('record_id')
         return call_and_log(
             '/ess/api/hr-letters/reset',
-            lambda: request.env['hr.letter.request'].sudo().reset_letter(kw.get('record_id')),
+            lambda: request.env['hr.letter.request'].sudo().reset_letter(record_id),
         )
 
     # ── Document Requests ─────────────────────────────────────────────────────
@@ -94,13 +111,13 @@ class HrServicesController(http.Controller):
         kw = get_body()
         return call_and_log(
             '/ess/api/document-requests/types',
-            lambda: [],  # stub — available document request types
+            lambda: _get_document_types(request),
         )
 
     @http.route('/ess/api/document-requests', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
     def document_requests(self):
         kw = get_body()
-        employee_id = kw.get('employee_id')
+        employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
         if request.httprequest.method == 'GET':
             return call_and_log(
                 '/ess/api/document-requests',
@@ -141,32 +158,34 @@ class HrServicesController(http.Controller):
     @http.route('/ess/api/document-requests/approve', type='http', auth='none', methods=['POST'], csrf=False)
     def document_approve(self):
         kw = get_body()
-        approver_employee_id = kw.get('approver_employee_id')
+        record_id = kw.get('doc_id') or kw.get('record_id')
+        approver_employee_id = kw.get('approver_employee_id') or get_auth_context().get('employee_id')
         return call_and_log(
             '/ess/api/document-requests/approve',
             lambda: request.env['hr.document.request'].sudo().approve_document(
-                kw.get('record_id'), approver_employee_id,
+                record_id, approver_employee_id,
             ),
         )
 
     @http.route('/ess/api/document-requests/refuse', type='http', auth='none', methods=['POST'], csrf=False)
     def document_refuse(self):
         kw = get_body()
-        approver_employee_id = kw.get('approver_employee_id')
+        record_id = kw.get('doc_id') or kw.get('record_id')
+        approver_employee_id = kw.get('approver_employee_id') or get_auth_context().get('employee_id')
         return call_and_log(
             '/ess/api/document-requests/refuse',
             lambda: request.env['hr.document.request'].sudo().refuse_document(
-                kw.get('record_id'), approver_employee_id, kw.get('reason', ''),
+                record_id, approver_employee_id, kw.get('reason', ''),
             ),
         )
 
     @http.route('/ess/api/document-requests/reset', type='http', auth='none', methods=['POST'], csrf=False)
     def document_reset(self):
         kw = get_body()
-        employee_id = kw.get('employee_id')
+        record_id = kw.get('doc_id') or kw.get('record_id')
         return call_and_log(
             '/ess/api/document-requests/reset',
-            lambda: request.env['hr.document.request'].sudo().reset_document(kw.get('record_id')),
+            lambda: request.env['hr.document.request'].sudo().reset_document(record_id),
         )
 
     # ── Experience Certificates ───────────────────────────────────────────────
@@ -174,7 +193,7 @@ class HrServicesController(http.Controller):
     @http.route('/ess/api/experience-certificates', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
     def certificates(self):
         kw = get_body()
-        employee_id = kw.get('employee_id')
+        employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
         if request.httprequest.method == 'GET':
             return call_and_log(
                 '/ess/api/experience-certificates',
@@ -215,33 +234,35 @@ class HrServicesController(http.Controller):
     @http.route('/ess/api/experience-certificates/approve', type='http', auth='none', methods=['POST'], csrf=False)
     def certificate_approve(self):
         kw = get_body()
-        approver_employee_id = kw.get('approver_employee_id')
+        record_id = kw.get('cert_id') or kw.get('record_id')
+        approver_employee_id = kw.get('approver_employee_id') or get_auth_context().get('employee_id')
         return call_and_log(
             '/ess/api/experience-certificates/approve',
             lambda: request.env['hr.experience.certificate'].sudo().approve_certificate(
-                kw.get('record_id'), approver_employee_id,
+                record_id, approver_employee_id,
             ),
         )
 
     @http.route('/ess/api/experience-certificates/refuse', type='http', auth='none', methods=['POST'], csrf=False)
     def certificate_refuse(self):
         kw = get_body()
-        approver_employee_id = kw.get('approver_employee_id')
+        record_id = kw.get('cert_id') or kw.get('record_id')
+        approver_employee_id = kw.get('approver_employee_id') or get_auth_context().get('employee_id')
         return call_and_log(
             '/ess/api/experience-certificates/refuse',
             lambda: request.env['hr.experience.certificate'].sudo().refuse_certificate(
-                kw.get('record_id'), approver_employee_id, kw.get('reason', ''),
+                record_id, approver_employee_id, kw.get('reason', ''),
             ),
         )
 
     @http.route('/ess/api/experience-certificates/reset', type='http', auth='none', methods=['POST'], csrf=False)
     def certificate_reset(self):
         kw = get_body()
-        employee_id = kw.get('employee_id')
+        record_id = kw.get('cert_id') or kw.get('record_id')
         return call_and_log(
             '/ess/api/experience-certificates/reset',
             lambda: request.env['hr.experience.certificate'].sudo().reset_certificate(
-                kw.get('record_id'),
+                record_id,
             ),
         )
 
@@ -260,7 +281,7 @@ class HrServicesController(http.Controller):
     @http.route('/ess/api/business-services', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
     def business_services(self):
         kw = get_body()
-        employee_id = kw.get('employee_id')
+        employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
         if request.httprequest.method == 'GET':
             return call_and_log(
                 '/ess/api/business-services',
@@ -306,32 +327,34 @@ class HrServicesController(http.Controller):
     @http.route('/ess/api/business-services/approve', type='http', auth='none', methods=['POST'], csrf=False)
     def business_service_approve(self):
         kw = get_body()
-        approver_employee_id = kw.get('approver_employee_id')
+        record_id = kw.get('service_id') or kw.get('record_id')
+        approver_employee_id = kw.get('approver_employee_id') or get_auth_context().get('employee_id')
         return call_and_log(
             '/ess/api/business-services/approve',
             lambda: request.env['hr.business.service.request'].sudo().approve_business_service(
-                kw.get('record_id'), approver_employee_id,
+                record_id, approver_employee_id,
             ),
         )
 
     @http.route('/ess/api/business-services/refuse', type='http', auth='none', methods=['POST'], csrf=False)
     def business_service_refuse(self):
         kw = get_body()
-        approver_employee_id = kw.get('approver_employee_id')
+        record_id = kw.get('service_id') or kw.get('record_id')
+        approver_employee_id = kw.get('approver_employee_id') or get_auth_context().get('employee_id')
         return call_and_log(
             '/ess/api/business-services/refuse',
             lambda: request.env['hr.business.service.request'].sudo().refuse_business_service(
-                kw.get('record_id'), approver_employee_id, kw.get('reason', ''),
+                record_id, approver_employee_id, kw.get('reason', ''),
             ),
         )
 
     @http.route('/ess/api/business-services/reset', type='http', auth='none', methods=['POST'], csrf=False)
     def business_service_reset(self):
         kw = get_body()
-        employee_id = kw.get('employee_id')
+        record_id = kw.get('service_id') or kw.get('record_id')
         return call_and_log(
             '/ess/api/business-services/reset',
             lambda: request.env['hr.business.service.request'].sudo().reset_business_service(
-                kw.get('record_id'),
+                record_id,
             ),
         )

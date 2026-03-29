@@ -7,7 +7,7 @@ grouped here because timesheets always belong to a task context.
 from odoo import http
 from odoo.http import request
 
-from .utils import call_and_log, get_body
+from .utils import call_and_log, get_body, get_auth_context
 
 
 class TasksController(http.Controller):
@@ -17,7 +17,7 @@ class TasksController(http.Controller):
     @http.route('/ess/api/tasks', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
     def list(self):
         kw = get_body()
-        employee_id = kw.get('employee_id')
+        employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
         return call_and_log(
             '/ess/api/tasks',
             lambda: request.env['project.task'].sudo().get_tasks(employee_id),
@@ -26,7 +26,6 @@ class TasksController(http.Controller):
     @http.route('/ess/api/tasks/<int:task_id>', type='http', auth='none', methods=['GET', 'PATCH'], csrf=False)
     def task_by_id(self, task_id):
         kw = get_body()
-        employee_id = kw.get('employee_id')
         if request.httprequest.method == 'GET':
             return call_and_log(
                 '/ess/api/tasks/<id>',
@@ -43,7 +42,6 @@ class TasksController(http.Controller):
     @http.route('/ess/api/tasks/<int:task_id>/attachments', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
     def task_attachments(self, task_id):
         kw = get_body()
-        employee_id = kw.get('employee_id')
         if request.httprequest.method == 'GET':
             return call_and_log(
                 '/ess/api/tasks/<id>/attachments',
@@ -62,16 +60,30 @@ class TasksController(http.Controller):
     @http.route('/ess/api/timesheets/<int:timesheet_id>', type='http', auth='none', methods=['GET', 'PATCH', 'DELETE'], csrf=False)
     def timesheet_by_id(self, timesheet_id):
         kw = get_body()
-        employee_id = kw.get('employee_id')
+        employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
+        method = request.httprequest.method
+        if method == 'GET':
+            return call_and_log(
+                '/ess/api/timesheets/<id>',
+                lambda: request.env['account.analytic.line'].sudo().get_timesheets(employee_id),
+            )
+        if method == 'PATCH':
+            return call_and_log(
+                '/ess/api/timesheets/<id>',
+                lambda: request.env['account.analytic.line'].sudo().update_timesheet(
+                    timesheet_id, kw.get('vals', {}),
+                ),
+            )
+        # DELETE
         return call_and_log(
             '/ess/api/timesheets/<id>',
-            lambda: {'id': timesheet_id},  # stub — update/delete single timesheet entry
+            lambda: request.env['account.analytic.line'].sudo().delete_timesheet(timesheet_id),
         )
 
     @http.route('/ess/api/timesheets', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
     def timesheets(self):
         kw = get_body()
-        employee_id = kw.get('employee_id')
+        employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
         if request.httprequest.method == 'GET':
             return call_and_log(
                 '/ess/api/timesheets',
@@ -91,7 +103,7 @@ class TasksController(http.Controller):
     @http.route('/ess/api/timesheets/daily', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
     def timesheet_daily(self):
         kw = get_body()
-        employee_id = kw.get('employee_id')
+        employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
         return call_and_log(
             '/ess/api/timesheets/daily',
             lambda: request.env['account.analytic.line'].sudo().get_daily_timesheet(
@@ -102,7 +114,7 @@ class TasksController(http.Controller):
     @http.route('/ess/api/timesheets/weekly', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
     def timesheet_weekly(self):
         kw = get_body()
-        employee_id = kw.get('employee_id')
+        employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
         return call_and_log(
             '/ess/api/timesheets/weekly',
             lambda: request.env['account.analytic.line'].sudo().get_weekly_timesheet(

@@ -3,6 +3,9 @@ from . import ess_server
 from . import ess_license
 from . import ess_api_log
 from . import ess_employee_credential
+from . import ess_notifications
+from . import ess_announcement
+from . import ess_personal_note
 from . import hr_employee_ext
 from . import hr_attendance_ext
 from . import hr_leave_ext

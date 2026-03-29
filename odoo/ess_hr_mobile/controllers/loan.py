@@ -1,7 +1,7 @@
 from odoo import http
 from odoo.http import request
 
-from .utils import call_and_log, get_body
+from .utils import call_and_log, get_body, get_auth_context
 
 
 class LoanController(http.Controller):
@@ -17,7 +17,7 @@ class LoanController(http.Controller):
     @http.route('/ess/api/loans', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
     def loans(self):
         kw = get_body()
-        employee_id = kw.get('employee_id')
+        employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
         if request.httprequest.method == 'GET':
             return call_and_log(
                 '/ess/api/loans',
@@ -27,16 +27,14 @@ class LoanController(http.Controller):
             '/ess/api/loans',
             lambda: request.env['hr.loan'].sudo().create_loan(
                 employee_id,
-                kw.get('amount'),
-                kw.get('duration_months'),
+                kw.get('loan_amount') or kw.get('amount'),
+                kw.get('duration_months', 12),
                 kw.get('transfer_method', 'bank'),
             ),
         )
 
     @http.route('/ess/api/loans/<int:loan_id>', type='http', auth='none', methods=['GET'], csrf=False)
     def loan_by_id(self, loan_id):
-        kw = get_body()
-        employee_id = kw.get('employee_id')
         return call_and_log(
             '/ess/api/loans/<id>',
             lambda: request.env['hr.loan'].sudo().get_loan_detail(loan_id),
@@ -45,7 +43,7 @@ class LoanController(http.Controller):
     @http.route('/ess/api/loans/approve', type='http', auth='none', methods=['POST'], csrf=False)
     def approve(self):
         kw = get_body()
-        approver_employee_id = kw.get('approver_employee_id')
+        approver_employee_id = kw.get('approver_employee_id') or get_auth_context().get('employee_id')
         return call_and_log(
             '/ess/api/loans/approve',
             lambda: request.env['hr.loan'].sudo().approve_loan(kw.get('loan_id'), approver_employee_id),
@@ -54,7 +52,7 @@ class LoanController(http.Controller):
     @http.route('/ess/api/loans/refuse', type='http', auth='none', methods=['POST'], csrf=False)
     def refuse(self):
         kw = get_body()
-        approver_employee_id = kw.get('approver_employee_id')
+        approver_employee_id = kw.get('approver_employee_id') or get_auth_context().get('employee_id')
         return call_and_log(
             '/ess/api/loans/refuse',
             lambda: request.env['hr.loan'].sudo().refuse_loan(

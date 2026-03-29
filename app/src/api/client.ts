@@ -11,7 +11,9 @@ const apiClient = axios.create({
   },
 });
 
-// Request interceptor — attach auth context headers on every request
+// Request interceptor — attach full auth context headers on every request.
+// This is the single place where all auth headers are assembled.
+// Odoo reads these via get_auth_context() in controllers/utils.py.
 apiClient.interceptors.request.use(
   config => {
     const auth = store.getState().auth;
@@ -22,6 +24,9 @@ apiClient.interceptors.request.use(
     if (auth.licenseKey) {
       config.headers['X-ESS-License-Key'] = auth.licenseKey;
     }
+    if (auth.serverUrl) {
+      config.headers['X-ESS-Server-URL'] = auth.serverUrl;
+    }
     if (auth.companyId != null) {
       config.headers['X-ESS-Company-ID'] = String(auth.companyId);
     }
@@ -30,6 +35,10 @@ apiClient.interceptors.request.use(
     }
     if (auth.loginMode) {
       config.headers['X-ESS-Login-Mode'] = auth.loginMode;
+    }
+    if (auth.loginIdentifier) {
+      // badge_id or username — never password or pin
+      config.headers['X-ESS-Login-Identifier'] = auth.loginIdentifier;
     }
 
     return config;

@@ -74,6 +74,8 @@ export default function LoginScreen() {
         user: data.user,
         companyId,
         companyName,
+        loginIdentifier: mockUser.badge_id,
+        loginMode: 'badge',
       }),
     );
     setQuickLoading(false);

@@ -77,11 +77,12 @@ class HrLoan(models.Model):
     request_date = fields.Date(string='Request Date', default=fields.Date.today)
     installment_ids = fields.One2many('hr.loan.installment', 'loan_id', string='Installments')
 
-    @api.model
-    def create(self, vals):
-        if vals.get('name', 'New') == 'New':
-            vals['name'] = self.env['ir.sequence'].next_by_code('hr.loan') or 'New'
-        return super().create(vals)
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get('name', 'New') == 'New':
+                vals['name'] = self.env['ir.sequence'].next_by_code('hr.loan') or 'New'
+        return super().create(vals_list)
 
     @api.model
     def get_loan_rules(self, company_id):
@@ -177,10 +178,13 @@ class HrLoan(models.Model):
         min_gap_months = config.min_gap_months if config else 3
         max_amount_percentage = config.max_amount_percentage if config else 3.0
 
-        contract = self.env['hr.contract'].sudo().search(
-            [('employee_id', '=', employee.id), ('state', 'in', ['open', 'draft'])],
-            order='date_start asc', limit=1,
-        )
+        try:
+            contract = self.env['hr.contract'].sudo().search(
+                [('employee_id', '=', employee.id), ('state', 'in', ['open', 'draft'])],
+                order='date_start asc', limit=1,
+            )
+        except KeyError:
+            contract = None
         if contract and contract.date_start:
             months_employed = (date.today().year - contract.date_start.year) * 12 + \
                               (date.today().month - contract.date_start.month)
@@ -260,8 +264,11 @@ class HrLoan(models.Model):
 
     def _get_employee_basic_wage(self, employee):
         """Return the basic wage from the employee's active contract."""
-        contract = self.env['hr.contract'].sudo().search(
-            [('employee_id', '=', employee.id), ('state', 'in', ['open', 'draft'])],
-            order='date_start desc', limit=1,
-        )
-        return contract.wage if contract else 0.0
+        try:
+            contract = self.env['hr.contract'].sudo().search(
+                [('employee_id', '=', employee.id), ('state', 'in', ['open', 'draft'])],
+                order='date_start desc', limit=1,
+            )
+            return contract.wage if contract else 0.0
+        except KeyError:
+            return 0.0

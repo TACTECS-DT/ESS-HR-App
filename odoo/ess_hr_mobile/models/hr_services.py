@@ -31,11 +31,12 @@ class HrLetterRequest(models.Model):
     approved_by = fields.Many2one('hr.employee', string='Approved By')
     request_date = fields.Date(string='Request Date', default=fields.Date.today)
 
-    @api.model
-    def create(self, vals):
-        if vals.get('name', 'New') == 'New':
-            vals['name'] = self.env['ir.sequence'].next_by_code('hr.letter.request') or 'New'
-        return super().create(vals)
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get('name', 'New') == 'New':
+                vals['name'] = self.env['ir.sequence'].next_by_code('hr.letter.request') or 'New'
+        return super().create(vals_list)
 
     @api.model
     def create_letter(self, employee_id, directed_to, salary_type):
@@ -168,11 +169,12 @@ class HrDocumentRequest(models.Model):
     approved_by = fields.Many2one('hr.employee', string='Approved By')
     request_date = fields.Date(string='Request Date', default=fields.Date.today)
 
-    @api.model
-    def create(self, vals):
-        if vals.get('name', 'New') == 'New':
-            vals['name'] = self.env['ir.sequence'].next_by_code('hr.document.request') or 'New'
-        return super().create(vals)
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get('name', 'New') == 'New':
+                vals['name'] = self.env['ir.sequence'].next_by_code('hr.document.request') or 'New'
+        return super().create(vals_list)
 
     @api.model
     def create_document(self, employee_id, document_type, return_date=False):
@@ -304,11 +306,12 @@ class HrExperienceCertificate(models.Model):
     reason_refusal = fields.Text(string='Reason for Refusal')
     approved_by = fields.Many2one('hr.employee', string='Approved By')
 
-    @api.model
-    def create(self, vals):
-        if vals.get('name', 'New') == 'New':
-            vals['name'] = self.env['ir.sequence'].next_by_code('hr.experience.certificate') or 'New'
-        return super().create(vals)
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get('name', 'New') == 'New':
+                vals['name'] = self.env['ir.sequence'].next_by_code('hr.experience.certificate') or 'New'
+        return super().create(vals_list)
 
     @api.model
     def create_certificate(self, employee_id, directed_to):
@@ -452,11 +455,12 @@ class HrBusinessServiceRequest(models.Model):
     approved_by = fields.Many2one('hr.employee', string='Approved By')
     request_date = fields.Date(string='Request Date', default=fields.Date.today)
 
-    @api.model
-    def create(self, vals):
-        if vals.get('name', 'New') == 'New':
-            vals['name'] = self.env['ir.sequence'].next_by_code('hr.business.service.request') or 'New'
-        return super().create(vals)
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get('name', 'New') == 'New':
+                vals['name'] = self.env['ir.sequence'].next_by_code('hr.business.service.request') or 'New'
+        return super().create(vals_list)
 
     @api.model
     def get_business_service_types(self, company_id):
