@@ -153,7 +153,7 @@ class AccountAnalyticLineExt(models.Model):
         employee = line.employee_id
         allowed = ['date', 'unit_amount', 'name', 'task_id']
         write_vals = {k: v for k, v in vals.items() if k in allowed}
-        self._env_for_write(employee).browse(line.id).write(write_vals)
+        line.sudo().write(write_vals)
         line.invalidate_recordset()
         return self._format_timesheet_record(line)
 
@@ -164,7 +164,7 @@ class AccountAnalyticLineExt(models.Model):
         if not line.exists():
             raise UserError(_('Timesheet entry not found.'))
         employee = line.employee_id
-        self._env_for_write(employee).browse(line.id).unlink()
+        line.sudo().unlink()
         return True
 
     @api.model
@@ -216,7 +216,7 @@ class AccountAnalyticLineExt(models.Model):
         }
         if employee.user_id:
             vals['user_id'] = employee.user_id.id
-        line = self._env_for_write(employee).create(vals)
+        line = self.sudo().create(vals)
         return self._format_timesheet_record(line)
 
     @api.model

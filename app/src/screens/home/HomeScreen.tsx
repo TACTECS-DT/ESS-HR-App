@@ -52,8 +52,9 @@ const ALL_SERVICES: ServiceItem[] = [
   {icon: '📋', labelKey: 'documentRequests.title',     screenTab: 'MoreTab', screen: 'DocumentRequestList'},
   {icon: '🎓', labelKey: 'experienceCertificates.title', screenTab: 'MoreTab', screen: 'ExperienceCertList'},
   {icon: '🔧', labelKey: 'businessServices.title',     screenTab: 'MoreTab', screen: 'BusinessServiceList'},
-  {icon: '✅', labelKey: 'tasks.title',                screenTab: 'MoreTab', screen: 'TaskList'},
-  {icon: '🕐', labelKey: 'timesheets.title',           screenTab: 'MoreTab', screen: 'TimesheetWeekly'},
+  // Tasks & Timesheets — disabled (work with res.users, not hr.employee — re-enable later)
+  // {icon: '✅', labelKey: 'tasks.title',                screenTab: 'MoreTab', screen: 'TaskList'},
+  // {icon: '🕐', labelKey: 'timesheets.title',           screenTab: 'MoreTab', screen: 'TimesheetWeekly'},
   // Manager/HR/Admin only
   {icon: '👥', labelKey: 'home.myTeam',               screenTab: 'LeavesTab', screen: 'LeaveTeamBalance', requiresPermission: 'canViewTeamWidgets'},
   {icon: '⏳', labelKey: 'home.pendingApprovals',      homeScreen: 'PendingApprovals',                   requiresPermission: 'canAccessPendingApprovals'},

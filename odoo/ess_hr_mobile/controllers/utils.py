@@ -38,6 +38,7 @@ import logging
 from odoo import http
 from odoo.http import request
 from odoo.exceptions import UserError, ValidationError
+from odoo.addons.ess_hr_mobile.exceptions import EssLicenseError
 
 _logger = logging.getLogger(__name__)
 
@@ -181,12 +182,22 @@ def call_and_log(endpoint: str, fn) -> http.Response:
                 'Missing authentication context. Please log in again.',
                 401, 'UNAUTHENTICATED',
             )
+        # Live license check — ensure the license for this server is still active and unexpired
+        try:
+            request.env['ess.license'].sudo().check_license_active_for_server(
+                ctx.get('server_url')
+            )
+        except EssLicenseError as exc:
+            return json_error(str(exc).strip(), 403, exc.code)
 
     start = time.time()
     error_msg = None
     try:
         result = fn()
         return json_ok(result)
+    except EssLicenseError as exc:
+        error_msg = str(exc).strip()
+        return json_error(error_msg, 400, exc.code)
     except (UserError, ValidationError) as exc:
         error_msg = str(exc).strip()
         return json_error(error_msg, 400, 'VALIDATION_ERROR')

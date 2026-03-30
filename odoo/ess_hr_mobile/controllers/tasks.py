@@ -3,11 +3,24 @@ Tasks & Timesheets controller.
 
 Tasks (project.task) and timesheets (account.analytic.line) are
 grouped here because timesheets always belong to a task context.
+
+NOTE: Both features are temporarily disabled — they work with res.users context,
+not hr.employee. Set _FEATURES_ENABLED = True to re-activate all routes.
 """
 from odoo import http
 from odoo.http import request
 
-from .utils import call_and_log, get_body, get_auth_context
+from .utils import call_and_log, get_body, get_auth_context, json_error
+
+# Set to True once Tasks & Timesheets are adapted to hr.employee context
+_FEATURES_ENABLED = False
+
+def _disabled():
+    return json_error(
+        'Tasks and Timesheets are not available yet. Coming soon.',
+        503,
+        'FEATURE_DISABLED',
+    )
 
 
 class TasksController(http.Controller):
@@ -16,6 +29,8 @@ class TasksController(http.Controller):
 
     @http.route('/ess/api/tasks', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
     def list(self):
+        if not _FEATURES_ENABLED:
+            return _disabled()
         kw = get_body()
         employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
         return call_and_log(
@@ -25,6 +40,8 @@ class TasksController(http.Controller):
 
     @http.route('/ess/api/tasks/<int:task_id>', type='http', auth='none', methods=['GET', 'PATCH'], csrf=False)
     def task_by_id(self, task_id):
+        if not _FEATURES_ENABLED:
+            return _disabled()
         kw = get_body()
         if request.httprequest.method == 'GET':
             return call_and_log(
@@ -41,6 +58,8 @@ class TasksController(http.Controller):
 
     @http.route('/ess/api/tasks/<int:task_id>/attachments', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
     def task_attachments(self, task_id):
+        if not _FEATURES_ENABLED:
+            return _disabled()
         kw = get_body()
         if request.httprequest.method == 'GET':
             return call_and_log(
@@ -59,6 +78,8 @@ class TasksController(http.Controller):
 
     @http.route('/ess/api/timesheets/<int:timesheet_id>', type='http', auth='none', methods=['GET', 'PATCH', 'DELETE'], csrf=False)
     def timesheet_by_id(self, timesheet_id):
+        if not _FEATURES_ENABLED:
+            return _disabled()
         kw = get_body()
         employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
         method = request.httprequest.method
@@ -82,6 +103,8 @@ class TasksController(http.Controller):
 
     @http.route('/ess/api/timesheets', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
     def timesheets(self):
+        if not _FEATURES_ENABLED:
+            return _disabled()
         kw = get_body()
         employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
         if request.httprequest.method == 'GET':
@@ -102,6 +125,8 @@ class TasksController(http.Controller):
 
     @http.route('/ess/api/timesheets/daily', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
     def timesheet_daily(self):
+        if not _FEATURES_ENABLED:
+            return _disabled()
         kw = get_body()
         employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
         return call_and_log(
@@ -113,6 +138,8 @@ class TasksController(http.Controller):
 
     @http.route('/ess/api/timesheets/weekly', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
     def timesheet_weekly(self):
+        if not _FEATURES_ENABLED:
+            return _disabled()
         kw = get_body()
         employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
         return call_and_log(

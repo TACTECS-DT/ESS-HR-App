@@ -2,8 +2,7 @@ import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import type {UserInfo} from '../../api/mocks/auth.mock';
 
 interface AuthState {
-  // Step 1 — License Activation
-  licenseKey: string | null;
+  // Step 1 — Server Connection
   serverUrl: string | null;
   // Step 2 — Login (identifier used, never password/pin)
   loginIdentifier: string | null;  // badge_id or username entered
@@ -18,7 +17,6 @@ interface AuthState {
 }
 
 const initialState: AuthState = {
-  licenseKey: null,
   serverUrl: null,
   loginIdentifier: null,
   loginMode: null,
@@ -36,9 +34,8 @@ const authSlice = createSlice({
   reducers: {
     setLicenseContext: (
       state,
-      action: PayloadAction<{licenseKey: string; serverUrl: string}>,
+      action: PayloadAction<{serverUrl: string}>,
     ) => {
-      state.licenseKey = action.payload.licenseKey;
       state.serverUrl = action.payload.serverUrl;
     },
     setCredentials: (

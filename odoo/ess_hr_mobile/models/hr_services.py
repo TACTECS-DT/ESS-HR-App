@@ -42,7 +42,7 @@ class HrLetterRequest(models.Model):
     def create_letter(self, employee_id, directed_to, salary_type):
         """Create a new letter request. Returns letter dict."""
         employee = self._get_employee(employee_id)
-        letter = self._env_for_write(employee).create({
+        letter = self.sudo().create({
             'employee_id': employee_id,
             'directed_to': directed_to or '',
             'salary_type': salary_type or 'gross',
@@ -79,7 +79,7 @@ class HrLetterRequest(models.Model):
         employee = letter.employee_id
         allowed = ['directed_to', 'salary_type']
         write_vals = {k: v for k, v in vals.items() if k in allowed}
-        self._env_for_write(employee).browse(letter.id).write(write_vals)
+        letter.sudo().write(write_vals)
         return self._format_letter_record(letter)
 
     @api.model
@@ -91,7 +91,7 @@ class HrLetterRequest(models.Model):
         if letter.state != 'draft':
             raise UserError(_('Only draft requests can be deleted.'))
         employee = letter.employee_id
-        self._env_for_write(employee).browse(letter.id).unlink()
+        letter.sudo().unlink()
         return True
 
     @api.model
@@ -100,8 +100,8 @@ class HrLetterRequest(models.Model):
         letter = self.sudo().browse(record_id)
         if not letter.exists():
             raise UserError(_('Letter request not found.'))
-        approver = self._get_employee(approver_employee_id)
-        self._env_for_write(approver).browse(letter.id).write({'state': 'approved', 'approved_by': approver_employee_id})
+        self._get_employee(approver_employee_id)
+        letter.sudo().write({'state': 'approved', 'approved_by': approver_employee_id})
         return True
 
     @api.model
@@ -110,8 +110,8 @@ class HrLetterRequest(models.Model):
         letter = self.sudo().browse(record_id)
         if not letter.exists():
             raise UserError(_('Letter request not found.'))
-        approver = self._get_employee(approver_employee_id)
-        self._env_for_write(approver).browse(letter.id).write({
+        self._get_employee(approver_employee_id)
+        letter.sudo().write({
             'state': 'refused',
             'approved_by': approver_employee_id,
             'reason_refusal': reason or '',
@@ -180,7 +180,7 @@ class HrDocumentRequest(models.Model):
     def create_document(self, employee_id, document_type, return_date=False):
         """Create a new document request. Returns document dict."""
         employee = self._get_employee(employee_id)
-        doc = self._env_for_write(employee).create({
+        doc = self.sudo().create({
             'employee_id': employee_id,
             'document_type': document_type,
             'return_date': return_date or False,
@@ -217,7 +217,7 @@ class HrDocumentRequest(models.Model):
         employee = doc.employee_id
         allowed = ['document_type', 'return_date']
         write_vals = {k: v for k, v in vals.items() if k in allowed}
-        self._env_for_write(employee).browse(doc.id).write(write_vals)
+        doc.sudo().write(write_vals)
         return self._format_document_record(doc)
 
     @api.model
@@ -229,7 +229,7 @@ class HrDocumentRequest(models.Model):
         if doc.state != 'draft':
             raise UserError(_('Only draft requests can be deleted.'))
         employee = doc.employee_id
-        self._env_for_write(employee).browse(doc.id).unlink()
+        doc.sudo().unlink()
         return True
 
     @api.model
@@ -238,8 +238,8 @@ class HrDocumentRequest(models.Model):
         doc = self.sudo().browse(record_id)
         if not doc.exists():
             raise UserError(_('Document request not found.'))
-        approver = self._get_employee(approver_employee_id)
-        self._env_for_write(approver).browse(doc.id).write({'state': 'approved', 'approved_by': approver_employee_id})
+        self._get_employee(approver_employee_id)
+        doc.sudo().write({'state': 'approved', 'approved_by': approver_employee_id})
         return True
 
     @api.model
@@ -248,8 +248,8 @@ class HrDocumentRequest(models.Model):
         doc = self.sudo().browse(record_id)
         if not doc.exists():
             raise UserError(_('Document request not found.'))
-        approver = self._get_employee(approver_employee_id)
-        self._env_for_write(approver).browse(doc.id).write({
+        self._get_employee(approver_employee_id)
+        doc.sudo().write({
             'state': 'refused',
             'approved_by': approver_employee_id,
             'reason_refusal': reason or '',
@@ -317,7 +317,7 @@ class HrExperienceCertificate(models.Model):
     def create_certificate(self, employee_id, directed_to):
         """Create a new experience certificate request. Returns certificate dict."""
         employee = self._get_employee(employee_id)
-        cert = self._env_for_write(employee).create({
+        cert = self.sudo().create({
             'employee_id': employee_id,
             'directed_to': directed_to or '',
             'state': 'submitted',
@@ -353,7 +353,7 @@ class HrExperienceCertificate(models.Model):
         employee = cert.employee_id
         allowed = ['directed_to']
         write_vals = {k: v for k, v in vals.items() if k in allowed}
-        self._env_for_write(employee).browse(cert.id).write(write_vals)
+        cert.sudo().write(write_vals)
         return self._format_certificate_record(cert)
 
     @api.model
@@ -365,7 +365,7 @@ class HrExperienceCertificate(models.Model):
         if cert.state != 'draft':
             raise UserError(_('Only draft requests can be deleted.'))
         employee = cert.employee_id
-        self._env_for_write(employee).browse(cert.id).unlink()
+        cert.sudo().unlink()
         return True
 
     @api.model
@@ -374,8 +374,8 @@ class HrExperienceCertificate(models.Model):
         cert = self.sudo().browse(record_id)
         if not cert.exists():
             raise UserError(_('Certificate request not found.'))
-        approver = self._get_employee(approver_employee_id)
-        self._env_for_write(approver).browse(cert.id).write({'state': 'approved', 'approved_by': approver_employee_id})
+        self._get_employee(approver_employee_id)
+        cert.sudo().write({'state': 'approved', 'approved_by': approver_employee_id})
         return True
 
     @api.model
@@ -384,8 +384,8 @@ class HrExperienceCertificate(models.Model):
         cert = self.sudo().browse(record_id)
         if not cert.exists():
             raise UserError(_('Certificate request not found.'))
-        approver = self._get_employee(approver_employee_id)
-        self._env_for_write(approver).browse(cert.id).write({
+        self._get_employee(approver_employee_id)
+        cert.sudo().write({
             'state': 'refused',
             'approved_by': approver_employee_id,
             'reason_refusal': reason or '',
@@ -478,7 +478,7 @@ class HrBusinessServiceRequest(models.Model):
         stype = self.env['hr.business.service.type'].sudo().browse(service_type_id)
         if not stype.exists():
             raise UserError(_('Service type not found.'))
-        req = self._env_for_write(employee).create({
+        req = self.sudo().create({
             'employee_id': employee_id,
             'service_type_id': service_type_id,
             'reason': reason or '',
@@ -516,7 +516,7 @@ class HrBusinessServiceRequest(models.Model):
         employee = req.employee_id
         allowed = ['service_type_id', 'reason', 'requested_date']
         write_vals = {k: v for k, v in vals.items() if k in allowed}
-        self._env_for_write(employee).browse(req.id).write(write_vals)
+        req.sudo().write(write_vals)
         return self._format_business_service_record(req)
 
     @api.model
@@ -528,7 +528,7 @@ class HrBusinessServiceRequest(models.Model):
         if req.state != 'draft':
             raise UserError(_('Only draft requests can be deleted.'))
         employee = req.employee_id
-        self._env_for_write(employee).browse(req.id).unlink()
+        req.sudo().unlink()
         return True
 
     @api.model
@@ -537,8 +537,8 @@ class HrBusinessServiceRequest(models.Model):
         req = self.sudo().browse(record_id)
         if not req.exists():
             raise UserError(_('Business service request not found.'))
-        approver = self._get_employee(approver_employee_id)
-        self._env_for_write(approver).browse(req.id).write({'state': 'approved', 'approved_by': approver_employee_id})
+        self._get_employee(approver_employee_id)
+        req.sudo().write({'state': 'approved', 'approved_by': approver_employee_id})
         return True
 
     @api.model
@@ -547,8 +547,8 @@ class HrBusinessServiceRequest(models.Model):
         req = self.sudo().browse(record_id)
         if not req.exists():
             raise UserError(_('Business service request not found.'))
-        approver = self._get_employee(approver_employee_id)
-        self._env_for_write(approver).browse(req.id).write({
+        self._get_employee(approver_employee_id)
+        req.sudo().write({
             'state': 'refused',
             'approved_by': approver_employee_id,
             'reason_refusal': reason or '',

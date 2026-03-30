@@ -49,17 +49,18 @@ const SECTIONS: Array<{titleKey: string; items: ModuleItem[]}> = [
       {icon: '🔧', titleKey: 'businessServices.title',   route: 'BusinessServiceList', color: '#FF6B35'},
     ],
   },
-  {
-    titleKey: 'more.tasksTimesheets',
-    items: [
-      {icon: '✅', titleKey: 'tasks.title',         route: 'TaskList',        color: '#30B0C7'},
-      {icon: '🕐', titleKey: 'timesheets.title',    route: 'TimesheetWeekly', color: '#636366'},
-      {icon: '👥', titleKey: 'teamHours.title',     route: 'TeamHours',       color: '#5856D6', requiresPermission: 'canAccessTeamHours'},
-      {icon: '⏱️', titleKey: 'timer.title',         route: 'Timer',           color: '#007AFF'},
-      {icon: '📝', titleKey: 'tasks.logTime',       route: 'LogTime',         color: '#34C759'},
-      {icon: '📎', titleKey: 'tasks.addAttachment', route: 'AddAttachment',   color: '#FF9500'},
-    ],
-  },
+  // Tasks & Timesheets — disabled (work with res.users, not hr.employee — re-enable later)
+  // {
+  //   titleKey: 'more.tasksTimesheets',
+  //   items: [
+  //     {icon: '✅', titleKey: 'tasks.title',         route: 'TaskList',        color: '#30B0C7'},
+  //     {icon: '🕐', titleKey: 'timesheets.title',    route: 'TimesheetWeekly', color: '#636366'},
+  //     {icon: '👥', titleKey: 'teamHours.title',     route: 'TeamHours',       color: '#5856D6', requiresPermission: 'canAccessTeamHours'},
+  //     {icon: '⏱️', titleKey: 'timer.title',         route: 'Timer',           color: '#007AFF'},
+  //     {icon: '📝', titleKey: 'tasks.logTime',       route: 'LogTime',         color: '#34C759'},
+  //     {icon: '📎', titleKey: 'tasks.addAttachment', route: 'AddAttachment',   color: '#FF9500'},
+  //   ],
+  // },
   {
     titleKey: 'more.personal',
     items: [

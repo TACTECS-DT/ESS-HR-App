@@ -56,8 +56,8 @@ export type PayslipStackParamList = {
 
 // ─── More Stack ───────────────────────────────────────────────
 // Houses: Expenses, Loans, Advance Salary, HR Letters,
-//         Documents, Certs, Business Services, Tasks,
-//         Timesheets, Profile, Settings
+//         Documents, Certs, Business Services,
+//         Profile, Settings
 export type MoreStackParamList = {
   MoreHub: undefined;
   // Expense
@@ -88,15 +88,15 @@ export type MoreStackParamList = {
   BusinessServiceList: undefined;
   BusinessServiceCreate: undefined;
   BusinessServiceDetail: {id: number};
-  // Tasks & Timesheets
-  TaskList: undefined;
-  TaskDetail: {id: number};
-  LogTime: {taskId?: number; taskName?: string};
-  AddAttachment: {taskId?: number; taskName?: string};
-  TimesheetDaily: {date?: string};
-  TimesheetWeekly: undefined;
-  Timer: undefined;
-  TeamHours: undefined;
+  // Tasks & Timesheets — disabled (re-enable when adapted to hr.employee context)
+  // TaskList: undefined;
+  // TaskDetail: {id: number};
+  // LogTime: {taskId?: number; taskName?: string};
+  // AddAttachment: {taskId?: number; taskName?: string};
+  // TimesheetDaily: {date?: string};
+  // TimesheetWeekly: undefined;
+  // Timer: undefined;
+  // TeamHours: undefined;
   // Personal & Analytics
   PersonalNotes: undefined;
   Analytics: undefined;
@@ -117,5 +117,5 @@ export type RootStackParamList = {
 // kept for backward compat (RequestsHubScreen still imports this)
 export type RequestsStackParamList = MoreStackParamList & {RequestsHub: undefined};
 
-// kept for backward compat (Tasks/Timesheet screens still import this)
+// Tasks/Timesheets disabled — alias kept so screen files compile without errors
 export type TasksStackParamList = MoreStackParamList;

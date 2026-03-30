@@ -1,7 +1,7 @@
 # Comprehensive ESS Analysis Report
 # Your Odoo Portal Modules vs. Competitor (Office Buddy)
 ---
-**Date:** 2026-03-10
+**Date:** 2026-03-30 (updated from 2026-03-10)
 **Purpose:** Full feature audit for mobile app replacement planning
 **Languages:** Arabic & English wireframes planned
 
@@ -586,9 +586,12 @@ ELSE -> Role: EMPLOYEE (own records only)
 |---------|--------------|--------------|--------|
 | Portal-based access (no license) | [Y] | [Y] (Badge ID approach) | Tie |
 | Username/Password | [Y] | [Y] | Tie |
-| Badge ID + PIN | [N] | [B] Yes | Office Buddy |
+| Badge ID + PIN | [B] Yes (implemented) | [B] Yes | Tie |
 | Biometric login (Fingerprint/FaceID) | [N] | [B] Yes | Office Buddy |
-| License key activation | [N] | [B] Yes | Office Buddy |
+| Server URL-based activation (no key exposed to user) | [B] Yes (new arch) | [N] | Your Solution |
+| Two-step login (Admin validates → Client authenticates) | [B] Yes (new arch) | [N] | Your Solution |
+| Admin-controlled module visibility per license | [B] Yes (new arch) | [N] | Your Solution |
+| Configurable auto-logout duration per server | [B] Yes (new arch) | [N] | Your Solution |
 
 ---
 
@@ -652,8 +655,7 @@ These are **gaps to fill** in the mobile app:
 3. **Passcode Authentication** - Backup verification method
 4. **Biometric App Login** - Fingerprint/Face ID for app access
 5. **Badge ID + PIN Login** - For non-licensed employees
-6. **License Key System** - Company-specific activation
-7. **Push Notifications** - Real-time alerts for approvals, announcements
+6. **Push Notifications** - Real-time alerts for approvals, announcements
 8. **Personal Calendar View** - Color-coded attendance/leave/holiday calendar
 9. **Daily Mood Tracking** - Employee well-being insights
 10. **Company Announcements** - HR-to-all-employees broadcasting
@@ -717,7 +719,6 @@ All existing features from your modules + competitor's best features:
 - Push Notifications (approvals, decisions, announcements)
 - Biometric Login (Fingerprint/Face ID)
 - Badge ID + PIN Login
-- License Key Activation System
 - Payslip Download to Device
 - Payslip Sharing (WhatsApp, email)
 - Dark Mode
@@ -754,28 +755,46 @@ All existing features from your modules + competitor's best features:
 
 ### 6.2 LICENSING MODEL RECOMMENDATION
 
-**Your Independent Licensing (NOT Odoo Licenses):**
-- License per employee (not per Odoo user)
-- Communicate with Odoo via REST API using single service account
-- License tiers:
-  - Basic: Attendance + Leaves + Payslip
-  - Standard: Basic + Expenses + Loans + Advance Salary
-  - Premium: Standard + HR Services + Analytics + Compliance
-- Annual subscription model
-- Employee count thresholds (e.g., 1-50, 51-200, 201-500, 500+)
+**Two-Module Architecture (Independent of Odoo Licenses):**
+
+The licensing system is split across two Odoo modules:
+
+- **ess_hr_admin** (Admin Server): Centralized license manager. Validates client server URLs, controls which modules are active per license, sets auto-logout duration, tracks employee usage. Only the app developer's team has an admin server.
+- **ess_hr_client** (Client Server): Installed on each customer's Odoo instance. Exposes business data APIs (attendance, leaves, payslip, etc.) and authenticates employees. No license key visible to end users.
+
+**Activation Flow:**
+1. Admin registers customer's server URL in ess_hr_admin → issues a license
+2. Mobile app connects to admin server with customer's server URL → validates license → returns allowed modules + auto-logout config
+3. Mobile app then connects directly to client server for all business data
+
+**License Tiers (admin-controlled per license):**
+- Basic: Attendance + Leaves + Payslip
+- Standard: Basic + Expenses + Loans + Advance Salary
+- Premium: Standard + HR Services + Analytics + Compliance
+
+**License Limits:**
+- Employee count threshold per license (e.g., 1-50, 51-200, 201-500, 500+)
+- Grace period with employee limit enforcement (configurable)
+- Annual subscription model; license expiry enforced on every API call
 
 ### 6.3 API ARCHITECTURE
 
-**Odoo Integration:**
-- Use Odoo JSON-RPC or XML-RPC API (or Odoo 18 REST API if available)
-- Single service user account with appropriate access rights
-- API middleware layer for:
-  - Authentication token management
-  - Request queuing (offline support)
-  - Response caching
-  - Rate limiting
-  - License validation
-  - Push notification dispatch
+**Direct Mobile-to-Odoo REST API (no middleware server):**
+
+- Mobile app calls Odoo REST API endpoints directly — no separate Django or middleware layer
+- Two independent API targets per session:
+  - **Admin Server** (`ess_hr_admin`): License validation, module list, auto-logout config — called once at Step 1 login; URL fixed in app `.env`
+  - **Client Server** (`ess_hr_client`): All business data (attendance, leaves, payslip, etc.) — URL entered by user at Step 1; persists in Redux + secure storage
+
+**Authentication:**
+- Client server uses Odoo session/token auth per employee
+- Admin server uses a fixed service key (not exposed to employees)
+- Per-request license check on client server (lightweight, cached)
+
+**Mobile-side API layer:**
+- Axios instance with dynamic `baseURL` set from Redux `auth.serverUrl`
+- Response interceptor for token refresh (401) and server-down detection (network error)
+- React Query for caching, background refresh, and optimistic updates
 
 ### 6.4 LANGUAGE & LOCALIZATION REQUIREMENTS
 
@@ -828,14 +847,14 @@ All existing features from your modules + competitor's best features:
 36. HR Chat
 37. Personal Notes
 38. Analytics Dashboard (Manager)
-39. Tasks - My Tasks List
-40. Tasks - Task Detail (status, timer, attachments, time log)
-41. Tasks - Add Attachment
-42. Tasks - Log Time Entry
-43. Tasks - Active Timer
-44. Timesheets - My Timesheets (daily/weekly)
-45. Timesheets - Day Detail
-46. Timesheets - Team Timesheets (Manager)
+~~39. Tasks - My Tasks List~~ *(deferred — works with res.users, not hr.employee)*
+~~40. Tasks - Task Detail (status, timer, attachments, time log)~~ *(deferred)*
+~~41. Tasks - Add Attachment~~ *(deferred)*
+~~42. Tasks - Log Time Entry~~ *(deferred)*
+~~43. Tasks - Active Timer~~ *(deferred)*
+~~44. Timesheets - My Timesheets (daily/weekly)~~ *(deferred)*
+~~45. Timesheets - Day Detail~~ *(deferred)*
+~~46. Timesheets - Team Timesheets (Manager)~~ *(deferred)*
 
 ---
 
@@ -852,11 +871,11 @@ All existing features from your modules + competitor's best features:
 | Mobile UX | 3/10 | 8/10 | You're web-portal; they're native mobile |
 | Security/Auth | 4/10 | 9/10 | Competitor has face + geofence + biometric + badge |
 | Manager Tools | 7/10 | 7/10 | Tie - different strengths |
-| Licensing Innovation | 5/10 | 8/10 | Competitor has independent license model |
+| Licensing Innovation | 9/10 | 8/10 | Two-module arch: server URL activation, admin-controlled modules, no key exposed |
 | Localization | 4/10 | 8/10 | Competitor has 100+ languages, RTL, dark mode |
 | Offline Capability | 0/10 | 0/10 | Neither has it - opportunity! |
 | Analytics | 0/10 | 0/10 | Neither has it - opportunity! |
-| **OVERALL** | **66/130** | **80/130** | **Gap closable with strategic mobile app** |
+| **OVERALL** | **70/130** | **79/130** | **Gap closable with strategic mobile app** |
 
 ---
 

@@ -54,7 +54,7 @@ class HrAdvanceSalary(models.Model):
         """Create a new advance salary request after validating the 50% cap. Returns advance dict."""
         employee = self._get_employee(employee_id)
         self._validate_advance_cap(employee, amount)
-        advance = self._env_for_write(employee).create({
+        advance = self.sudo().create({
             'employee_id': employee_id,
             'amount': amount,
             'state': 'submitted',
@@ -87,8 +87,8 @@ class HrAdvanceSalary(models.Model):
             raise UserError(_('Advance salary request not found.'))
         if advance.state not in ('draft', 'submitted'):
             raise UserError(_('Only draft or submitted requests can be approved.'))
-        manager = self._get_employee(manager_employee_id)
-        self._env_for_write(manager).browse(advance.id).write({
+        self._get_employee(manager_employee_id)
+        advance.sudo().write({
             'state': 'approved',
             'approved_by': manager_employee_id,
             'approved_date': fields.Date.today(),
@@ -103,8 +103,8 @@ class HrAdvanceSalary(models.Model):
             raise UserError(_('Advance salary request not found.'))
         if advance.state not in ('draft', 'submitted'):
             raise UserError(_('Only draft or submitted requests can be refused.'))
-        manager = self._get_employee(manager_employee_id)
-        self._env_for_write(manager).browse(advance.id).write({
+        self._get_employee(manager_employee_id)
+        advance.sudo().write({
             'state': 'refused',
             'approved_by': manager_employee_id,
             'reason_refusal': reason or '',

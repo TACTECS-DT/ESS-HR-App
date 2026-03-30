@@ -33,43 +33,107 @@ export default function LicenseActivationScreen() {
   const theme = useTheme();
   const dispatch = useAppDispatch();
 
-  const [licenseKey, setLicenseKey] = useState('');
   const [serverUrl, setServerUrl] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');   // single error string → shown in modal
 
-  const allFilled = licenseKey.trim() && serverUrl.trim();
+  type ErrorType =
+    | 'INVALID_URL'
+    | 'SERVER_UNREACHABLE'
+    | 'SERVER_NOT_FOUND'
+    | 'LICENSE_INACTIVE'
+    | 'LICENSE_EXPIRED'
+    | 'GENERIC';
+  const [errorType, setErrorType] = useState<ErrorType | null>(null);
+  const [errorBody, setErrorBody] = useState('');
+
+  function showError(code: string | undefined, fallbackMessage: string) {
+    if (
+      code === 'INVALID_URL' ||
+      code === 'SERVER_UNREACHABLE' ||
+      code === 'SERVER_NOT_FOUND' ||
+      code === 'LICENSE_INACTIVE' ||
+      code === 'LICENSE_EXPIRED'
+    ) {
+      setErrorType(code);
+      setErrorBody('');
+    } else {
+      setErrorType('GENERIC');
+      setErrorBody(fallbackMessage);
+    }
+  }
+
+  const ERROR_CONFIG: Record<ErrorType, {emoji: string; title: string; body: string}> = {
+    INVALID_URL: {
+      emoji: '🔗',
+      title: t('auth.errors.invalidUrl.title'),
+      body:  t('auth.errors.invalidUrl.body'),
+    },
+    SERVER_UNREACHABLE: {
+      emoji: '📡',
+      title: t('auth.errors.serverUnreachable.title'),
+      body:  t('auth.errors.serverUnreachable.body'),
+    },
+    SERVER_NOT_FOUND: {
+      emoji: '🔍',
+      title: t('auth.errors.serverNotFound.title'),
+      body:  t('auth.errors.serverNotFound.body'),
+    },
+    LICENSE_INACTIVE: {
+      emoji: '🔒',
+      title: t('auth.errors.licenseInactive.title'),
+      body:  t('auth.errors.licenseInactive.body'),
+    },
+    LICENSE_EXPIRED: {
+      emoji: '⏰',
+      title: t('auth.errors.licenseExpired.title'),
+      body:  t('auth.errors.licenseExpired.body'),
+    },
+    GENERIC: {
+      emoji: '⚠️',
+      title: t('common.error'),
+      body:  errorBody,
+    },
+  };
+
+  const allFilled = serverUrl.trim();
 
   async function handleActivate() {
-    // Local validation — show modal for empty fields too
-    if (!licenseKey.trim()) {
-      setError(t('auth.errors.invalidLicense'));
+    const raw = serverUrl.trim();
+    if (!raw) {
+      showError('GENERIC', t('common.error'));
       return;
     }
-    if (!serverUrl.trim()) {
-      setError(t('common.error'));
+
+    // Validate URL format before hitting the network
+    if (!/^https?:\/\/.+\..+/.test(raw)) {
+      showError('INVALID_URL', '');
       return;
     }
+
     setLoading(true);
-    setError('');
+    setErrorType(null);
     try {
+      const base = raw.replace(/\/$/, '');
       const res = await apiClient.post(API_MAP.auth.validateLicense, {
-        license_key: licenseKey.trim(),
-        server_url: serverUrl.trim(),
+        server_url: base,
+      }, {
+        baseURL: base + '/ess/api',
       });
       const data = res.data;
       if (isApiSuccess(data)) {
-        dispatch(setLicenseContext({
-          licenseKey: licenseKey.trim(),
-          serverUrl: serverUrl.trim(),
-        }));
+        dispatch(setLicenseContext({serverUrl: base}));
         navigation.navigate('CompanySelection', {companies: data.data.companies});
       } else {
-        setError(data.error.message);
+        showError(data.error?.code, data.error?.message || t('common.error'));
       }
     } catch (err: any) {
-      const msg = err?.response?.data?.error?.message;
-      setError(msg || t('common.error'));
+      if (!err?.response) {
+        // Network error — server unreachable, DNS failure, timeout, etc.
+        showError('SERVER_UNREACHABLE', '');
+      } else {
+        const errData = err.response.data?.error;
+        showError(errData?.code, errData?.message || t('common.error'));
+      }
     } finally {
       setLoading(false);
       Keyboard.dismiss();
@@ -99,20 +163,10 @@ export default function LicenseActivationScreen() {
         {/* Form card — no error props on inputs */}
         <View style={[styles.card, {backgroundColor: theme.surface, borderColor: theme.border}]}>
           <TextInput
-            label={t('auth.licenseKey') + ' *'}
-            placeholder={t('auth.licenseKeyPlaceholder')}
-            value={licenseKey}
-            onChangeText={v => { setLicenseKey(v); setError(''); }}
-            autoCapitalize="characters"
-            autoCorrect={false}
-            keyboardType="default"
-          />
-
-          <TextInput
             label={t('auth.serverUrl') + ' *'}
             placeholder={t('auth.serverUrlPlaceholder')}
             value={serverUrl}
-            onChangeText={v => { setServerUrl(v); setError(''); }}
+            onChangeText={v => { setServerUrl(v); setErrorType(null); }}
             autoCapitalize="none"
             autoCorrect={false}
             keyboardType="url"
@@ -133,30 +187,33 @@ export default function LicenseActivationScreen() {
         </Text>
       </ScrollView>
 
-      {/* ── Invalid license / server wizard ──────────────────────────────── */}
+      {/* ── License / server error dialog ────────────────────────────────── */}
       <Modal
-        visible={!!error}
+        visible={!!errorType}
         transparent
         animationType="fade"
-        onRequestClose={() => setError('')}>
+        onRequestClose={() => setErrorType(null)}>
         <TouchableOpacity
           style={styles.overlay}
           activeOpacity={1}
-          onPress={() => setError('')}>
-          <View style={[styles.errorDialog, {backgroundColor: theme.surface}]}>
-            <View style={styles.errorIconWrap}>
-              <Text style={styles.errorEmoji}>⚠️</Text>
-            </View>
-            <Text style={[styles.errorTitle, {color: theme.text}]}>
-              {t('auth.errors.invalidLicense')}
-            </Text>
-            <Text style={styles.errorBody}>{error}</Text>
-            <TouchableOpacity
-              style={styles.errorDismissBtn}
-              onPress={() => setError('')}>
-              <Text style={styles.errorDismissBtnLabel}>{t('common.close')}</Text>
-            </TouchableOpacity>
-          </View>
+          onPress={() => setErrorType(null)}>
+          {errorType && (() => {
+            const cfg = ERROR_CONFIG[errorType];
+            return (
+              <View style={[styles.errorDialog, {backgroundColor: theme.surface}]}>
+                <View style={styles.errorIconWrap}>
+                  <Text style={styles.errorEmoji}>{cfg.emoji}</Text>
+                </View>
+                <Text style={[styles.errorTitle, {color: theme.text}]}>{cfg.title}</Text>
+                <Text style={styles.errorBody}>{cfg.body}</Text>
+                <TouchableOpacity
+                  style={styles.errorDismissBtn}
+                  onPress={() => setErrorType(null)}>
+                  <Text style={styles.errorDismissBtnLabel}>{t('common.close')}</Text>
+                </TouchableOpacity>
+              </View>
+            );
+          })()}
         </TouchableOpacity>
       </Modal>
     </KeyboardAvoidingView>

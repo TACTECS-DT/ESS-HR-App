@@ -2,8 +2,8 @@
 # خارطة طريق المنتج - تطبيق الخدمة الذاتية للموظفين
 
 ---
-**Version:** 1.0
-**Date:** 2026-03-10
+**Version:** 2.0
+**Date:** 2026-03-30
 
 ---
 
@@ -40,16 +40,20 @@
 
 ### 2.1 AUTHENTICATION & ONBOARDING
 
+Two-step login flow: **Step 1 → Admin Server** (validate + get config), **Step 2 → Client Server** (employee auth + data).
+
 | # | Feature | Priority | Complexity | Description |
 |---|---------|----------|------------|-------------|
-| 1.1 | License Key Activation | P0 | Medium | Company-specific license key entry on first launch |
-| 1.2 | Badge ID + PIN Login | P0 | Medium | Primary login for non-Odoo users |
-| 1.3 | Username + Password Login | P0 | Low | Alternative for Odoo users |
-| 1.4 | JWT Token Management | P0 | Medium | Secure token storage, auto-refresh, expiry handling |
-| 1.5 | Company Selection | P0 | Low | Select company after license activation |
-| 1.6 | Language Selection | P0 | Low | Arabic / English toggle on login screen |
-| 1.7 | Password Reset Flow | P1 | Low | Forgot password with email verification |
-| 1.8 | Session Management | P0 | Medium | Auto-logout on token expiry, single device enforcement |
+| 1.1 | Server URL Entry — Step 1 | P0 | Medium | User enters client server URL; app contacts Admin Server (fixed in .env) to validate license, get allowed modules and auto-logout duration |
+| 1.2 | Server URL Cache / Quick Re-login | P0 | Medium | Previously used valid server URLs shown as tappable chips on login screen for fast re-entry |
+| 1.3 | Allowed Modules Enforcement | P0 | Medium | Admin returns list of module codes; mobile shows only those modules and hides all others entirely |
+| 1.4 | Badge ID + PIN Login — Step 2 | P0 | Medium | Primary login to client server for non-Odoo users |
+| 1.5 | Username + Password Login — Step 2 | P0 | Low | Alternative Step 2 login to client server |
+| 1.6 | Token Management | P0 | Medium | Secure token storage, auto-refresh, expiry handling |
+| 1.7 | Company Selection | P0 | Low | Select company from list returned by Step 1 (comes from client server companies via admin) |
+| 1.8 | Language Selection | P0 | Low | Arabic / English toggle on login screen |
+| 1.9 | Password Reset Flow | P1 | Low | Forgot password with email verification |
+| 1.10 | Auto-Logout with Configurable Duration | P0 | Medium | Default 72h; overridden by `auto_logout_hours` from Admin Server on each Step 1; cached for subsequent app opens |
 
 ---
 
@@ -229,19 +233,21 @@
 
 ### 2.13 TASKS & TIMESHEETS MODULE
 
+> **Status: Deferred — not in MVP.** Tasks and Timesheets operate on `res.users` context in Odoo, not `hr.employee`. Will be re-enabled once the client module adapts them to the employee context. All backend routes exist but return 503 until re-enabled.
+
 | # | Feature | Priority | Complexity | Description |
 |---|---------|----------|------------|-------------|
-| 13.1 | View My Tasks | P0 | Medium | List assigned tasks with project, stage, deadline, priority |
-| 13.2 | Task Filtering & Search | P0 | Low | Filter by stage, project; text search in task name |
-| 13.3 | View Task Detail | P0 | Medium | Full task view with all fields, description, metadata |
-| 13.4 | Update Task Stage | P0 | Low | Move task between stages (New → In Progress → Done) |
-| 13.5 | Start/Stop Timer | P0 | High | Real-time timer on a task; auto-creates timesheet entry on stop |
-| 13.6 | Timer Persistence | P0 | High | Timer survives app navigation/background; persistent mini-timer bar |
-| 13.7 | Manual Time Logging | P0 | Medium | Log hours against a task with date, hours, description |
-| 13.8 | View My Timesheets | P0 | Medium | Daily/weekly grouped view with daily totals |
-| 13.9 | View Task Attachments | P1 | Low | List all files attached to a task |
-| 13.10 | Upload Task Attachments | P1 | Medium | Upload files (camera, gallery, documents) to a task |
-| 13.11 | Timesheet Weekly Summary | P1 | Medium | Summary card with weekly total hours vs target |
+| 13.1 | View My Tasks | P1 | Medium | List assigned tasks with project, stage, deadline, priority |
+| 13.2 | Task Filtering & Search | P1 | Low | Filter by stage, project; text search in task name |
+| 13.3 | View Task Detail | P1 | Medium | Full task view with all fields, description, metadata |
+| 13.4 | Update Task Stage | P1 | Low | Move task between stages (New → In Progress → Done) |
+| 13.5 | Start/Stop Timer | P1 | High | Real-time timer on a task; auto-creates timesheet entry on stop |
+| 13.6 | Timer Persistence | P1 | High | Timer survives app navigation/background; persistent mini-timer bar |
+| 13.7 | Manual Time Logging | P1 | Medium | Log hours against a task with date, hours, description |
+| 13.8 | View My Timesheets | P1 | Medium | Daily/weekly grouped view with daily totals |
+| 13.9 | View Task Attachments | P2 | Low | List all files attached to a task |
+| 13.10 | Upload Task Attachments | P2 | Medium | Upload files (camera, gallery, documents) to a task |
+| 13.11 | Timesheet Weekly Summary | P2 | Medium | Summary card with weekly total hours vs target |
 
 ---
 
@@ -277,9 +283,11 @@
 | 16.3 | Basic Offline Cache | P0 | Medium | Cache last-viewed data for offline reading |
 | 16.4 | Pull-to-Refresh | P0 | Low | Refresh data on all list screens |
 | 16.5 | Loading States | P0 | Low | Skeleton screens, progress indicators |
-| 16.6 | Error Handling | P0 | Medium | User-friendly error messages (bilingual) |
-| 16.7 | Network Status Indicator | P0 | Low | Show online/offline status bar |
+| 16.6 | Error Handling | P0 | Medium | User-friendly error messages (bilingual), distinct errors for invalid URL / server unreachable / license inactive / license expired |
+| 16.7 | Network Status Indicator | P0 | Low | Show online/offline banner; separate banner when client server is down but device has internet |
 | 16.8 | Basic Push Notifications | P1 | High | Approval/refusal notifications |
+| 16.9 | Dynamic Client Server URL | P0 | Medium | All business API calls use server URL from login — not a hardcoded .env value |
+| 16.10 | Admin Server Validation | P0 | Medium | Fixed admin server URL in .env; every login Step 1 hits admin server first |
 
 ---
 
@@ -287,12 +295,13 @@
 
 | Metric | Count |
 |--------|-------|
-| Total Features | ~120 |
-| P0 (Must Have) | ~95 |
-| P1 (Should Have) | ~25 |
-| Modules | 14 (Auth, Dashboard, Attendance, Leaves, Payslip, Expenses, Loans, Advance Salary, HR Letters, Documents, Certificates, Business Services, Profile, Settings) |
+| Total Features | ~125 |
+| P0 (Must Have) | ~98 |
+| P1 (Should Have) | ~27 |
+| Modules | 13 active (Auth, Dashboard, Attendance, Leaves, Payslip, Expenses, Loans, Advance Salary, HR Letters, Documents, Certificates, Business Services, Profile, Settings) + Tasks/Timesheets deferred |
 | Estimated Screens | ~35 |
 | Estimated Duration | 4 months (2 developers + 1 designer) |
+| Architecture | Two-step login: Admin Server (Step 1 — license + modules) → Client Server (Step 2 — auth + data) |
 
 ---
 
@@ -392,10 +401,13 @@
 
 ---
 
-### 3.8 TASKS & TIMESHEETS - ADVANCED
+### 3.8 TASKS & TIMESHEETS — RE-ENABLE & ADVANCED
+
+> **Prerequisite:** ESS client module must adapt Tasks & Timesheets to `hr.employee` context before any item here can ship.
 
 | # | Feature | Priority | Complexity | Description |
 |---|---------|----------|------------|-------------|
+| 27.0 | Re-enable Tasks & Timesheets | P0 | Medium | Adapt client module to employee context; uncomment mobile routes and flip `_FEATURES_ENABLED = True` |
 | 27.1 | Edit/Delete Time Entry | P1 | Low | Modify or remove existing timesheet entries |
 | 27.2 | Update Task Priority | P1 | Low | Change task priority from detail screen |
 | 27.3 | Team Timesheets (Manager) | P1 | Medium | Manager views team members' weekly timesheet summaries |
@@ -565,14 +577,15 @@ Phase 3:        ██████████  ████████░░  
 
 | Risk | Impact | Probability | Mitigation |
 |------|--------|------------|------------|
-| Odoo API changes in updates | High | Medium | Version-specific API adapters, regular testing |
+| Client server API changes in updates | High | Medium | Version-specific API adapters, regular testing |
+| Admin server unreachable | High | Low | Clear error shown; cached auto-logout duration used; login blocked until admin responds |
 | Face recognition accuracy | Medium | Medium | Use proven ML Kit, add passcode fallback |
 | Offline sync conflicts | High | High | Clear conflict rules, server wins for statuses |
-| Multi-tenant scalability | High | Low | Horizontal scaling, Redis caching, connection pooling |
 | App Store rejection | Medium | Low | Follow Apple/Google guidelines strictly |
-| Arabic RTL complexity | Medium | High | Flutter's built-in RTL + thorough testing |
-| License key piracy | Medium | Medium | Server-side validation, device binding, periodic checks |
+| Arabic RTL complexity | Medium | High | React Native I18nManager + thorough testing |
+| Employee limit exceeded silently | Medium | Medium | Admin scheduled action runs daily; grace limit field provides buffer before deactivation |
 | Competitor releases new features | Medium | High | Maintain 4-month release cycle advantage |
+| Tasks/Timesheets user context mismatch | Medium | Confirmed | Deferred to Phase 2; backend returns 503; mobile hides routes entirely |
 
 ---
 

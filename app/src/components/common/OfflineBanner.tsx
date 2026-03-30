@@ -1,35 +1,45 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, StyleSheet, Animated} from 'react-native';
+import {Text, StyleSheet, Animated} from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import {useTranslation} from 'react-i18next';
 import {colors, fontSize, spacing} from '../../config/theme';
+import {useAppSelector} from '../../hooks/useAppSelector';
 
 export default function OfflineBanner() {
   const {t} = useTranslation();
   const [isOffline, setIsOffline] = useState(false);
+  const serverDown = useAppSelector(state => state.connectivity.serverDown);
   const slideAnim = React.useRef(new Animated.Value(-50)).current;
+
+  const visible = isOffline || serverDown;
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
-      const offline = !state.isConnected;
-      setIsOffline(offline);
-      Animated.timing(slideAnim, {
-        toValue: offline ? 0 : -50,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
+      setIsOffline(!state.isConnected);
     });
     return () => unsubscribe();
-  }, [slideAnim]);
+  }, []);
 
-  if (!isOffline) {
+  useEffect(() => {
+    Animated.timing(slideAnim, {
+      toValue: visible ? 0 : -50,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  }, [visible, slideAnim]);
+
+  if (!visible) {
     return null;
   }
+
+  const message = isOffline
+    ? `📡 ${t('common.noInternet')}`
+    : `🔴 ${t('common.serverDown')}`;
 
   return (
     <Animated.View
       style={[styles.banner, {transform: [{translateY: slideAnim}]}]}>
-      <Text style={styles.text}>📡 {t('common.noInternet')}</Text>
+      <Text style={styles.text}>{message}</Text>
     </Animated.View>
   );
 }

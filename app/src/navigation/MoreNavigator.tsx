@@ -31,15 +31,15 @@ import ExperienceCertDetailScreen from '../screens/experience-certificates/Exper
 import BusinessServiceListScreen from '../screens/business-services/BusinessServiceListScreen';
 import BusinessServiceCreateScreen from '../screens/business-services/BusinessServiceCreateScreen';
 import BusinessServiceDetailScreen from '../screens/business-services/BusinessServiceDetailScreen';
-// Tasks & Timesheets
-import TaskListScreen from '../screens/tasks/TaskListScreen';
-import TaskDetailScreen from '../screens/tasks/TaskDetailScreen';
-import LogTimeScreen from '../screens/tasks/LogTimeScreen';
-import AddAttachmentScreen from '../screens/tasks/AddAttachmentScreen';
-import TimesheetDailyScreen from '../screens/tasks/TimesheetDailyScreen';
-import TimesheetWeeklyScreen from '../screens/tasks/TimesheetWeeklyScreen';
-import TimerScreen from '../screens/tasks/TimerScreen';
-import TeamHoursScreen from '../screens/tasks/TeamHoursScreen';
+// Tasks & Timesheets — disabled (work with res.users, not hr.employee — re-enable later)
+// import TaskListScreen from '../screens/tasks/TaskListScreen';
+// import TaskDetailScreen from '../screens/tasks/TaskDetailScreen';
+// import LogTimeScreen from '../screens/tasks/LogTimeScreen';
+// import AddAttachmentScreen from '../screens/tasks/AddAttachmentScreen';
+// import TimesheetDailyScreen from '../screens/tasks/TimesheetDailyScreen';
+// import TimesheetWeeklyScreen from '../screens/tasks/TimesheetWeeklyScreen';
+// import TimerScreen from '../screens/tasks/TimerScreen';
+// import TeamHoursScreen from '../screens/tasks/TeamHoursScreen';
 // Personal & Analytics
 import PersonalNotesScreen from '../screens/more/PersonalNotesScreen';
 import AnalyticsScreen from '../screens/more/AnalyticsScreen';
@@ -84,15 +84,15 @@ export default function MoreNavigator() {
       <Stack.Screen name="BusinessServiceList" component={BusinessServiceListScreen} />
       <Stack.Screen name="BusinessServiceCreate" component={BusinessServiceCreateScreen} />
       <Stack.Screen name="BusinessServiceDetail" component={BusinessServiceDetailScreen} />
-      {/* Tasks & Timesheets */}
-      <Stack.Screen name="TaskList" component={TaskListScreen} />
+      {/* Tasks & Timesheets — disabled (re-enable with imports above when ready) */}
+      {/* <Stack.Screen name="TaskList" component={TaskListScreen} />
       <Stack.Screen name="TaskDetail" component={TaskDetailScreen} />
       <Stack.Screen name="LogTime" component={LogTimeScreen} />
       <Stack.Screen name="AddAttachment" component={AddAttachmentScreen} />
       <Stack.Screen name="TimesheetDaily" component={TimesheetDailyScreen} />
       <Stack.Screen name="TimesheetWeekly" component={TimesheetWeeklyScreen} />
       <Stack.Screen name="Timer" component={TimerScreen} />
-      <Stack.Screen name="TeamHours" component={TeamHoursScreen} />
+      <Stack.Screen name="TeamHours" component={TeamHoursScreen} /> */}
       {/* Personal & Analytics */}
       <Stack.Screen name="PersonalNotes" component={PersonalNotesScreen} />
       <Stack.Screen name="Analytics" component={AnalyticsScreen} />

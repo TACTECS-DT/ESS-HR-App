@@ -66,15 +66,16 @@ import {
   MOCK_BUSINESS_SERVICES,
   MOCK_SERVICE_CREATE_SUCCESS,
 } from './mocks/business-services.mock';
-import {MOCK_TASKS} from './mocks/tasks.mock';
-import {MOCK_TIMESHEETS, MOCK_LOG_TIME_SUCCESS} from './mocks/timesheets.mock';
+// Tasks & Timesheets mocks disabled
+// import {MOCK_TASKS} from './mocks/tasks.mock';
+// import {MOCK_TIMESHEETS, MOCK_LOG_TIME_SUCCESS} from './mocks/timesheets.mock';
 import {MOCK_PROFILE, MOCK_EMPLOYEES, MOCK_PROFILES_BY_ID} from './mocks/profile.mock';
 import {MOCK_NOTIFICATIONS} from './mocks/notifications.mock';
 import {MOCK_ANNOUNCEMENTS} from './mocks/announcements.mock';
 import {MOCK_PENDING_APPROVALS, MOCK_APPROVAL_ACTION_SUCCESS} from './mocks/pending-approvals.mock';
 import {MOCK_PERSONAL_NOTES, MOCK_NOTE_CREATE_SUCCESS} from './mocks/personal-notes.mock';
 import {MOCK_ANALYTICS} from './mocks/analytics.mock';
-import {MOCK_TEAM_HOURS} from './mocks/team-hours.mock';
+// import {MOCK_TEAM_HOURS} from './mocks/team-hours.mock';
 
 function randomDelay(): number {
   return (
@@ -195,16 +196,14 @@ export function setupMocks(): void {
   mockInstance.onGet(API_MAP.businessServices.requests).reply(200, MOCK_BUSINESS_SERVICES);
   mockInstance.onPost(API_MAP.businessServices.requests).reply(201, MOCK_SERVICE_CREATE_SUCCESS);
 
-  // ─── Tasks ──────────────────────────────────────────────────────────────
-  mockInstance.onGet(API_MAP.tasks.list).reply(200, MOCK_TASKS);
-  mockInstance.onPatch(pathToRegex(API_MAP.tasks.byId(0))).reply(200, {success: true, data: null});
-  mockInstance.onPost(pathToRegex(API_MAP.tasks.attachments(0))).reply(200, {success: true, data: null});
-
-  // ─── Timesheets ─────────────────────────────────────────────────────────
-  mockInstance.onGet(API_MAP.timesheets.timesheets).reply(200, MOCK_TIMESHEETS);
-  mockInstance.onPost(API_MAP.timesheets.timesheets).reply(201, MOCK_LOG_TIME_SUCCESS);
-  mockInstance.onPatch(pathToRegex(API_MAP.timesheets.byId(0))).reply(200, {success: true, data: null});
-  mockInstance.onDelete(pathToRegex(API_MAP.timesheets.byId(0))).reply(200, {success: true, data: null});
+  // Tasks & Timesheets mocks disabled (re-enable with imports above when ready)
+  // mockInstance.onGet(API_MAP.tasks.list).reply(200, MOCK_TASKS);
+  // mockInstance.onPatch(pathToRegex(API_MAP.tasks.byId(0))).reply(200, {success: true, data: null});
+  // mockInstance.onPost(pathToRegex(API_MAP.tasks.attachments(0))).reply(200, {success: true, data: null});
+  // mockInstance.onGet(API_MAP.timesheets.timesheets).reply(200, MOCK_TIMESHEETS);
+  // mockInstance.onPost(API_MAP.timesheets.timesheets).reply(201, MOCK_LOG_TIME_SUCCESS);
+  // mockInstance.onPatch(pathToRegex(API_MAP.timesheets.byId(0))).reply(200, {success: true, data: null});
+  // mockInstance.onDelete(pathToRegex(API_MAP.timesheets.byId(0))).reply(200, {success: true, data: null});
 
   // ─── Employee / Profile ─────────────────────────────────────────────────
   mockInstance.onGet(API_MAP.employee.profile).reply(config => {
@@ -238,8 +237,8 @@ export function setupMocks(): void {
   // ─── Analytics ──────────────────────────────────────────────────────────
   mockInstance.onGet(API_MAP.analytics.summary).reply(200, MOCK_ANALYTICS);
 
-  // ─── Team Hours ─────────────────────────────────────────────────────────
-  mockInstance.onGet(API_MAP.team.hours).reply(200, MOCK_TEAM_HOURS);
+  // Team Hours mock disabled
+  // mockInstance.onGet(API_MAP.team.hours).reply(200, MOCK_TEAM_HOURS);
 }
 
 export function teardownMocks(): void {

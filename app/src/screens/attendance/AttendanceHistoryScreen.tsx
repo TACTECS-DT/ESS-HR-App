@@ -52,7 +52,25 @@ export default function AttendanceHistoryScreen() {
     queryKey: ['attendance-history'],
     queryFn: async () => {
       const res = await apiClient.get(API_MAP.attendance.history);
-      return isApiSuccess(res.data) ? (res.data.data as AttendanceRecord[]) : [];
+      if (!isApiSuccess(res.data)) {return [];}
+      const payload = res.data.data as any;
+      const records: any[] = Array.isArray(payload) ? payload : (payload?.records ?? []);
+      return records.map((r): AttendanceRecord => {
+        const checkInDt: string | null = r.check_in ?? null;
+        const checkOutDt: string | null = r.check_out ?? null;
+        const dateStr: string = checkInDt ? checkInDt.substring(0, 10) : (r.date ?? '');
+        const checkInTime: string | null = checkInDt ? checkInDt.substring(11, 16) : null;
+        const checkOutTime: string | null = checkOutDt ? checkOutDt.substring(11, 16) : null;
+        return {
+          id: r.id,
+          date: dateStr,
+          check_in: checkInTime,
+          check_out: checkOutTime,
+          worked_hours: r.worked_hours ?? 0,
+          day_status: r.day_status ?? (checkInDt ? 'present' : 'absent'),
+          sheet_status: r.sheet_status ?? 'draft',
+        };
+      });
     },
   });
 

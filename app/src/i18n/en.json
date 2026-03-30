@@ -20,6 +20,7 @@
     "refresh": "Refresh",
     "noData": "No data available",
     "noInternet": "No internet connection",
+    "serverDown": "Server is currently unavailable. Please try again later.",
     "all": "All",
     "myRequests": "My Requests",
     "date": "Date",
@@ -43,16 +44,14 @@
     }
   },
   "auth": {
-    "licenseTitle": "Activate Company",
-    "licenseSubtitle": "Enter your company license key to get started",
-    "licenseKey": "License Key",
-    "licenseKeyPlaceholder": "XXXX-XXXX-XXXX-XXXX",
+    "licenseTitle": "Login",
+    "licenseSubtitle": "Step 1 of 3 — Enter your company server URL",
     "serverUrl": "Server URL",
     "serverUrlPlaceholder": "https://your-company.odoo.com",
-    "activate": "Activate License",
-    "contactHR": "Contact your HR administrator to obtain the license key",
+    "activate": "Next",
+    "contactHR": "Contact your HR administrator to obtain the server URL",
     "selectCompany": "Select Company",
-    "selectCompanySubtitle": "Choose your company to continue",
+    "selectCompanySubtitle": "Step 2 of 3 — Choose your company to continue",
     "loginTitle": "Welcome Back",
     "loginSubtitle": "Sign in to continue",
     "badgeId": "Badge ID",
@@ -83,7 +82,27 @@
     "errors": {
       "invalidLicense": "Invalid or expired license key",
       "invalidCredentials": "Invalid badge ID or PIN",
-      "sessionExpired": "Your session has expired. Please login again."
+      "sessionExpired": "Your session has expired. Please login again.",
+      "invalidUrl": {
+        "title": "Invalid URL",
+        "body": "Please enter a valid server URL starting with https:// or http://"
+      },
+      "serverUnreachable": {
+        "title": "Cannot Reach Server",
+        "body": "Could not connect to the server. Check the URL and your internet connection, then try again."
+      },
+      "serverNotFound": {
+        "title": "Server Not Found",
+        "body": "The server URL you entered is not registered. Please check the URL and try again."
+      },
+      "licenseInactive": {
+        "title": "License Inactive",
+        "body": "This server does not have an active license. Please contact your HR administrator."
+      },
+      "licenseExpired": {
+        "title": "License Expired",
+        "body": "The license for this server has expired. Please contact your HR administrator to renew it."
+      }
     }
   },
   "home": {

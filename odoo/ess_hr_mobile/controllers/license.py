@@ -11,8 +11,8 @@ class LicenseController(http.Controller):
         kw = get_body()
         return call_and_log(
             '/ess/api/auth/validate-license',
-            lambda: request.env['ess.license'].sudo().validate_license_key(
-                kw.get('license_key'), kw.get('server_url'),
+            lambda: request.env['ess.license'].sudo().validate_server_url(
+                kw.get('server_url'),
             ),
         )
 

@@ -2,6 +2,10 @@
  * ESS HR App — Root component
  * Wires: Redux store, React Query, i18n, Navigation, Mock API
  */
+
+
+
+
 import React from 'react';
 import {StatusBar} from 'react-native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';

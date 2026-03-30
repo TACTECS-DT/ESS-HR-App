@@ -80,7 +80,7 @@ class HrLeaveExt(models.Model):
             'date_to': date_to_dt,
             'name': description or '/',
         }
-        leave = self._env_for_write(employee).with_context(mail_notify_force_send=False).create(vals)
+        leave = self.sudo().with_context(mail_notify_force_send=False).create(vals)
         return self._format_leave_record(leave)
 
     @api.model
@@ -110,11 +110,10 @@ class HrLeaveExt(models.Model):
             raise UserError(_('Leave request not found.'))
         if leave.state not in ('confirm',):
             raise UserError(_('Only pending leave requests can be updated.'))
-        employee = leave.employee_id
         allowed = ['name']
         write_vals = {k: v for k, v in vals.items() if k in allowed}
         if write_vals:
-            self._env_for_write(employee).browse(leave.id).write(write_vals)
+            leave.sudo().write(write_vals)
         return self._format_leave_record(leave)
 
     @api.model
@@ -139,11 +138,7 @@ class HrLeaveExt(models.Model):
         leave = self.sudo().browse(leave_id)
         if not leave.exists():
             raise UserError(_('Leave request not found.'))
-        manager = self._get_employee(manager_employee_id)
-        if manager.user_id:
-            leave.with_user(manager.user_id).action_approve()
-        else:
-            leave.sudo().action_approve()
+        leave.sudo().action_approve()
         return True
 
     @api.model
@@ -152,11 +147,7 @@ class HrLeaveExt(models.Model):
         leave = self.sudo().browse(leave_id)
         if not leave.exists():
             raise UserError(_('Leave request not found.'))
-        manager = self._get_employee(manager_employee_id)
-        if manager.user_id:
-            leave.with_user(manager.user_id).action_refuse()
-        else:
-            leave.sudo().action_refuse()
+        leave.sudo().action_refuse()
         if reason:
             leave.sudo().write({'name': (leave.name or '') + ' [Refused: %s]' % reason})
         return True
@@ -170,11 +161,7 @@ class HrLeaveExt(models.Model):
         leave = self.sudo().browse(leave_id)
         if not leave.exists():
             raise UserError(_('Leave request not found.'))
-        hr_employee = self._get_employee(hr_employee_id)
-        if hr_employee.user_id:
-            leave.with_user(hr_employee.user_id).action_approve()
-        else:
-            leave.sudo().action_approve()
+        leave.sudo().action_approve()
         return True
 
     @api.model

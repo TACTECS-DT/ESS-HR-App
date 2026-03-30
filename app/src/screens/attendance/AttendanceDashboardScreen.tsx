@@ -65,26 +65,40 @@ export default function AttendanceDashboardScreen() {
     mutationFn: async () => {
       const res = await apiClient.post(API_MAP.attendance.checkIn, {
         task_id: selectedTask,
-        location: {lat: 24.7136, lng: 46.6753},
+        latitude: 24.7136,
+        longitude: 46.6753,
       });
       return res.data;
     },
-    onSuccess: () => {
+    onSuccess: (res: any) => {
       queryClient.invalidateQueries({queryKey: ['attendance-summary']});
-      Alert.alert(t('common.done'), t('attendance.checkIn') + ' ✓');
+      if (res?.data?.already_checked_in) {
+        Alert.alert(t('common.info', 'Info'), t('attendance.alreadyCheckedIn', 'Already checked in'));
+      } else {
+        Alert.alert(t('common.done'), t('attendance.checkIn') + ' ✓');
+      }
+    },
+    onError: (err: any) => {
+      const msg = err?.response?.data?.error?.message ?? t('common.error');
+      Alert.alert(t('common.error'), msg);
     },
   });
 
   const checkOutMutation = useMutation({
     mutationFn: async () => {
       const res = await apiClient.post(API_MAP.attendance.checkOut, {
-        location: {lat: 24.7136, lng: 46.6753},
+        latitude: 24.7136,
+        longitude: 46.6753,
       });
       return res.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['attendance-summary']});
       Alert.alert(t('common.done'), t('attendance.checkOut') + ' ✓');
+    },
+    onError: (err: any) => {
+      const msg = err?.response?.data?.error?.message ?? t('common.error');
+      Alert.alert(t('common.error'), msg);
     },
   });
 

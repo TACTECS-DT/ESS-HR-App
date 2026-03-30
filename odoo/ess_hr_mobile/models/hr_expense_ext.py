@@ -74,7 +74,7 @@ class HrExpenseExt(models.Model):
         }
         if tax_ids:
             vals['tax_ids'] = [(6, 0, tax_ids)]
-        expense = self.sudo().create(vals)
+        expense = self.with_company(employee.company_id).sudo().create(vals)
         return self._format_expense_record(expense)
 
     @api.model
@@ -127,7 +127,7 @@ class HrExpenseExt(models.Model):
         write_vals = {k: v for k, v in vals.items() if k in allowed_fields}
         if 'tax_ids' in vals:
             write_vals['tax_ids'] = [(6, 0, vals['tax_ids'])]
-        self._env_for_write(employee).browse(expense.id).write(write_vals)
+        expense.sudo().write(write_vals)
         return self._format_expense_record(expense)
 
     @api.model
@@ -138,7 +138,7 @@ class HrExpenseExt(models.Model):
             raise UserError(_('Expense not found.'))
         self._validate_expense_editable(expense)
         employee = expense.employee_id
-        self._env_for_write(employee).browse(expense.id).unlink()
+        expense.sudo().unlink()
         return True
 
     @api.model
@@ -153,7 +153,7 @@ class HrExpenseExt(models.Model):
             raise UserError(_('Expense not found.'))
         self._validate_expense_editable(expense)
         employee = expense.employee_id
-        self._env_for_write(employee).browse(expense.id).action_submit()
+        expense.sudo().action_submit()
         expense.invalidate_recordset()
         return self._format_expense_record(expense)
 
@@ -168,20 +168,27 @@ class HrExpenseExt(models.Model):
         sheet_id = False
         if hasattr(expense, 'sheet_id') and expense.sheet_id:
             sheet_id = expense.sheet_id.id
+        product_name = expense.product_id.name if expense.product_id else ''
+        currency_name = expense.currency_id.name if expense.currency_id else ''
+        employee_name = expense.employee_id.name if expense.employee_id else ''
         return {
             'id': expense.id,
             'name': expense.name,
             'employee_id': expense.employee_id.id,
-            'employee_name': expense.employee_id.name,
+            'employee': employee_name,
+            'employee_ar': employee_name,
             'product_id': expense.product_id.id if expense.product_id else False,
-            'product_name': expense.product_id.name if expense.product_id else '',
-            'total_amount': expense.total_amount,
+            'category': product_name,
+            'category_ar': product_name,
+            'amount': expense.total_amount,
             'currency_id': expense.currency_id.id if expense.currency_id else False,
-            'currency_name': expense.currency_id.name if expense.currency_id else '',
+            'currency': currency_name,
+            'tax_amount': 0.0,
             'payment_mode': expense.payment_mode,
             'date': expense.date.strftime('%Y-%m-%d') if expense.date else False,
-            'state': expense.state,
+            'status': expense.state,
             'sheet_id': sheet_id,
             'tax_ids': expense.tax_ids.ids,
+            'attachments': [],
         }
 

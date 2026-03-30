@@ -108,7 +108,7 @@ class HrLoan(models.Model):
         employee = self._get_employee(employee_id)
         company_id = employee.company_id.id if employee.company_id else False
         self._validate_loan_rules(employee, amount, duration_months, company_id)
-        loan = self._env_for_write(employee).create({
+        loan = self.sudo().create({
             'employee_id': employee_id,
             'amount': amount,
             'duration_months': duration_months,
@@ -146,8 +146,8 @@ class HrLoan(models.Model):
             raise UserError(_('Loan not found.'))
         if loan.state not in ('draft', 'submitted'):
             raise UserError(_('Only draft or submitted loans can be approved.'))
-        approver = self._get_employee(approver_employee_id)
-        self._env_for_write(approver).browse(loan.id).write({
+        self._get_employee(approver_employee_id)
+        loan.sudo().write({
             'state': 'approved',
             'approved_by': approver_employee_id,
             'approved_date': fields.Date.today(),
@@ -162,8 +162,8 @@ class HrLoan(models.Model):
             raise UserError(_('Loan not found.'))
         if loan.state not in ('draft', 'submitted'):
             raise UserError(_('Only draft or submitted loans can be refused.'))
-        approver = self._get_employee(approver_employee_id)
-        self._env_for_write(approver).browse(loan.id).write({
+        self._get_employee(approver_employee_id)
+        loan.sudo().write({
             'state': 'refused',
             'approved_by': approver_employee_id,
             'reason_refusal': reason or '',

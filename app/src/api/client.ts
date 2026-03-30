@@ -3,7 +3,6 @@ import {ENV} from '../config/env';
 import {store} from '../store';
 
 const apiClient = axios.create({
-  baseURL: ENV.API_BASE_URL,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -18,11 +17,15 @@ apiClient.interceptors.request.use(
   config => {
     const auth = store.getState().auth;
 
+    // Dynamic base URL: use the server URL from login, fall back to .env (mock/dev)
+    if (!config.baseURL) {
+      config.baseURL = auth.serverUrl
+        ? auth.serverUrl.replace(/\/$/, '') + '/ess/api'
+        : ENV.API_BASE_URL;
+    }
+
     if (auth.accessToken) {
       config.headers['Authorization'] = `Bearer ${auth.accessToken}`;
-    }
-    if (auth.licenseKey) {
-      config.headers['X-ESS-License-Key'] = auth.licenseKey;
     }
     if (auth.serverUrl) {
       config.headers['X-ESS-Server-URL'] = auth.serverUrl;

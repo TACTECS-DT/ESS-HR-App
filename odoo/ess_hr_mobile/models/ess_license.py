@@ -2,6 +2,7 @@ import base64
 import uuid
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
+from odoo.addons.ess_hr_mobile.exceptions import EssLicenseError
 
 
 class EssLicense(models.Model):
@@ -34,22 +35,31 @@ class EssLicense(models.Model):
     )
 
     @api.model
-    def validate_license_key(self, key, server_url=None):
+    def validate_server_url(self, server_url):
         """
-        Validate a license key + server URL and return the companies on that server.
+        Validate by server URL alone — look up the license registered for that server.
 
-        Hierarchy: license → servers → companies.
-        The server URL must be registered under the license's servers.
-        Companies returned are those assigned to the matched server.
+        Hierarchy: server URL → ess.server → ess.license → companies.
+        The server must be active and have an active, non-expired license.
         """
-        if not key:
-            raise UserError(_('License key is required.'))
         if not server_url:
             raise UserError(_('Server URL is required.'))
 
-        license_rec = self._get_valid_license(key)
-        server = self._get_authorized_server(license_rec, server_url)
+        server = self._get_server_by_url(server_url)
+        license_rec = self._get_license_for_server(server)
         return {'companies': self._format_companies(server.company_ids)}
+
+    @api.model
+    def check_license_active_for_server(self, server_url):
+        """
+        Check that the license for the given server URL is still active and not expired.
+        Raises UserError if the license is inactive or expired.
+        Called on every authenticated request to keep enforcement live.
+        """
+        if not server_url:
+            return  # no server URL in context — skip check
+        server = self._get_server_by_url(server_url)
+        self._get_license_for_server(server)
 
     @api.model
     def get_companies_for_license(self, key, server_url=None):
@@ -72,7 +82,52 @@ class EssLicense(models.Model):
             raise UserError(_('No companies found for this license.'))
         return companies
 
+    @api.model
+    def validate_license_key(self, key, server_url=None):
+        """Legacy: validate by explicit license key + server URL."""
+        if not key:
+            raise UserError(_('License key is required.'))
+        if not server_url:
+            raise UserError(_('Server URL is required.'))
+
+        license_rec = self._get_valid_license(key)
+        server = self._get_authorized_server(license_rec, server_url)
+        return {'companies': self._format_companies(server.company_ids)}
+
     # ── Internal helpers ──────────────────────────────────────────────────────
+
+    def _get_server_by_url(self, server_url):
+        """Find an active ess.server record matching the given URL."""
+        normalized = self._normalize_url(server_url)
+        servers = self.env['ess.server'].sudo().search([('active', '=', True)])
+        server = servers.filtered(
+            lambda s: self._normalize_url(s.url) == normalized
+        )[:1]
+        if not server:
+            raise EssLicenseError(
+                _('Server URL not found. Please check the URL and try again.'),
+                'SERVER_NOT_FOUND',
+            )
+        return server
+
+    def _get_license_for_server(self, server):
+        """Find a valid (active, non-expired) license that includes this server."""
+        licenses = self.sudo().search([
+            ('server_ids', 'in', server.id),
+            ('active', '=', True),
+        ])
+        if not licenses:
+            raise EssLicenseError(
+                _('This server does not have an active license. Please contact your administrator.'),
+                'LICENSE_INACTIVE',
+            )
+        valid = licenses.filtered(lambda l: not l._is_expired())
+        if not valid:
+            raise EssLicenseError(
+                _('The license for this server has expired. Please contact your administrator.'),
+                'LICENSE_EXPIRED',
+            )
+        return valid[0]
 
     def _get_valid_license(self, key):
         license_rec = self.sudo().search(
