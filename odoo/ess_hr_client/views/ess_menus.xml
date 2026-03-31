@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ── Root menu ────────────────────────────────────────────────────────── -->
+    <menuitem
+        id="menu_ess_client_root"
+        name="ESS HR Client"
+        sequence="5"
+        groups="ess_mobile_group"/>
+
+    <!-- ── Monitoring sub-menu ─────────────────────────────────────────────── -->
+    <menuitem
+        id="menu_ess_monitoring"
+        name="Monitoring"
+        parent="menu_ess_client_root"
+        sequence="10"/>
+
+    <menuitem
+        id="menu_ess_api_logs"
+        name="All Requests"
+        parent="menu_ess_monitoring"
+        action="action_ess_api_log"
+        sequence="10"/>
+
+    <menuitem
+        id="menu_ess_employee_activity"
+        name="Employee Activity"
+        parent="menu_ess_monitoring"
+        action="action_ess_api_log_employee"
+        sequence="20"/>
+
+    <menuitem
+        id="menu_ess_error_monitor"
+        name="Error Monitor"
+        parent="menu_ess_monitoring"
+        action="action_ess_api_log_errors"
+        sequence="30"/>
+
+    <!-- Employee credentials are managed from the employee form (ESS Mobile tab)
+         and are not exposed as a standalone menu item per the architecture spec. -->
+
+</odoo>

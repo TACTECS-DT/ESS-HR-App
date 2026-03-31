@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ess_module_list" model="ir.ui.view">
+        <field name="name">ess.module.list</field>
+        <field name="model">ess.module</field>
+        <field name="arch" type="xml">
+            <list string="ESS Modules">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="description"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ess_module_form" model="ir.ui.view">
+        <field name="name">ess.module.form</field>
+        <field name="model">ess.module</field>
+        <field name="arch" type="xml">
+            <form string="ESS Module">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="code" help="Used by mobile app to enable/disable this module."/>
+                        <field name="sequence"/>
+                        <field name="active"/>
+                    </group>
+                    <group string="Description">
+                        <field name="description" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_ess_module" model="ir.actions.act_window">
+        <field name="name">Mobile Modules</field>
+        <field name="res_model">ess.module</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

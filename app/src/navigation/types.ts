@@ -8,7 +8,7 @@
 
 export type AuthStackParamList = {
   LicenseActivation: undefined;
-  CompanySelection: {companies: Array<{id: number; name: string; name_ar: string}>};
+  CompanySelection: undefined;
   Login: {companyId: number; companyName: string};
   PasswordReset: undefined;
 };

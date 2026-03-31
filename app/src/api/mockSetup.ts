@@ -10,8 +10,7 @@ import {API_MAP, pathToRegex} from './apiMap';
 
 // Mock data
 import {
-  MOCK_LICENSE_VALID,
-  MOCK_LICENSE_INVALID,
+  MOCK_COMPANIES,
   MOCK_LOGIN_SUCCESS,
   MOCK_LOGIN_INVALID,
   MOCK_REFRESH_SUCCESS,
@@ -97,13 +96,11 @@ export function setupMocks(): void {
   mockInstance = new MockAdapter(apiClient, {delayResponse: randomDelay()});
 
   // ─── Auth ───────────────────────────────────────────────────────────────
-  mockInstance.onPost(API_MAP.auth.validateLicense).reply(config => {
-    const body = JSON.parse(config.data as string);
-    if (body.license_key === 'INVALID') {
-      return [400, MOCK_LICENSE_INVALID];
-    }
-    return [200, MOCK_LICENSE_VALID];
-  });
+  // Admin validate (Step 1) is handled in mock mode by LicenseActivationScreen directly —
+  // it uses plain axios which bypasses this mock adapter.
+
+  // Companies endpoint (Step 2 setup) — called from CompanySelectionScreen via apiClient
+  mockInstance.onGet(API_MAP.auth.companies).reply(200, MOCK_COMPANIES);
 
   mockInstance.onPost(API_MAP.auth.login).reply(config => {
     const body = JSON.parse(config.data as string);

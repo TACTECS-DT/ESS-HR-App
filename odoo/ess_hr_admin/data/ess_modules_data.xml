@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Standard ESS Mobile modules — codes match mobile app module identifiers -->
+
+        <record id="ess_module_attendance" model="ess.module">
+            <field name="name">Attendance</field>
+            <field name="code">attendance</field>
+            <field name="description">Check-in/check-out, attendance history and team attendance.</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="ess_module_leave" model="ess.module">
+            <field name="name">Leave</field>
+            <field name="code">leave</field>
+            <field name="description">Leave requests, balances, approvals and team leave.</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <record id="ess_module_payslip" model="ess.module">
+            <field name="name">Payslip</field>
+            <field name="code">payslip</field>
+            <field name="description">View and download payslips.</field>
+            <field name="sequence">30</field>
+        </record>
+
+        <record id="ess_module_expense" model="ess.module">
+            <field name="name">Expense</field>
+            <field name="code">expense</field>
+            <field name="description">Submit and track expense claims.</field>
+            <field name="sequence">40</field>
+        </record>
+
+        <record id="ess_module_loan" model="ess.module">
+            <field name="name">Loan</field>
+            <field name="code">loan</field>
+            <field name="description">Apply for and track salary loans.</field>
+            <field name="sequence">50</field>
+        </record>
+
+        <record id="ess_module_advance_salary" model="ess.module">
+            <field name="name">Advance Salary</field>
+            <field name="code">advance_salary</field>
+            <field name="description">Request advance salary payments.</field>
+            <field name="sequence">60</field>
+        </record>
+
+        <record id="ess_module_hr_services" model="ess.module">
+            <field name="name">HR Services</field>
+            <field name="code">hr_services</field>
+            <field name="description">HR letters, document requests, experience certificates, business services.</field>
+            <field name="sequence">70</field>
+        </record>
+
+        <record id="ess_module_announcements" model="ess.module">
+            <field name="name">Announcements</field>
+            <field name="code">announcements</field>
+            <field name="description">Company and department announcements.</field>
+            <field name="sequence">80</field>
+        </record>
+
+        <record id="ess_module_notifications" model="ess.module">
+            <field name="name">Notifications</field>
+            <field name="code">notifications</field>
+            <field name="description">In-app notifications for HR actions.</field>
+            <field name="sequence">90</field>
+        </record>
+
+        <record id="ess_module_analytics" model="ess.module">
+            <field name="name">Analytics</field>
+            <field name="code">analytics</field>
+            <field name="description">API usage analytics and activity dashboards.</field>
+            <field name="sequence">100</field>
+        </record>
+
+        <record id="ess_module_tasks" model="ess.module">
+            <field name="name">Tasks</field>
+            <field name="code">tasks</field>
+            <field name="description">Project tasks and timesheets (coming soon).</field>
+            <field name="sequence">110</field>
+        </record>
+
+    </data>
+</odoo>

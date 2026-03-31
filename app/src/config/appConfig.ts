@@ -24,6 +24,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 import {
   ACTIVE_BACKEND,
+  ESS_ADMIN_URL,
   ODOO_BASE_URL,
   DJANGO_BASE_URL,
   MOCK_DELAY_MIN,
@@ -47,7 +48,13 @@ export const ENV = {
   MOCK_MODE: _backend === 'mock',
   /** Base URL prepended to every API_MAP path by the axios client */
   API_BASE_URL: _resolveBaseUrl(_backend),
-  /** Odoo server root + /ess/api prefix — edit in .env */
+  /**
+   * Central ESS Admin server root URL (no path suffix).
+   * Used for Step 1 of login: POST /ess/admin/api/validate
+   * This is the ONLY server URL fixed in .env — all client URLs are user-entered.
+   */
+  ESS_ADMIN_URL,
+  /** Odoo client server root + /ess/api prefix — dev fallback only */
   ODOO_BASE_URL,
   /** Django / middleware server root — edit in .env */
   DJANGO_BASE_URL,

@@ -13,12 +13,15 @@ import OfflineBanner from './components/common/OfflineBanner';
 import TimerBar from './components/common/TimerBar';
 import {useAppSelector} from './hooks/useAppSelector';
 import {useTheme} from './hooks/useTheme';
+import {useAutoLogout} from './hooks/useAutoLogout';
 
 export default function AppNavigator() {
   const isAuthenticated = useAppSelector(state => state.auth.isAuthenticated);
   const language = useAppSelector(state => state.settings.language);
   const theme = useTheme();
   const isDark = theme.isDark;
+
+  useAutoLogout();
 
   return (
     <View style={{flex: 1, backgroundColor: theme.background, direction: language === 'ar' ? 'rtl' : 'ltr'}}>

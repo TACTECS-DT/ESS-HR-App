@@ -49,6 +49,7 @@
     "serverUrl": "Server URL",
     "serverUrlPlaceholder": "https://your-company.odoo.com",
     "activate": "Next",
+    "recentServers": "Recent Servers",
     "contactHR": "Contact your HR administrator to obtain the server URL",
     "selectCompany": "Select Company",
     "selectCompanySubtitle": "Step 2 of 3 — Choose your company to continue",
@@ -102,6 +103,10 @@
       "licenseExpired": {
         "title": "License Expired",
         "body": "The license for this server has expired. Please contact your HR administrator to renew it."
+      },
+      "employeeLimit": {
+        "title": "Employee Limit Exceeded",
+        "body": "This server has exceeded its licensed employee count. Please contact your HR administrator."
       }
     }
   },

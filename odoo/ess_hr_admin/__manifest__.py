@@ -1,0 +1,21 @@
+{
+    'name': 'ESS HR Admin',
+    'version': '19.1',
+    'summary': 'Central license manager for ESS Mobile App — validates licenses and controls module access',
+    'category': 'Human Resources',
+    'author': 'ESS',
+    'depends': ['base', 'mail'],
+    'data': [
+        'security/security.xml',
+        'security/ir.model.access.csv',
+        'data/ess_modules_data.xml',
+        'data/ess_cron.xml',
+        'views/ess_module_views.xml',
+        'views/ess_server_views.xml',
+        'views/ess_license_views.xml',
+        'views/ess_menus.xml',
+    ],
+    'installable': True,
+    'application': True,
+    'license': 'LGPL-3',
+}

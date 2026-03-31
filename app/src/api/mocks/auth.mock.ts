@@ -28,14 +28,36 @@ export interface AuthTokens {
   expires_in: number;
 }
 
-export const MOCK_LICENSE_VALID: ApiSuccess<{companies: Company[]}> = {
+/** Mock response from the admin server Step 1 validate endpoint */
+export const MOCK_ADMIN_VALIDATE_VALID: ApiSuccess<{
+  status: string;
+  allowed_modules: Array<{name: string; code: string}>;
+  auto_logout_duration: number;
+}> = {
   success: true,
   data: {
-    companies: [
-      {id: 1, name: 'Acme Corp', name_ar: 'شركة أكمي', logo: undefined},
-      {id: 2, name: 'Acme Holding', name_ar: 'أكمي القابضة', logo: undefined},
+    status: 'active',
+    allowed_modules: [
+      {name: 'Attendance', code: 'attendance'},
+      {name: 'Leave', code: 'leave'},
+      {name: 'Payslip', code: 'payslip'},
+      {name: 'Expense', code: 'expense'},
+      {name: 'Loan', code: 'loan'},
+      {name: 'Advance Salary', code: 'advance_salary'},
+      {name: 'HR Services', code: 'hr_services'},
+      {name: 'Analytics', code: 'analytics'},
     ],
+    auto_logout_duration: 72,
   },
+};
+
+/** Mock companies list returned by the client server's /ess/api/auth/companies */
+export const MOCK_COMPANIES: ApiSuccess<Company[]> = {
+  success: true,
+  data: [
+    {id: 1, name: 'Acme Corp', name_ar: 'شركة أكمي', logo: undefined},
+    {id: 2, name: 'Acme Holding', name_ar: 'أكمي القابضة', logo: undefined},
+  ],
 };
 
 export const MOCK_LICENSE_INVALID: {success: false; error: {code: string; message: string; message_ar: string}} = {

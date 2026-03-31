@@ -1,24 +1,54 @@
-import React from 'react';
-import {View, Text, FlatList, TouchableOpacity, StyleSheet, I18nManager} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {View, Text, FlatList, TouchableOpacity, StyleSheet, I18nManager, ActivityIndicator} from 'react-native';
 import {useTranslation} from 'react-i18next';
-import {useNavigation, useRoute} from '@react-navigation/native';
-import type {StackNavigationProp, RouteProp} from '@react-navigation/stack';
+import {useNavigation} from '@react-navigation/native';
+import type {StackNavigationProp} from '@react-navigation/stack';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useTheme} from '../../hooks/useTheme';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
+import apiClient from '../../api/client';
+import {useAppSelector} from '../../hooks/useAppSelector';
+import {API_MAP} from '../../api/apiMap';
 import type {AuthStackParamList} from '../../navigation/types';
 
 type Nav = StackNavigationProp<AuthStackParamList, 'CompanySelection'>;
-type Route = RouteProp<AuthStackParamList, 'CompanySelection'>;
+
+interface Company {
+  id: number;
+  name: string;
+  name_ar: string;
+}
 
 export default function CompanySelectionScreen() {
   const {t, i18n} = useTranslation();
   const navigation = useNavigation<Nav>();
-  const route = useRoute<Route>();
   const theme = useTheme();
   const insets = useSafeAreaInsets();
-  const {companies} = route.params;
   const isAr = i18n.language === 'ar';
+
+  const serverUrl = useAppSelector(s => s.auth.serverUrl);
+
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!serverUrl) {
+      setError(t('common.error'));
+      setLoading(false);
+      return;
+    }
+    // Uses apiClient so mock adapter intercepts this in MOCK_MODE.
+    // baseURL is set by the request interceptor from auth.serverUrl.
+    apiClient
+      .get<{data: Company[]}>(API_MAP.auth.companies, {timeout: 15000})
+      .then(res => {
+        const list = res.data?.data ?? res.data;
+        setCompanies(Array.isArray(list) ? list : []);
+      })
+      .catch(() => setError(t('auth.errors.serverUnreachable.body')))
+      .finally(() => setLoading(false));
+  }, [serverUrl, t]);
 
   function selectCompany(id: number, name: string, name_ar: string) {
     navigation.navigate('Login', {
@@ -29,7 +59,7 @@ export default function CompanySelectionScreen() {
 
   return (
     <View style={[styles.container, {backgroundColor: theme.background}]}>
-      {/* ── Back bar (sits below status bar via insets.top) ─────────────── */}
+      {/* ── Back bar ─────────────────────────────────────────────────────── */}
       <View style={[styles.topBar, {paddingTop: insets.top + spacing.sm, borderBottomColor: theme.border}]}>
         <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
           <Text style={[styles.backArrow, {color: colors.primary}]}>
@@ -53,26 +83,54 @@ export default function CompanySelectionScreen() {
         </Text>
       </View>
 
-      <FlatList
-        data={companies}
-        keyExtractor={item => String(item.id)}
-        contentContainerStyle={[styles.list, {paddingBottom: insets.bottom + spacing.lg}]}
-        renderItem={({item}) => (
-          <TouchableOpacity
-            style={[styles.item, {backgroundColor: theme.surface, borderColor: theme.border}]}
-            onPress={() => selectCompany(item.id, item.name, item.name_ar)}>
-            <View style={styles.itemIcon}>
-              <Text style={styles.itemIconText}>🏢</Text>
-            </View>
-            <Text style={[styles.itemName, {color: theme.text}]}>
-              {isAr ? item.name_ar : item.name}
-            </Text>
-            <Text style={{color: theme.textSecondary, fontSize: 20}}>
-              {I18nManager.isRTL ? '‹' : '›'}
-            </Text>
+      {loading && (
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      )}
+
+      {!loading && error && (
+        <View style={styles.center}>
+          <Text style={[styles.errorText, {color: colors.error}]}>{error}</Text>
+          <TouchableOpacity style={styles.retryBtn} onPress={() => {
+            setError(null);
+            setLoading(true);
+            apiClient
+              .get<{data: Company[]}>(API_MAP.auth.companies, {timeout: 15000})
+              .then(res => {
+                const list = res.data?.data ?? res.data;
+                setCompanies(Array.isArray(list) ? list : []);
+              })
+              .catch(() => setError(t('auth.errors.serverUnreachable.body')))
+              .finally(() => setLoading(false));
+          }}>
+            <Text style={[styles.retryLabel, {color: colors.primary}]}>{t('common.retry')}</Text>
           </TouchableOpacity>
-        )}
-      />
+        </View>
+      )}
+
+      {!loading && !error && (
+        <FlatList
+          data={companies}
+          keyExtractor={item => String(item.id)}
+          contentContainerStyle={[styles.list, {paddingBottom: insets.bottom + spacing.lg}]}
+          renderItem={({item}) => (
+            <TouchableOpacity
+              style={[styles.item, {backgroundColor: theme.surface, borderColor: theme.border}]}
+              onPress={() => selectCompany(item.id, item.name, item.name_ar)}>
+              <View style={styles.itemIcon}>
+                <Text style={styles.itemIconText}>🏢</Text>
+              </View>
+              <Text style={[styles.itemName, {color: theme.text}]}>
+                {isAr ? item.name_ar : item.name}
+              </Text>
+              <Text style={{color: theme.textSecondary, fontSize: 20}}>
+                {I18nManager.isRTL ? '‹' : '›'}
+              </Text>
+            </TouchableOpacity>
+          )}
+        />
+      )}
     </View>
   );
 }
@@ -114,4 +172,8 @@ const styles = StyleSheet.create({
   },
   itemIconText: {fontSize: 22},
   itemName: {flex: 1, fontSize: fontSize.md, fontWeight: '600'},
+  center: {flex: 1, justifyContent: 'center', alignItems: 'center', gap: spacing.md},
+  errorText: {fontSize: fontSize.md, textAlign: 'center', paddingHorizontal: spacing.xl},
+  retryBtn: {paddingVertical: spacing.sm, paddingHorizontal: spacing.lg},
+  retryLabel: {fontSize: fontSize.md, fontWeight: '600'},
 });

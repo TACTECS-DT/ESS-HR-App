@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ess_license_list" model="ir.ui.view">
+        <field name="name">ess.license.list</field>
+        <field name="model">ess.license</field>
+        <field name="arch" type="xml">
+            <list string="ESS Licenses"
+                  decoration-danger="not active"
+                  decoration-muted="not active">
+                <field name="name"/>
+                <field name="license_key"/>
+                <field name="tier"/>
+                <field name="expiry_date"/>
+                <field name="active" widget="boolean_toggle"/>
+                <field name="deactivation_reason" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ess_license_form" model="ir.ui.view">
+        <field name="name">ess.license.form</field>
+        <field name="model">ess.license</field>
+        <field name="arch" type="xml">
+            <form string="ESS License">
+                <sheet>
+                    <group>
+                        <group string="License Info">
+                            <field name="name"/>
+                            <field name="license_key"/>
+                            <field name="tier"/>
+                            <field name="active"/>
+                            <field name="expiry_date"/>
+                        </group>
+                        <group string="Employee Limits">
+                            <field name="max_employees"
+                                   help="Maximum active employees allowed under this license."/>
+                            <field name="employee_overage_allowed"
+                                   help="Employees above Max allowed before auto-deactivation."/>
+                        </group>
+                    </group>
+
+                    <group string="Allowed Modules">
+                        <field name="module_ids" widget="many2many_tags" nolabel="1"
+                               help="Leave empty to allow all active modules."/>
+                    </group>
+
+                    <group string="Authorized Servers">
+                        <field name="server_ids" nolabel="1">
+                            <list string="Servers">
+                                <field name="name"/>
+                                <field name="url"/>
+                                <field name="employee_count" readonly="1"/>
+                                <field name="auto_logout_duration"/>
+                                <field name="server_status" widget="badge"
+                                       decoration-success="server_status == 'active'"
+                                       decoration-danger="server_status == 'deactivated'"
+                                       decoration-warning="server_status == 'unreachable'"/>
+                                <field name="active" widget="boolean_toggle"/>
+                            </list>
+                        </field>
+                    </group>
+
+                    <group string="Deactivation Info" invisible="active">
+                        <field name="deactivation_date" readonly="1"/>
+                        <field name="deactivation_reason" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_ess_license" model="ir.actions.act_window">
+        <field name="name">Licenses</field>
+        <field name="res_model">ess.license</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

@@ -6,7 +6,10 @@ declare module '@env' {
   /** 'mock' | 'odoo' | 'django' — selects which backend the app talks to */
   export const ACTIVE_BACKEND: string;
 
-  /** Odoo server root + base API path, e.g. http://your-odoo-server.com/ess/api */
+  /** Central ESS Admin server root (no path), e.g. http://192.168.1.10:8055 — Step 1 of login */
+  export const ESS_ADMIN_URL: string;
+
+  /** Odoo client server root + base API path, e.g. http://your-odoo-server.com/ess/api */
   export const ODOO_BASE_URL: string;
 
   /** Django / middleware server, e.g. https://api.ess-hr.app/v1 */

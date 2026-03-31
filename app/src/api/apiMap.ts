@@ -35,10 +35,17 @@ export function pathToRegex(path: string): RegExp {
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
 const auth = {
-  /** Validate a license key before showing login. Stage 2: /ess/api/license/validate */
-  validateLicense: '/auth/validate-license',
-  /** Get companies available for a license key. Stage 2: /ess/api/license/companies */
-  licenseCompanies: '/auth/companies',
+  /**
+   * Step 1 — Admin server validate (path only; caller must use ESS_ADMIN_URL as base).
+   * POST /ess/admin/api/validate  body: { server_url }
+   * Returns: { status, allowed_modules: [{name, code}], auto_logout_duration }
+   */
+  adminValidate: '/ess/admin/api/validate',
+  /**
+   * Step 2 setup — fetch companies from the CLIENT server after Step 1 succeeds.
+   * GET /ess/api/auth/companies  (appended to serverUrl + /ess/api)
+   */
+  companies: '/auth/companies',
   /** Badge + PIN login. Stage 2: /ess/api/auth/badge-pin */
   login: '/auth/login',
   /** Refresh access token. */
@@ -47,8 +54,6 @@ const auth = {
   logout: '/auth/logout',
   /** Resolve employee record by Odoo user ID. Stage 2: /ess/api/auth/by-user */
   byUser: '/auth/by-user',
-  /** Reset mobile PIN. Stage 2: /ess/api/auth/reset-pin */
-  resetPin: '/auth/reset-pin',
 } as const;
 
 // ─── Employee ─────────────────────────────────────────────────────────────────

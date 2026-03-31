@@ -14,6 +14,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 import {useTheme} from '../../hooks/useTheme';
 import {useAppDispatch} from '../../hooks/useAppDispatch';
+import {useAppSelector} from '../../hooks/useAppSelector';
 import {useRBAC} from '../../hooks/useRBAC';
 import {clearAuth} from '../../store/slices/authSlice';
 import {clearTokens} from '../../utils/secureStorage';
@@ -29,31 +30,33 @@ interface ModuleItem {
   color: string;
   /** If set, item is hidden unless the role has this permission */
   requiresPermission?: 'canAccessAnalytics' | 'canAccessTeamHours' | 'canViewOtherProfiles';
+  /** If set, item is hidden unless this code is in allowedModules (empty list = all allowed) */
+  moduleCode?: string;
 }
 
 const SECTIONS: Array<{titleKey: string; items: ModuleItem[]}> = [
   {
     titleKey: 'more.financial',
     items: [
-      {icon: '🧾', titleKey: 'expense.title',           route: 'ExpenseList',        color: '#FF9500'},
-      {icon: '🏦', titleKey: 'loan.title',              route: 'LoanList',           color: '#007AFF'},
-      {icon: '💵', titleKey: 'advanceSalary.title',     route: 'AdvanceSalaryList',  color: '#34C759'},
+      {icon: '🧾', titleKey: 'expense.title',           route: 'ExpenseList',        color: '#FF9500', moduleCode: 'expense'},
+      {icon: '🏦', titleKey: 'loan.title',              route: 'LoanList',           color: '#007AFF', moduleCode: 'loan'},
+      {icon: '💵', titleKey: 'advanceSalary.title',     route: 'AdvanceSalaryList',  color: '#34C759', moduleCode: 'advance_salary'},
     ],
   },
   {
     titleKey: 'more.hrServices',
     items: [
-      {icon: '📄', titleKey: 'hrLetter.title',           route: 'HRLetterList',        color: '#5AC8FA'},
-      {icon: '📋', titleKey: 'documentRequests.title',   route: 'DocumentRequestList', color: '#FF3B30'},
-      {icon: '🎓', titleKey: 'experienceCertificates.title', route: 'ExperienceCertList', color: '#AF52DE'},
-      {icon: '🔧', titleKey: 'businessServices.title',   route: 'BusinessServiceList', color: '#FF6B35'},
+      {icon: '📄', titleKey: 'hrLetter.title',               route: 'HRLetterList',        color: '#5AC8FA', moduleCode: 'hr_services'},
+      {icon: '📋', titleKey: 'documentRequests.title',        route: 'DocumentRequestList', color: '#FF3B30', moduleCode: 'hr_services'},
+      {icon: '🎓', titleKey: 'experienceCertificates.title',  route: 'ExperienceCertList',  color: '#AF52DE', moduleCode: 'hr_services'},
+      {icon: '🔧', titleKey: 'businessServices.title',        route: 'BusinessServiceList', color: '#FF6B35', moduleCode: 'hr_services'},
     ],
   },
   // Tasks & Timesheets — disabled (work with res.users, not hr.employee — re-enable later)
   // {
   //   titleKey: 'more.tasksTimesheets',
   //   items: [
-  //     {icon: '✅', titleKey: 'tasks.title',         route: 'TaskList',        color: '#30B0C7'},
+  //     {icon: '✅', titleKey: 'tasks.title',         route: 'TaskList',        color: '#30B0C7', moduleCode: 'tasks'},
   //     {icon: '🕐', titleKey: 'timesheets.title',    route: 'TimesheetWeekly', color: '#636366'},
   //     {icon: '👥', titleKey: 'teamHours.title',     route: 'TeamHours',       color: '#5856D6', requiresPermission: 'canAccessTeamHours'},
   //     {icon: '⏱️', titleKey: 'timer.title',         route: 'Timer',           color: '#007AFF'},
@@ -65,7 +68,7 @@ const SECTIONS: Array<{titleKey: string; items: ModuleItem[]}> = [
     titleKey: 'more.personal',
     items: [
       {icon: '📝', titleKey: 'personalNotes.title', route: 'PersonalNotes', color: '#FF9F0A'},
-      {icon: '📊', titleKey: 'analytics.title',     route: 'Analytics',     color: '#30D158', requiresPermission: 'canAccessAnalytics'},
+      {icon: '📊', titleKey: 'analytics.title',     route: 'Analytics',     color: '#30D158', requiresPermission: 'canAccessAnalytics', moduleCode: 'analytics'},
     ],
   },
   {
@@ -86,13 +89,21 @@ export default function MoreHubScreen() {
   const dispatch = useAppDispatch();
   const insets = useSafeAreaInsets();
   const rbac = useRBAC();
+  const allowedModules = useAppSelector(s => s.auth.allowedModules ?? []);
 
-  // Filter items within each section based on role permissions
+  // Empty allowedModules = all modules permitted (no restrictions from admin).
+  function isModuleAllowed(code?: string): boolean {
+    if (!code) {return true;}
+    if (allowedModules.length === 0) {return true;}
+    return allowedModules.some(m => m.code === code);
+  }
+
+  // Filter items by both RBAC role and admin-granted module codes.
   const visibleSections = SECTIONS.map(section => ({
     ...section,
     items: section.items.filter(item => {
-      if (!item.requiresPermission) {return true;}
-      return rbac[item.requiresPermission] === true;
+      if (item.requiresPermission && !rbac[item.requiresPermission]) {return false;}
+      return isModuleAllowed(item.moduleCode);
     }),
   })).filter(section => section.items.length > 0);
 
