@@ -91,10 +91,8 @@ export default function MoreHubScreen() {
   const rbac = useRBAC();
   const allowedModules = useAppSelector(s => s.auth.allowedModules ?? []);
 
-  // Empty allowedModules = all modules permitted (no restrictions from admin).
   function isModuleAllowed(code?: string): boolean {
     if (!code) {return true;}
-    if (allowedModules.length === 0) {return true;}
     return allowedModules.some(m => m.code === code);
   }
 

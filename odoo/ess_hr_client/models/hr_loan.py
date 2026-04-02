@@ -1,6 +1,6 @@
 from datetime import date
 from dateutil.relativedelta import relativedelta
-from odoo import models, fields, api, _
+from odoo import models, fields, api, _, SUPERUSER_ID
 from odoo.exceptions import UserError
 
 
@@ -91,8 +91,8 @@ class HrLoan(models.Model):
         Called from ess_data.xml via <function> so reinstalls never hit the unique constraint.
         """
         main_company = self.env.ref('base.main_company')
-        if not self.sudo().search([('company_id', '=', main_company.id)], limit=1):
-            self.sudo().create({
+        if not self.with_user(SUPERUSER_ID).search([('company_id', '=', main_company.id)], limit=1):
+            self.with_user(SUPERUSER_ID).create({
                 'company_id': main_company.id,
                 'min_hiring_months': 6,
                 'max_duration_months': 24,
@@ -103,7 +103,7 @@ class HrLoan(models.Model):
     @api.model
     def get_loan_rules(self, company_id):
         """Return the loan configuration dict for the given company."""
-        config = self.env['hr.loan.config'].sudo().search([('company_id', '=', company_id)], limit=1)
+        config = self.env['hr.loan.config'].with_user(SUPERUSER_ID).search([('company_id', '=', company_id)], limit=1)
         if not config:
             return {
                 'min_hiring_months': 6,
@@ -124,7 +124,7 @@ class HrLoan(models.Model):
         employee = self._get_employee(employee_id)
         company_id = employee.company_id.id if employee.company_id else False
         self._validate_loan_rules(employee, amount, duration_months, company_id)
-        loan = self.sudo().create({
+        loan = self.with_user(SUPERUSER_ID).create({
             'employee_id': employee_id,
             'amount': amount,
             'duration_months': duration_months,
@@ -138,16 +138,16 @@ class HrLoan(models.Model):
     @api.model
     def get_loans(self, employee_id):
         """Return list of loan records for the given employee."""
-        employee = self.env['hr.employee'].sudo().browse(employee_id)
+        employee = self.env['hr.employee'].with_user(SUPERUSER_ID).browse(employee_id)
         if not employee.exists():
             raise UserError(_('Employee not found.'))
-        loans = self.sudo().search([('employee_id', '=', employee_id)], order='request_date desc')
+        loans = self.with_user(SUPERUSER_ID).search([('employee_id', '=', employee_id)], order='request_date desc')
         return [self._format_loan_record(l) for l in loans]
 
     @api.model
     def get_loan_detail(self, loan_id):
         """Return a full loan dict including installment schedule."""
-        loan = self.sudo().browse(loan_id)
+        loan = self.with_user(SUPERUSER_ID).browse(loan_id)
         if not loan.exists():
             raise UserError(_('Loan not found.'))
         result = self._format_loan_record(loan)
@@ -157,13 +157,13 @@ class HrLoan(models.Model):
     @api.model
     def approve_loan(self, loan_id, approver_employee_id):
         """Approve a loan request. Returns True."""
-        loan = self.sudo().browse(loan_id)
+        loan = self.with_user(SUPERUSER_ID).browse(loan_id)
         if not loan.exists():
             raise UserError(_('Loan not found.'))
         if loan.state not in ('draft', 'submitted'):
             raise UserError(_('Only draft or submitted loans can be approved.'))
         self._get_employee(approver_employee_id)
-        loan.sudo().write({
+        loan.with_user(SUPERUSER_ID).write({
             'state': 'approved',
             'approved_by': approver_employee_id,
             'approved_date': fields.Date.today(),
@@ -173,13 +173,13 @@ class HrLoan(models.Model):
     @api.model
     def refuse_loan(self, loan_id, approver_employee_id, reason):
         """Refuse a loan request with a given reason. Returns True."""
-        loan = self.sudo().browse(loan_id)
+        loan = self.with_user(SUPERUSER_ID).browse(loan_id)
         if not loan.exists():
             raise UserError(_('Loan not found.'))
         if loan.state not in ('draft', 'submitted'):
             raise UserError(_('Only draft or submitted loans can be refused.'))
         self._get_employee(approver_employee_id)
-        loan.sudo().write({
+        loan.with_user(SUPERUSER_ID).write({
             'state': 'refused',
             'approved_by': approver_employee_id,
             'reason_refusal': reason or '',
@@ -188,14 +188,20 @@ class HrLoan(models.Model):
 
     def _validate_loan_rules(self, employee, amount, duration_months, company_id):
         """Raise UserError if the loan request violates company rules."""
-        config = self.env['hr.loan.config'].sudo().search([('company_id', '=', company_id)], limit=1)
+        try:
+            amount_val = float(amount) if amount is not None else 0.0
+        except (TypeError, ValueError):
+            amount_val = 0.0
+        if amount_val <= 0:
+            raise UserError(_('Loan amount must be greater than zero.'))
+        config = self.env['hr.loan.config'].with_user(SUPERUSER_ID).search([('company_id', '=', company_id)], limit=1)
         min_hiring_months = config.min_hiring_months if config else 6
         max_duration_months = config.max_duration_months if config else 24
         min_gap_months = config.min_gap_months if config else 3
         max_amount_percentage = config.max_amount_percentage if config else 3.0
 
         try:
-            contract = self.env['hr.contract'].sudo().search(
+            contract = self.env['hr.contract'].with_user(SUPERUSER_ID).search(
                 [('employee_id', '=', employee.id), ('state', 'in', ['open', 'draft'])],
                 order='date_start asc', limit=1,
             )
@@ -212,7 +218,7 @@ class HrLoan(models.Model):
         if duration_months > max_duration_months:
             raise UserError(_('Loan duration cannot exceed %d months.') % max_duration_months)
 
-        recent_loan = self.sudo().search([
+        recent_loan = self.with_user(SUPERUSER_ID).search([
             ('employee_id', '=', employee.id),
             ('state', '=', 'approved'),
         ], order='approved_date desc', limit=1)
@@ -240,7 +246,7 @@ class HrLoan(models.Model):
         installments = []
         for i in range(loan.duration_months):
             due_date = start_date + relativedelta(months=i + 1)
-            inst = self.env['hr.loan.installment'].sudo().create({
+            inst = self.env['hr.loan.installment'].with_user(SUPERUSER_ID).create({
                 'loan_id': loan.id,
                 'sequence': i + 1,
                 'date': due_date,
@@ -281,7 +287,7 @@ class HrLoan(models.Model):
     def _get_employee_basic_wage(self, employee):
         """Return the basic wage from the employee's active contract."""
         try:
-            contract = self.env['hr.contract'].sudo().search(
+            contract = self.env['hr.contract'].with_user(SUPERUSER_ID).search(
                 [('employee_id', '=', employee.id), ('state', 'in', ['open', 'draft'])],
                 order='date_start desc', limit=1,
             )

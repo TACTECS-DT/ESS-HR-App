@@ -22,7 +22,7 @@ from .utils import call_and_log
 
 class StatsController(http.Controller):
 
-    @http.route('/ess/api/stats', type='http', auth='none', methods=['GET'], csrf=False)
+    @http.route('/ess/api/stats', type='http', auth='none', methods=['GET'], csrf=False, readonly=False)
     def stats(self):
         return call_and_log(
             '/ess/api/stats',

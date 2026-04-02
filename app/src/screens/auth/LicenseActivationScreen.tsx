@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -37,9 +37,19 @@ export default function LicenseActivationScreen() {
   const dispatch = useAppDispatch();
 
   const knownServerUrls = useAppSelector(s => s.auth.knownServerUrls ?? []);
+  const cachedServerUrl = useAppSelector(s => s.auth.serverUrl);
 
   const [serverUrl, setServerUrl] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Auto-refresh allowedModules from the admin server on every visit to this screen.
+  // This ensures module permissions are always up-to-date after an admin changes the license.
+  useEffect(() => {
+    if (!ENV.MOCK_MODE && cachedServerUrl && cachedServerUrl !== 'mock') {
+      handleActivate(cachedServerUrl);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   type ErrorType =
     | 'INVALID_URL'
@@ -145,10 +155,13 @@ export default function LicenseActivationScreen() {
         {timeout: 15000},
       );
       const data = res.data;
+      console.log('[ESS Admin] raw response:', JSON.stringify(data));
       if (isApiSuccess(data)) {
+        const modules = data.data.allowed_modules ?? [];
+        console.log('[ESS Admin] allowed_modules:', JSON.stringify(modules));
         dispatch(setAdminContext({
           serverUrl: base,
-          allowedModules: data.data.allowed_modules ?? [],
+          allowedModules: modules,
           autoLogoutDuration: data.data.auto_logout_duration ?? 72,
         }));
         navigation.navigate('CompanySelection');

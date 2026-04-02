@@ -41,7 +41,7 @@ def _build_analytics_summary(req, date_from=None, date_to=None):
 
 class AnalyticsController(http.Controller):
 
-    @http.route('/ess/api/analytics', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
+    @http.route('/ess/api/analytics', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
     def summary(self):
         kw = get_body()
         return call_and_log(
@@ -49,7 +49,7 @@ class AnalyticsController(http.Controller):
             lambda: _build_analytics_summary(request, kw.get('date_from'), kw.get('date_to')),
         )
 
-    @http.route('/ess/api/analytics/module-stats', type='http', auth='none', methods=['POST'], csrf=False)
+    @http.route('/ess/api/analytics/module-stats', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def module_stats(self):
         kw = get_body()
         return call_and_log(
@@ -59,7 +59,7 @@ class AnalyticsController(http.Controller):
             ),
         )
 
-    @http.route('/ess/api/analytics/employee-activity', type='http', auth='none', methods=['POST'], csrf=False)
+    @http.route('/ess/api/analytics/employee-activity', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def employee_activity(self):
         kw = get_body()
         return call_and_log(
@@ -69,7 +69,7 @@ class AnalyticsController(http.Controller):
             ),
         )
 
-    @http.route('/ess/api/analytics/hourly-distribution', type='http', auth='none', methods=['POST'], csrf=False)
+    @http.route('/ess/api/analytics/hourly-distribution', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def hourly_distribution(self):
         kw = get_body()
         return call_and_log(
@@ -79,7 +79,7 @@ class AnalyticsController(http.Controller):
             ),
         )
 
-    @http.route('/ess/api/analytics/error-summary', type='http', auth='none', methods=['POST'], csrf=False)
+    @http.route('/ess/api/analytics/error-summary', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def error_summary(self):
         kw = get_body()
         return call_and_log(
@@ -89,7 +89,7 @@ class AnalyticsController(http.Controller):
             ),
         )
 
-    @http.route('/ess/api/analytics/daily-totals', type='http', auth='none', methods=['POST'], csrf=False)
+    @http.route('/ess/api/analytics/daily-totals', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def daily_totals(self):
         kw = get_body()
         return call_and_log(

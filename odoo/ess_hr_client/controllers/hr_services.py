@@ -25,7 +25,7 @@ class HrServicesController(http.Controller):
 
     # ── HR Letters ────────────────────────────────────────────────────────────
 
-    @http.route('/ess/api/hr-letters', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
+    @http.route('/ess/api/hr-letters', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
     def letters(self):
         kw = get_body()
         employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
@@ -43,7 +43,7 @@ class HrServicesController(http.Controller):
             ),
         )
 
-    @http.route('/ess/api/hr-letters/<int:letter_id>', type='http', auth='none', methods=['GET', 'PATCH', 'DELETE'], csrf=False)
+    @http.route('/ess/api/hr-letters/<int:letter_id>', type='http', auth='none', methods=['GET', 'PATCH', 'DELETE'], csrf=False, readonly=False)
     def letter_by_id(self, letter_id):
         kw = get_body()
         method = request.httprequest.method
@@ -64,7 +64,7 @@ class HrServicesController(http.Controller):
             lambda: request.env['hr.letter.request'].sudo().delete_letter(letter_id),
         )
 
-    @http.route('/ess/api/hr-letters/approve', type='http', auth='none', methods=['POST'], csrf=False)
+    @http.route('/ess/api/hr-letters/approve', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def letter_approve(self):
         kw = get_body()
         record_id = kw.get('letter_id') or kw.get('record_id')
@@ -76,7 +76,7 @@ class HrServicesController(http.Controller):
             ),
         )
 
-    @http.route('/ess/api/hr-letters/refuse', type='http', auth='none', methods=['POST'], csrf=False)
+    @http.route('/ess/api/hr-letters/refuse', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def letter_refuse(self):
         kw = get_body()
         record_id = kw.get('letter_id') or kw.get('record_id')
@@ -88,7 +88,7 @@ class HrServicesController(http.Controller):
             ),
         )
 
-    @http.route('/ess/api/hr-letters/reset', type='http', auth='none', methods=['POST'], csrf=False)
+    @http.route('/ess/api/hr-letters/reset', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def letter_reset(self):
         kw = get_body()
         record_id = kw.get('letter_id') or kw.get('record_id')
@@ -99,14 +99,14 @@ class HrServicesController(http.Controller):
 
     # ── Document Requests ─────────────────────────────────────────────────────
 
-    @http.route('/ess/api/document-requests/types', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
+    @http.route('/ess/api/document-requests/types', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
     def document_types(self):
         return call_and_log(
             '/ess/api/document-requests/types',
             lambda: _get_document_types(request),
         )
 
-    @http.route('/ess/api/document-requests', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
+    @http.route('/ess/api/document-requests', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
     def document_requests(self):
         kw = get_body()
         employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
@@ -124,7 +124,7 @@ class HrServicesController(http.Controller):
             ),
         )
 
-    @http.route('/ess/api/document-requests/<int:doc_id>', type='http', auth='none', methods=['GET', 'PATCH', 'DELETE'], csrf=False)
+    @http.route('/ess/api/document-requests/<int:doc_id>', type='http', auth='none', methods=['GET', 'PATCH', 'DELETE'], csrf=False, readonly=False)
     def document_by_id(self, doc_id):
         kw = get_body()
         method = request.httprequest.method
@@ -145,7 +145,7 @@ class HrServicesController(http.Controller):
             lambda: request.env['hr.document.request'].sudo().delete_document(doc_id),
         )
 
-    @http.route('/ess/api/document-requests/approve', type='http', auth='none', methods=['POST'], csrf=False)
+    @http.route('/ess/api/document-requests/approve', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def document_approve(self):
         kw = get_body()
         record_id = kw.get('doc_id') or kw.get('record_id')
@@ -157,7 +157,7 @@ class HrServicesController(http.Controller):
             ),
         )
 
-    @http.route('/ess/api/document-requests/refuse', type='http', auth='none', methods=['POST'], csrf=False)
+    @http.route('/ess/api/document-requests/refuse', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def document_refuse(self):
         kw = get_body()
         record_id = kw.get('doc_id') or kw.get('record_id')
@@ -169,7 +169,7 @@ class HrServicesController(http.Controller):
             ),
         )
 
-    @http.route('/ess/api/document-requests/reset', type='http', auth='none', methods=['POST'], csrf=False)
+    @http.route('/ess/api/document-requests/reset', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def document_reset(self):
         kw = get_body()
         record_id = kw.get('doc_id') or kw.get('record_id')
@@ -180,7 +180,7 @@ class HrServicesController(http.Controller):
 
     # ── Experience Certificates ───────────────────────────────────────────────
 
-    @http.route('/ess/api/experience-certificates', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
+    @http.route('/ess/api/experience-certificates', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
     def certificates(self):
         kw = get_body()
         employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
@@ -198,7 +198,7 @@ class HrServicesController(http.Controller):
             ),
         )
 
-    @http.route('/ess/api/experience-certificates/<int:cert_id>', type='http', auth='none', methods=['GET', 'PATCH', 'DELETE'], csrf=False)
+    @http.route('/ess/api/experience-certificates/<int:cert_id>', type='http', auth='none', methods=['GET', 'PATCH', 'DELETE'], csrf=False, readonly=False)
     def certificate_by_id(self, cert_id):
         kw = get_body()
         method = request.httprequest.method
@@ -219,7 +219,7 @@ class HrServicesController(http.Controller):
             lambda: request.env['hr.experience.certificate'].sudo().delete_certificate(cert_id),
         )
 
-    @http.route('/ess/api/experience-certificates/approve', type='http', auth='none', methods=['POST'], csrf=False)
+    @http.route('/ess/api/experience-certificates/approve', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def certificate_approve(self):
         kw = get_body()
         record_id = kw.get('cert_id') or kw.get('record_id')
@@ -231,7 +231,7 @@ class HrServicesController(http.Controller):
             ),
         )
 
-    @http.route('/ess/api/experience-certificates/refuse', type='http', auth='none', methods=['POST'], csrf=False)
+    @http.route('/ess/api/experience-certificates/refuse', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def certificate_refuse(self):
         kw = get_body()
         record_id = kw.get('cert_id') or kw.get('record_id')
@@ -243,7 +243,7 @@ class HrServicesController(http.Controller):
             ),
         )
 
-    @http.route('/ess/api/experience-certificates/reset', type='http', auth='none', methods=['POST'], csrf=False)
+    @http.route('/ess/api/experience-certificates/reset', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def certificate_reset(self):
         kw = get_body()
         record_id = kw.get('cert_id') or kw.get('record_id')
@@ -254,7 +254,7 @@ class HrServicesController(http.Controller):
 
     # ── Business Services ─────────────────────────────────────────────────────
 
-    @http.route('/ess/api/business-services/types', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
+    @http.route('/ess/api/business-services/types', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
     def business_service_types(self):
         kw = get_body()
         return call_and_log(
@@ -264,7 +264,7 @@ class HrServicesController(http.Controller):
             ),
         )
 
-    @http.route('/ess/api/business-services', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
+    @http.route('/ess/api/business-services', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
     def business_services(self):
         kw = get_body()
         employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
@@ -283,7 +283,7 @@ class HrServicesController(http.Controller):
             ),
         )
 
-    @http.route('/ess/api/business-services/<int:service_id>', type='http', auth='none', methods=['GET', 'PATCH', 'DELETE'], csrf=False)
+    @http.route('/ess/api/business-services/<int:service_id>', type='http', auth='none', methods=['GET', 'PATCH', 'DELETE'], csrf=False, readonly=False)
     def business_service_by_id(self, service_id):
         kw = get_body()
         method = request.httprequest.method
@@ -304,7 +304,7 @@ class HrServicesController(http.Controller):
             lambda: request.env['hr.business.service.request'].sudo().delete_business_service(service_id),
         )
 
-    @http.route('/ess/api/business-services/approve', type='http', auth='none', methods=['POST'], csrf=False)
+    @http.route('/ess/api/business-services/approve', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def business_service_approve(self):
         kw = get_body()
         record_id = kw.get('service_id') or kw.get('record_id')
@@ -316,7 +316,7 @@ class HrServicesController(http.Controller):
             ),
         )
 
-    @http.route('/ess/api/business-services/refuse', type='http', auth='none', methods=['POST'], csrf=False)
+    @http.route('/ess/api/business-services/refuse', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def business_service_refuse(self):
         kw = get_body()
         record_id = kw.get('service_id') or kw.get('record_id')
@@ -328,7 +328,7 @@ class HrServicesController(http.Controller):
             ),
         )
 
-    @http.route('/ess/api/business-services/reset', type='http', auth='none', methods=['POST'], csrf=False)
+    @http.route('/ess/api/business-services/reset', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def business_service_reset(self):
         kw = get_body()
         record_id = kw.get('service_id') or kw.get('record_id')

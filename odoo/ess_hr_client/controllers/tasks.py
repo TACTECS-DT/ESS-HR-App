@@ -25,7 +25,7 @@ def _disabled():
 
 class TasksController(http.Controller):
 
-    @http.route('/ess/api/tasks', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
+    @http.route('/ess/api/tasks', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
     def list(self):
         if not _FEATURES_ENABLED:
             return _disabled()
@@ -36,7 +36,7 @@ class TasksController(http.Controller):
             lambda: request.env['project.task'].sudo().get_tasks(employee_id),
         )
 
-    @http.route('/ess/api/tasks/<int:task_id>', type='http', auth='none', methods=['GET', 'PATCH'], csrf=False)
+    @http.route('/ess/api/tasks/<int:task_id>', type='http', auth='none', methods=['GET', 'PATCH'], csrf=False, readonly=False)
     def task_by_id(self, task_id):
         if not _FEATURES_ENABLED:
             return _disabled()
@@ -53,7 +53,7 @@ class TasksController(http.Controller):
             ),
         )
 
-    @http.route('/ess/api/tasks/<int:task_id>/attachments', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
+    @http.route('/ess/api/tasks/<int:task_id>/attachments', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
     def task_attachments(self, task_id):
         if not _FEATURES_ENABLED:
             return _disabled()
@@ -70,7 +70,7 @@ class TasksController(http.Controller):
             ),
         )
 
-    @http.route('/ess/api/timesheets/<int:timesheet_id>', type='http', auth='none', methods=['GET', 'PATCH', 'DELETE'], csrf=False)
+    @http.route('/ess/api/timesheets/<int:timesheet_id>', type='http', auth='none', methods=['GET', 'PATCH', 'DELETE'], csrf=False, readonly=False)
     def timesheet_by_id(self, timesheet_id):
         if not _FEATURES_ENABLED:
             return _disabled()
@@ -94,7 +94,7 @@ class TasksController(http.Controller):
             lambda: request.env['account.analytic.line'].sudo().delete_timesheet(timesheet_id),
         )
 
-    @http.route('/ess/api/timesheets', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
+    @http.route('/ess/api/timesheets', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
     def timesheets(self):
         if not _FEATURES_ENABLED:
             return _disabled()
@@ -116,7 +116,7 @@ class TasksController(http.Controller):
             ),
         )
 
-    @http.route('/ess/api/timesheets/daily', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
+    @http.route('/ess/api/timesheets/daily', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
     def timesheet_daily(self):
         if not _FEATURES_ENABLED:
             return _disabled()
@@ -129,7 +129,7 @@ class TasksController(http.Controller):
             ),
         )
 
-    @http.route('/ess/api/timesheets/weekly', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
+    @http.route('/ess/api/timesheets/weekly', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
     def timesheet_weekly(self):
         if not _FEATURES_ENABLED:
             return _disabled()

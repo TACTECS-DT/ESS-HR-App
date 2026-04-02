@@ -1,5 +1,5 @@
 import base64
-from odoo import models, fields, api, _
+from odoo import models, fields, api, _, SUPERUSER_ID
 from odoo.exceptions import UserError
 
 
@@ -10,7 +10,7 @@ class HrExpenseExt(models.Model):
     @api.model
     def get_expense_categories(self):
         """Return list of product dicts suitable as expense types."""
-        products = self.env['product.product'].sudo().search([
+        products = self.env['product.product'].with_user(SUPERUSER_ID).search([
             ('can_be_expensed', '=', True),
             ('active', '=', True),
         ])
@@ -26,7 +26,7 @@ class HrExpenseExt(models.Model):
     @api.model
     def get_currencies(self):
         """Return list of active currency dicts."""
-        currencies = self.env['res.currency'].sudo().search([('active', '=', True)])
+        currencies = self.env['res.currency'].with_user(SUPERUSER_ID).search([('active', '=', True)])
         result = []
         for c in currencies:
             try:
@@ -47,7 +47,7 @@ class HrExpenseExt(models.Model):
         domain = [('type_tax_use', '=', 'purchase'), ('active', '=', True)]
         if company_id:
             domain.append(('company_id', '=', company_id))
-        taxes = self.env['account.tax'].sudo().search(domain)
+        taxes = self.env['account.tax'].with_user(SUPERUSER_ID).search(domain)
         return [{
             'id': t.id,
             'name': t.name,
@@ -60,7 +60,7 @@ class HrExpenseExt(models.Model):
                        tax_ids, payment_mode, name, date):
         """Create a new expense record and return its dict."""
         employee = self._get_employee(employee_id)
-        product = self.env['product.product'].sudo().browse(product_id)
+        product = self.env['product.product'].with_user(SUPERUSER_ID).browse(product_id)
         if not product.exists():
             raise UserError(_('Expense category not found.'))
         vals = {
@@ -74,16 +74,16 @@ class HrExpenseExt(models.Model):
         }
         if tax_ids:
             vals['tax_ids'] = [(6, 0, tax_ids)]
-        expense = self.with_company(employee.company_id).sudo().create(vals)
+        expense = self.with_company(employee.company_id).with_user(SUPERUSER_ID).create(vals)
         return self._format_expense_record(expense)
 
     @api.model
     def attach_file_to_expense(self, expense_id, filename, file_base64):
         """Attach a file to an expense and return the attachment dict."""
-        expense = self.sudo().browse(expense_id)
+        expense = self.with_user(SUPERUSER_ID).browse(expense_id)
         if not expense.exists():
             raise UserError(_('Expense not found.'))
-        attachment = self.env['ir.attachment'].sudo().create({
+        attachment = self.env['ir.attachment'].with_user(SUPERUSER_ID).create({
             'name': filename,
             'datas': file_base64,
             'res_model': 'hr.expense',
@@ -100,7 +100,7 @@ class HrExpenseExt(models.Model):
     @api.model
     def get_expense_detail(self, expense_id):
         """Return a single expense record dict by ID."""
-        expense = self.sudo().browse(expense_id)
+        expense = self.with_user(SUPERUSER_ID).browse(expense_id)
         if not expense.exists():
             raise UserError(_('Expense not found.'))
         return self._format_expense_record(expense)
@@ -111,13 +111,13 @@ class HrExpenseExt(models.Model):
         domain = [('employee_id', '=', employee_id)]
         if state_filter:
             domain.append(('state', '=', state_filter))
-        expenses = self.sudo().search(domain, order='date desc')
+        expenses = self.with_user(SUPERUSER_ID).search(domain, order='date desc')
         return [self._format_expense_record(e) for e in expenses]
 
     @api.model
     def update_expense(self, expense_id, vals):
         """Update an expense record with the given values and return updated dict."""
-        expense = self.sudo().browse(expense_id)
+        expense = self.with_user(SUPERUSER_ID).browse(expense_id)
         if not expense.exists():
             raise UserError(_('Expense not found.'))
         self._validate_expense_editable(expense)
@@ -127,18 +127,18 @@ class HrExpenseExt(models.Model):
         write_vals = {k: v for k, v in vals.items() if k in allowed_fields}
         if 'tax_ids' in vals:
             write_vals['tax_ids'] = [(6, 0, vals['tax_ids'])]
-        expense.sudo().write(write_vals)
+        expense.with_user(SUPERUSER_ID).write(write_vals)
         return self._format_expense_record(expense)
 
     @api.model
     def delete_expense(self, expense_id):
         """Delete a draft expense. Returns True."""
-        expense = self.sudo().browse(expense_id)
+        expense = self.with_user(SUPERUSER_ID).browse(expense_id)
         if not expense.exists():
             raise UserError(_('Expense not found.'))
         self._validate_expense_editable(expense)
         employee = expense.employee_id
-        expense.sudo().unlink()
+        expense.with_user(SUPERUSER_ID).unlink()
         return True
 
     @api.model
@@ -148,12 +148,12 @@ class HrExpenseExt(models.Model):
         In Odoo 19 hr.expense.sheet was removed; submission is done directly via
         action_submit() on the hr.expense record itself.
         """
-        expense = self.sudo().browse(expense_id)
+        expense = self.with_user(SUPERUSER_ID).browse(expense_id)
         if not expense.exists():
             raise UserError(_('Expense not found.'))
         self._validate_expense_editable(expense)
         employee = expense.employee_id
-        expense.sudo().action_submit()
+        expense.with_user(SUPERUSER_ID).action_submit()
         expense.invalidate_recordset()
         return self._format_expense_record(expense)
 

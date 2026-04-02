@@ -116,10 +116,12 @@ def _validate_api_key() -> bool:
 
 
 def _validate_admin_api_key() -> bool:
+    incoming = request.httprequest.headers.get('X-ESS-Admin-Key')
+    if incoming is None:
+        return False  # header absent → always deny
     stored = request.env['ir.config_parameter'].sudo().get_param(_ADMIN_API_KEY_PARAM, '')
     if not stored:
-        return True
-    incoming = request.httprequest.headers.get('X-ESS-Admin-Key', '')
+        return True  # key not configured → accept any present header
     return incoming == stored
 
 
@@ -215,14 +217,27 @@ def call_and_log(endpoint: str, fn) -> http.Response:
 
 
 def _write_log(endpoint, employee_id, error_msg, duration_ms):
+    """
+    Write an API access log entry.
+    Uses a savepoint so a failure never aborts the caller's transaction.
+    """
     try:
-        request.env['ess.api.log'].sudo().write_log(
-            endpoint=endpoint,
-            employee_id=employee_id,
-            status='error' if error_msg else 'success',
-            error_message=error_msg or '',
-            duration_ms=duration_ms,
-            ip_address=request.httprequest.remote_addr,
-        )
+        cr = request.env.cr
+        cr.execute('SAVEPOINT ess_api_log_write')
+        try:
+            request.env['ess.api.log'].sudo().write_log(
+                endpoint=endpoint,
+                employee_id=employee_id,
+                status='error' if error_msg else 'success',
+                error_message=error_msg or '',
+                duration_ms=duration_ms,
+                ip_address=request.httprequest.remote_addr,
+            )
+            cr.execute('RELEASE SAVEPOINT ess_api_log_write')
+        except Exception:
+            try:
+                cr.execute('ROLLBACK TO SAVEPOINT ess_api_log_write')
+            except Exception:
+                pass
     except Exception:
         pass

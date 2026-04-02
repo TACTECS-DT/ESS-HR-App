@@ -1,5 +1,5 @@
 import hashlib
-from odoo import models, fields, api, _
+from odoo import models, fields, api, _, SUPERUSER_ID
 from odoo.exceptions import UserError
 
 
@@ -160,7 +160,7 @@ class EssEmployeeCredential(models.Model):
     # ── Reset action ──────────────────────────────────────────────────────────
 
     def reset_credentials(self):
-        self.sudo().write({
+        self.with_user(SUPERUSER_ID).write({
             'pin_hash': False,
             'password_hash': False,
             'last_reset_date': fields.Datetime.now(),
@@ -185,9 +185,9 @@ class EssEmployeeCredential(models.Model):
 
     @api.model
     def get_or_create_for_employee(self, employee_id):
-        cred = self.sudo().search([('employee_id', '=', employee_id)], limit=1)
+        cred = self.with_user(SUPERUSER_ID).search([('employee_id', '=', employee_id)], limit=1)
         if not cred:
-            cred = self.sudo().create({'employee_id': employee_id})
+            cred = self.with_user(SUPERUSER_ID).create({'employee_id': employee_id})
         return cred
 
     def _hash_value(self, value):

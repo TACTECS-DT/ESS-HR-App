@@ -129,17 +129,13 @@ class EssLicense(models.Model):
                     'EMPLOYEE_LIMIT',
                 )
 
-        # Allowed modules
-        if license_rec.module_ids:
-            allowed_modules = [
-                {'name': m.name, 'code': m.code}
-                for m in license_rec.module_ids
-                if m.active
-            ]
-        else:
-            # No restriction — return all active modules
-            all_modules = self.env['ess.module'].sudo().search([('active', '=', True)])
-            allowed_modules = [{'name': m.name, 'code': m.code} for m in all_modules]
+        # Allowed modules — only what is explicitly assigned to the license.
+        # Empty list means no modules are permitted.
+        allowed_modules = [
+            {'name': m.name, 'code': m.code}
+            for m in license_rec.module_ids
+            if m.active
+        ]
 
         return {
             'status': 'valid',

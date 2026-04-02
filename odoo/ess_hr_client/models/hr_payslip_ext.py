@@ -1,5 +1,5 @@
 import base64
-from odoo import models, fields, api, _
+from odoo import models, fields, api, _, SUPERUSER_ID
 from odoo.exceptions import UserError
 
 
@@ -20,13 +20,13 @@ class HrPayslipExt(models.Model):
             _, last_day = calendar.monthrange(year, month)
             domain.append(('date_from', '>=', '%d-%02d-01' % (year, month)))
             domain.append(('date_from', '<=', '%d-%02d-%02d' % (year, month, last_day)))
-        slips = self.sudo().search(domain, order='date_from desc')
+        slips = self.with_user(SUPERUSER_ID).search(domain, order='date_from desc')
         return [self._format_payslip_summary(s) for s in slips]
 
     @api.model
     def get_payslip_detail(self, payslip_id):
         """Return a full payslip dict with earnings, deductions, and net pay."""
-        slip = self.sudo().browse(payslip_id)
+        slip = self.with_user(SUPERUSER_ID).browse(payslip_id)
         if not slip.exists():
             raise UserError(_('Payslip not found.'))
         result = self._format_payslip_summary(slip)
@@ -36,7 +36,7 @@ class HrPayslipExt(models.Model):
     @api.model
     def get_payslip_pdf(self, payslip_id):
         """Return the payslip PDF as a base64-encoded string."""
-        slip = self.sudo().browse(payslip_id)
+        slip = self.with_user(SUPERUSER_ID).browse(payslip_id)
         if not slip.exists():
             raise UserError(_('Payslip not found.'))
         return self._generate_payslip_pdf(slip)
@@ -86,7 +86,7 @@ class HrPayslipExt(models.Model):
         """Render and return the payslip PDF as a base64-encoded string."""
         try:
             report = self.env.ref('hr_payroll.action_report_payslip')
-            pdf_content, _pdf_type = self.env['ir.actions.report'].sudo()._render_qweb_pdf(
+            pdf_content, _pdf_type = self.env['ir.actions.report'].with_user(SUPERUSER_ID)._render_qweb_pdf(
                 report, slip.ids
             )
             return base64.b64encode(pdf_content).decode('utf-8')

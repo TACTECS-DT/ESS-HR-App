@@ -54,7 +54,7 @@ export default function ProfileScreen() {
     queryKey: ['profile', employeeId ?? 'me'],
     enabled: accessAllowed,
     queryFn: async () => {
-      const res = await apiClient.get(API_MAP.profile.me, {params: employeeId ? {employee_id: employeeId} : undefined});
+      const res = await apiClient.get(API_MAP.employee.profile, {params: employeeId ? {employee_id: employeeId} : undefined});
       return isApiSuccess(res.data) ? (res.data.data as EmployeeProfile) : null;
     },
   });

@@ -1,4 +1,4 @@
-from odoo import models, api, _
+from odoo import models, api, _, SUPERUSER_ID
 from odoo.exceptions import UserError
 
 
@@ -23,7 +23,7 @@ class EssMixin(models.AbstractModel):
         Fetch and validate an employee record by ID.
         Raises UserError if the employee does not exist.
         """
-        employee = self.env['hr.employee'].sudo().browse(employee_id)
+        employee = self.env['hr.employee'].with_user(SUPERUSER_ID).browse(employee_id)
         if not employee.exists():
             raise UserError(_('Employee not found (id=%s).') % employee_id)
         return employee
@@ -40,4 +40,4 @@ class EssMixin(models.AbstractModel):
         """
         if employee and employee.user_id:
             return self.with_user(employee.user_id)
-        return self.sudo()
+        return self.with_user(SUPERUSER_ID)

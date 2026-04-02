@@ -27,9 +27,8 @@ export default function MainNavigator() {
   const {t} = useTranslation();
   const allowedModules = useAppSelector(s => s.auth.allowedModules ?? []);
 
-  // Empty allowedModules list means all modules are permitted (no restrictions set).
+  console.log('[MainNavigator] allowedModules:', JSON.stringify(allowedModules));
   function isAllowed(code: string): boolean {
-    if (allowedModules.length === 0) {return true;}
     return allowedModules.some(m => m.code === code);
   }
 

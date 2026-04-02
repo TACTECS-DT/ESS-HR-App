@@ -1,6 +1,6 @@
 import base64
 from datetime import datetime, timedelta, date
-from odoo import models, fields, api, _
+from odoo import models, fields, api, _, SUPERUSER_ID
 from odoo.exceptions import UserError
 
 
@@ -11,20 +11,20 @@ class ProjectTaskExt(models.Model):
     @api.model
     def get_tasks(self, employee_id):
         """Return list of task summary dicts assigned to the employee's user."""
-        employee = self.env['hr.employee'].sudo().browse(employee_id)
+        employee = self.env['hr.employee'].with_user(SUPERUSER_ID).browse(employee_id)
         if not employee.exists():
             raise UserError(_('Employee not found.'))
         user_id = employee.user_id.id if employee.user_id else False
         if not user_id:
             return []
         domain = [('user_ids', 'in', [user_id])]
-        tasks = self.sudo().search(domain, order='date_deadline asc')
+        tasks = self.with_user(SUPERUSER_ID).search(domain, order='date_deadline asc')
         return [self._format_task_summary(t) for t in tasks]
 
     @api.model
     def get_task_detail(self, task_id):
         """Return a full task dict."""
-        task = self.sudo().browse(task_id)
+        task = self.with_user(SUPERUSER_ID).browse(task_id)
         if not task.exists():
             raise UserError(_('Task not found.'))
         return self._format_task_record(task)
@@ -32,22 +32,22 @@ class ProjectTaskExt(models.Model):
     @api.model
     def update_task_stage(self, task_id, stage_id):
         """Move a task to the given stage. Returns True."""
-        task = self.sudo().browse(task_id)
+        task = self.with_user(SUPERUSER_ID).browse(task_id)
         if not task.exists():
             raise UserError(_('Task not found.'))
-        stage = self.env['project.task.type'].sudo().browse(stage_id)
+        stage = self.env['project.task.type'].with_user(SUPERUSER_ID).browse(stage_id)
         if not stage.exists():
             raise UserError(_('Stage not found.'))
-        task.sudo().write({'stage_id': stage_id})
+        task.with_user(SUPERUSER_ID).write({'stage_id': stage_id})
         return True
 
     @api.model
     def get_task_attachments(self, task_id):
         """Return list of attachment dicts for the task."""
-        task = self.sudo().browse(task_id)
+        task = self.with_user(SUPERUSER_ID).browse(task_id)
         if not task.exists():
             raise UserError(_('Task not found.'))
-        attachments = self.env['ir.attachment'].sudo().search([
+        attachments = self.env['ir.attachment'].with_user(SUPERUSER_ID).search([
             ('res_model', '=', 'project.task'),
             ('res_id', '=', task_id),
         ])
@@ -62,10 +62,10 @@ class ProjectTaskExt(models.Model):
     @api.model
     def add_task_attachment(self, task_id, filename, file_base64):
         """Add a file attachment to a task and return the attachment dict."""
-        task = self.sudo().browse(task_id)
+        task = self.with_user(SUPERUSER_ID).browse(task_id)
         if not task.exists():
             raise UserError(_('Task not found.'))
-        attachment = self.env['ir.attachment'].sudo().create({
+        attachment = self.env['ir.attachment'].with_user(SUPERUSER_ID).create({
             'name': filename,
             'datas': file_base64,
             'res_model': 'project.task',
@@ -133,7 +133,7 @@ class AccountAnalyticLineExt(models.Model):
     @api.model
     def get_timesheets(self, employee_id, date_from=None, date_to=None):
         """Return a list of timesheet entries for the employee, optionally date-filtered."""
-        employee = self.env['hr.employee'].sudo().browse(employee_id)
+        employee = self.env['hr.employee'].with_user(SUPERUSER_ID).browse(employee_id)
         if not employee.exists():
             raise UserError(_('Employee not found.'))
         domain = [('employee_id', '=', employee_id)]
@@ -141,39 +141,39 @@ class AccountAnalyticLineExt(models.Model):
             domain.append(('date', '>=', date_from))
         if date_to:
             domain.append(('date', '<=', date_to))
-        lines = self.sudo().search(domain, order='date desc')
+        lines = self.with_user(SUPERUSER_ID).search(domain, order='date desc')
         return [self._format_timesheet_record(l) for l in lines]
 
     @api.model
     def update_timesheet(self, timesheet_id, vals):
         """Update a timesheet entry and return the updated dict."""
-        line = self.sudo().browse(timesheet_id)
+        line = self.with_user(SUPERUSER_ID).browse(timesheet_id)
         if not line.exists():
             raise UserError(_('Timesheet entry not found.'))
         employee = line.employee_id
         allowed = ['date', 'unit_amount', 'name', 'task_id']
         write_vals = {k: v for k, v in vals.items() if k in allowed}
-        line.sudo().write(write_vals)
+        line.with_user(SUPERUSER_ID).write(write_vals)
         line.invalidate_recordset()
         return self._format_timesheet_record(line)
 
     @api.model
     def delete_timesheet(self, timesheet_id):
         """Delete a timesheet entry. Returns True."""
-        line = self.sudo().browse(timesheet_id)
+        line = self.with_user(SUPERUSER_ID).browse(timesheet_id)
         if not line.exists():
             raise UserError(_('Timesheet entry not found.'))
         employee = line.employee_id
-        line.sudo().unlink()
+        line.with_user(SUPERUSER_ID).unlink()
         return True
 
     @api.model
     def get_team_hours(self, manager_employee_id, date_from=None, date_to=None):
         """Return total logged hours per employee for the manager's direct reports."""
-        manager = self.env['hr.employee'].sudo().browse(manager_employee_id)
+        manager = self.env['hr.employee'].with_user(SUPERUSER_ID).browse(manager_employee_id)
         if not manager.exists():
             raise UserError(_('Employee not found.'))
-        team = self.env['hr.employee'].sudo().search([('parent_id', '=', manager_employee_id)])
+        team = self.env['hr.employee'].with_user(SUPERUSER_ID).search([('parent_id', '=', manager_employee_id)])
         if not team:
             return []
         team_ids = team.ids
@@ -182,7 +182,7 @@ class AccountAnalyticLineExt(models.Model):
             domain.append(('date', '>=', date_from))
         if date_to:
             domain.append(('date', '<=', date_to))
-        lines = self.sudo().search(domain)
+        lines = self.with_user(SUPERUSER_ID).search(domain)
         # Group by employee
         from collections import defaultdict
         emp_hours = defaultdict(float)
@@ -201,7 +201,7 @@ class AccountAnalyticLineExt(models.Model):
     def log_timesheet(self, employee_id, task_id, date, unit_amount, name):
         """Create a timesheet entry for an employee on a task. Returns timesheet dict."""
         employee = self._get_employee(employee_id)
-        task = self.env['project.task'].sudo().browse(task_id)
+        task = self.env['project.task'].with_user(SUPERUSER_ID).browse(task_id)
         if not task.exists():
             raise UserError(_('Task not found.'))
         if unit_amount <= 0:
@@ -216,17 +216,17 @@ class AccountAnalyticLineExt(models.Model):
         }
         if employee.user_id:
             vals['user_id'] = employee.user_id.id
-        line = self.sudo().create(vals)
+        line = self.with_user(SUPERUSER_ID).create(vals)
         return self._format_timesheet_record(line)
 
     @api.model
     def get_daily_timesheet(self, employee_id, date):
         """Return list of timesheet entries for the employee on the given date, with daily total."""
-        employee = self.env['hr.employee'].sudo().browse(employee_id)
+        employee = self.env['hr.employee'].with_user(SUPERUSER_ID).browse(employee_id)
         if not employee.exists():
             raise UserError(_('Employee not found.'))
         domain = [('employee_id', '=', employee_id), ('date', '=', date)]
-        lines = self.sudo().search(domain, order='date asc')
+        lines = self.with_user(SUPERUSER_ID).search(domain, order='date asc')
         records = [self._format_timesheet_record(l) for l in lines]
         total_hours = sum(l.unit_amount for l in lines)
         return {
@@ -238,7 +238,7 @@ class AccountAnalyticLineExt(models.Model):
     @api.model
     def get_weekly_timesheet(self, employee_id, week_start):
         """Return timesheets grouped by day for the week starting on week_start (YYYY-MM-DD)."""
-        employee = self.env['hr.employee'].sudo().browse(employee_id)
+        employee = self.env['hr.employee'].with_user(SUPERUSER_ID).browse(employee_id)
         if not employee.exists():
             raise UserError(_('Employee not found.'))
         if not week_start:
@@ -251,7 +251,7 @@ class AccountAnalyticLineExt(models.Model):
             ('date', '>=', start_dt.strftime('%Y-%m-%d')),
             ('date', '<=', end_dt.strftime('%Y-%m-%d')),
         ]
-        lines = self.sudo().search(domain, order='date asc')
+        lines = self.with_user(SUPERUSER_ID).search(domain, order='date asc')
         grouped = self._group_timesheets_by_day(lines)
         total_week_hours = sum(d['total_hours'] for d in grouped)
         return {

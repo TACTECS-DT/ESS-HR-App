@@ -33,7 +33,7 @@ from .utils import call_admin, get_body
 
 class ValidateController(http.Controller):
 
-    @http.route('/ess/admin/api/validate', type='http', auth='none', methods=['POST'], csrf=False)
+    @http.route('/ess/admin/api/validate', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def validate(self):
         kw = get_body()
         return call_admin(

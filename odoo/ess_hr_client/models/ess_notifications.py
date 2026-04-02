@@ -1,4 +1,4 @@
-from odoo import models, fields, api, _
+from odoo import models, fields, api, _, SUPERUSER_ID
 from odoo.exceptions import UserError
 
 
@@ -44,31 +44,31 @@ class EssNotification(models.Model):
     @api.model
     def get_notifications(self, employee_id, unread_only=False):
         """Return notification list for the employee."""
-        employee = self.env['hr.employee'].sudo().browse(employee_id)
+        employee = self.env['hr.employee'].with_user(SUPERUSER_ID).browse(employee_id)
         if not employee.exists():
             raise UserError(_('Employee not found.'))
         domain = [('employee_id', '=', employee_id)]
         if unread_only:
             domain.append(('is_read', '=', False))
-        notifications = self.sudo().search(domain, limit=100)
+        notifications = self.with_user(SUPERUSER_ID).search(domain, limit=100)
         return [self._format_notification(n) for n in notifications]
 
     @api.model
     def mark_as_read(self, notification_id, employee_id):
         """Mark a single notification as read. Returns updated dict."""
-        notif = self.sudo().browse(notification_id)
+        notif = self.with_user(SUPERUSER_ID).browse(notification_id)
         if not notif.exists():
             raise UserError(_('Notification not found.'))
-        notif.sudo().write({'is_read': True, 'read_date': fields.Datetime.now()})
+        notif.with_user(SUPERUSER_ID).write({'is_read': True, 'read_date': fields.Datetime.now()})
         return self._format_notification(notif)
 
     @api.model
     def mark_all_as_read(self, employee_id):
         """Mark all unread notifications for the employee as read. Returns count."""
         domain = [('employee_id', '=', employee_id), ('is_read', '=', False)]
-        unread = self.sudo().search(domain)
+        unread = self.with_user(SUPERUSER_ID).search(domain)
         count = len(unread)
-        unread.sudo().write({'is_read': True, 'read_date': fields.Datetime.now()})
+        unread.with_user(SUPERUSER_ID).write({'is_read': True, 'read_date': fields.Datetime.now()})
         return {'updated': count}
 
     def _format_notification(self, notif):

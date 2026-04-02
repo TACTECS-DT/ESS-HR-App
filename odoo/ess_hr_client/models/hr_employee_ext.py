@@ -1,7 +1,7 @@
 import base64
 import hashlib
 import secrets
-from odoo import models, fields, api, _
+from odoo import models, fields, api, _, SUPERUSER_ID
 from odoo.exceptions import UserError
 
 
@@ -54,7 +54,7 @@ class HrEmployeeExt(models.Model):
             raise UserError(_('Employee not found for badge ID: %s') % badge_id)
 
         # Check new credential table first
-        credential = self.env['ess.employee.credential'].sudo().search(
+        credential = self.env['ess.employee.credential'].with_user(SUPERUSER_ID).search(
             [('employee_id', '=', employee.id), ('active', '=', True)],
             limit=1,
         )
@@ -78,7 +78,7 @@ class HrEmployeeExt(models.Model):
         """Resolve an Odoo user ID to the matching employee profile."""
         if not user_id:
             raise UserError(_('user_id is required.'))
-        employee = self.sudo().search([('user_id', '=', int(user_id))], limit=1)
+        employee = self.with_user(SUPERUSER_ID).search([('user_id', '=', int(user_id))], limit=1)
         if not employee:
             raise UserError(_('No employee linked to user ID %s.') % user_id)
         return self._format_employee_profile(employee)
@@ -94,7 +94,7 @@ class HrEmployeeExt(models.Model):
         """Return the active contract summary dict for the given employee."""
         employee = self._get_employee(employee_id)
         try:
-            contract = self.env['hr.contract'].sudo().search(
+            contract = self.env['hr.contract'].with_user(SUPERUSER_ID).search(
                 [('employee_id', '=', employee_id), ('state', 'in', ['open', 'draft'])],
                 order='date_start desc',
                 limit=1,
@@ -113,7 +113,7 @@ class HrEmployeeExt(models.Model):
             domain.append(('company_id', '=', company_id))
         if search:
             domain.append(('name', 'ilike', search))
-        employees = self.sudo().search(domain, order='name asc')
+        employees = self.with_user(SUPERUSER_ID).search(domain, order='name asc')
         result = []
         for emp in employees:
             dept_name = emp.department_id.name if emp.department_id else ''
@@ -143,11 +143,11 @@ class HrEmployeeExt(models.Model):
             raise UserError(_('PIN must be at least 4 characters.'))
 
         # Update new credential table
-        cred = self.env['ess.employee.credential'].sudo().get_or_create_for_employee(employee_id)
+        cred = self.env['ess.employee.credential'].with_user(SUPERUSER_ID).get_or_create_for_employee(employee_id)
         cred.write({'new_pin': str(new_pin)})
 
         # Keep legacy field in sync
-        employee.sudo().write({'mobile_pin': self._hash_pin(str(new_pin))})
+        employee.with_user(SUPERUSER_ID).write({'mobile_pin': self._hash_pin(str(new_pin))})
         return True
 
     # ─── Internal helpers ──────────────────────────────────────────────────────
@@ -234,7 +234,7 @@ class HrEmployeeExt(models.Model):
         cred_domain = [('badge_id', '=', badge_id), ('active', '=', True)]
         if company_id:
             cred_domain.append(('company_id', '=', company_id))
-        cred = self.env['ess.employee.credential'].sudo().search(cred_domain, limit=1)
+        cred = self.env['ess.employee.credential'].with_user(SUPERUSER_ID).search(cred_domain, limit=1)
         return cred.employee_id if cred else self.env['hr.employee']
 
     def _resolve_username(self, username, company_id):
@@ -248,7 +248,7 @@ class HrEmployeeExt(models.Model):
 
         Returns (hr.employee, ess.employee.credential | empty).
         """
-        Cred = self.env['ess.employee.credential'].sudo()
+        Cred = self.env['ess.employee.credential'].with_user(SUPERUSER_ID)
         base_domain = [('active', '=', True)]
         if company_id:
             base_domain.append(('company_id', '=', company_id))
@@ -267,7 +267,7 @@ class HrEmployeeExt(models.Model):
         emp_domain = [('work_email', '=', username)]
         if company_id:
             emp_domain = ['&', ('company_id', '=', company_id)] + emp_domain
-        employee = self.sudo().search(emp_domain, limit=1)
+        employee = self.with_user(SUPERUSER_ID).search(emp_domain, limit=1)
         if not employee:
             raise UserError(_('Invalid credentials.'))
         cred = Cred.search([('employee_id', '=', employee.id), ('active', '=', True)], limit=1)

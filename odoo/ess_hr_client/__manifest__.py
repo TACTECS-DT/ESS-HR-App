@@ -15,6 +15,7 @@
     ],
     'post_init_hook': 'post_init_hook',
     'installable': True,
+    'demo': [],
     'application': False,
     'license': 'LGPL-3',
 }

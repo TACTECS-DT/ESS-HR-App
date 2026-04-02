@@ -4,15 +4,14 @@
  * NEVER hardcode an API path anywhere in the app. Always import from here.
  *
  * ─── How the layers map ────────────────────────────────────────────────────
- *  Stage 1 │ MOCK_MODE=true  │ axios-mock-adapter intercepts these paths locally
- *  Stage 2 │ MOCK_MODE=false │ Point API_BASE_URL → Odoo; change paths below to /ess/api/...
- *  Stage 3 │ MOCK_MODE=false │ Point API_BASE_URL → Django; Django mirrors these REST paths
+ *  mock  │ MOCK_MODE=true  │ axios-mock-adapter intercepts these paths locally
+ *  odoo  │ MOCK_MODE=false │ baseURL = user-entered client server URL + /ess/api (from Redux)
+ *  django│ MOCK_MODE=false │ baseURL = DJANGO_BASE_URL from .env; Django mirrors the same paths
  * ──────────────────────────────────────────────────────────────────────────
  *
  * To switch backend layers:
- *   1. Update API_BASE_URL in src/config/env.ts
- *   2. If the new layer uses different path conventions (e.g. Odoo's /ess/api/*)
- *      update the string values below — the "Stage 2:" comments show the Odoo equivalents
+ *   1. Update ACTIVE_BACKEND in .env
+ *   2. If paths differ (e.g. Odoo's /ess/api/* prefix) update values below
  *   3. No other file in the app needs to change
  */
 

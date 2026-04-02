@@ -1,4 +1,4 @@
-from odoo import models, fields, api, _
+from odoo import models, fields, api, _, SUPERUSER_ID
 from odoo.exceptions import UserError
 
 
@@ -36,7 +36,7 @@ class EssAnnouncement(models.Model):
     @api.model
     def get_announcements(self, employee_id, company_id=None):
         """Return active announcements visible to the employee."""
-        employee = self.env['hr.employee'].sudo().browse(employee_id)
+        employee = self.env['hr.employee'].with_user(SUPERUSER_ID).browse(employee_id)
         if not employee.exists():
             raise UserError(_('Employee not found.'))
         now = fields.Datetime.now()
@@ -55,7 +55,7 @@ class EssAnnouncement(models.Model):
             domain += ['|', ('department_id', '=', emp_dept), ('department_id', '=', False)]
         else:
             domain.append(('department_id', '=', False))
-        announcements = self.sudo().search(domain)
+        announcements = self.with_user(SUPERUSER_ID).search(domain)
         return [self._format_announcement(a) for a in announcements]
 
     def _format_announcement(self, ann):

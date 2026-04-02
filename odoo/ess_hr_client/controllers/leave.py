@@ -6,7 +6,7 @@ from .utils import call_and_log, get_body, get_auth_context
 
 class LeaveController(http.Controller):
 
-    @http.route('/ess/api/leave/types', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
+    @http.route('/ess/api/leave/types', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
     def types(self):
         kw = get_body()
         return call_and_log(
@@ -14,7 +14,7 @@ class LeaveController(http.Controller):
             lambda: request.env['hr.leave.type'].sudo().get_leave_types(kw.get('company_id')),
         )
 
-    @http.route('/ess/api/leave/balances', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
+    @http.route('/ess/api/leave/balances', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
     def balances(self):
         kw = get_body()
         employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
@@ -23,7 +23,7 @@ class LeaveController(http.Controller):
             lambda: request.env['hr.leave'].sudo().get_leave_balance(employee_id),
         )
 
-    @http.route('/ess/api/leave/team-balances', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
+    @http.route('/ess/api/leave/team-balances', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
     def team_balances(self):
         kw = get_body()
         manager_employee_id = kw.get('manager_employee_id') or get_auth_context().get('employee_id')
@@ -32,7 +32,7 @@ class LeaveController(http.Controller):
             lambda: request.env['hr.leave'].sudo().get_team_leave_allocations(manager_employee_id),
         )
 
-    @http.route('/ess/api/leave/requests', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
+    @http.route('/ess/api/leave/requests', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
     def requests(self):
         kw = get_body()
         employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
@@ -54,7 +54,7 @@ class LeaveController(http.Controller):
             ),
         )
 
-    @http.route('/ess/api/leave/requests/<int:leave_id>', type='http', auth='none', methods=['GET', 'PATCH', 'DELETE'], csrf=False)
+    @http.route('/ess/api/leave/requests/<int:leave_id>', type='http', auth='none', methods=['GET', 'PATCH', 'DELETE'], csrf=False, readonly=False)
     def request_by_id(self, leave_id):
         kw = get_body()
         method = request.httprequest.method
@@ -75,7 +75,7 @@ class LeaveController(http.Controller):
             lambda: request.env['hr.leave'].sudo().cancel_leave_request(leave_id),
         )
 
-    @http.route('/ess/api/leave/approve', type='http', auth='none', methods=['POST'], csrf=False)
+    @http.route('/ess/api/leave/approve', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def approve(self):
         kw = get_body()
         manager_employee_id = kw.get('manager_employee_id') or get_auth_context().get('employee_id')
@@ -84,7 +84,7 @@ class LeaveController(http.Controller):
             lambda: request.env['hr.leave'].sudo().approve_leave(kw.get('leave_id'), manager_employee_id),
         )
 
-    @http.route('/ess/api/leave/refuse', type='http', auth='none', methods=['POST'], csrf=False)
+    @http.route('/ess/api/leave/refuse', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def refuse(self):
         kw = get_body()
         manager_employee_id = kw.get('manager_employee_id') or get_auth_context().get('employee_id')
@@ -95,7 +95,7 @@ class LeaveController(http.Controller):
             ),
         )
 
-    @http.route('/ess/api/leave/validate', type='http', auth='none', methods=['POST'], csrf=False)
+    @http.route('/ess/api/leave/validate', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def validate(self):
         kw = get_body()
         hr_employee_id = kw.get('hr_employee_id') or get_auth_context().get('employee_id')
@@ -104,7 +104,7 @@ class LeaveController(http.Controller):
             lambda: request.env['hr.leave'].sudo().validate_leave(kw.get('leave_id'), hr_employee_id),
         )
 
-    @http.route('/ess/api/leave/reset', type='http', auth='none', methods=['POST'], csrf=False)
+    @http.route('/ess/api/leave/reset', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def reset(self):
         kw = get_body()
         return call_and_log(

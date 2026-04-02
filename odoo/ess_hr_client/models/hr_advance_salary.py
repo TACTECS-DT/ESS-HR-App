@@ -1,4 +1,4 @@
-from odoo import models, fields, api, _
+from odoo import models, fields, api, _, SUPERUSER_ID
 from odoo.exceptions import UserError
 
 
@@ -42,7 +42,7 @@ class HrAdvanceSalary(models.Model):
     @api.model
     def get_advance_salary_cap(self, employee_id):
         """Return the advance salary cap (50% of basic wage) for the employee."""
-        employee = self.env['hr.employee'].sudo().browse(employee_id)
+        employee = self.env['hr.employee'].with_user(SUPERUSER_ID).browse(employee_id)
         if not employee.exists():
             raise UserError(_('Employee not found.'))
         basic_wage = self._get_basic_wage(employee)
@@ -54,7 +54,7 @@ class HrAdvanceSalary(models.Model):
         """Create a new advance salary request after validating the 50% cap. Returns advance dict."""
         employee = self._get_employee(employee_id)
         self._validate_advance_cap(employee, amount)
-        advance = self.sudo().create({
+        advance = self.with_user(SUPERUSER_ID).create({
             'employee_id': employee_id,
             'amount': amount,
             'state': 'submitted',
@@ -65,7 +65,7 @@ class HrAdvanceSalary(models.Model):
     @api.model
     def get_advance_salary_detail(self, advance_id):
         """Return a single advance salary request dict by ID."""
-        advance = self.sudo().browse(advance_id)
+        advance = self.with_user(SUPERUSER_ID).browse(advance_id)
         if not advance.exists():
             raise UserError(_('Advance salary request not found.'))
         return self._format_advance_record(advance)
@@ -73,22 +73,22 @@ class HrAdvanceSalary(models.Model):
     @api.model
     def get_advance_salaries(self, employee_id):
         """Return list of advance salary records for the employee."""
-        employee = self.env['hr.employee'].sudo().browse(employee_id)
+        employee = self.env['hr.employee'].with_user(SUPERUSER_ID).browse(employee_id)
         if not employee.exists():
             raise UserError(_('Employee not found.'))
-        advances = self.sudo().search([('employee_id', '=', employee_id)], order='request_date desc')
+        advances = self.with_user(SUPERUSER_ID).search([('employee_id', '=', employee_id)], order='request_date desc')
         return [self._format_advance_record(a) for a in advances]
 
     @api.model
     def approve_advance_salary(self, request_id, manager_employee_id):
         """Approve an advance salary request. Returns True."""
-        advance = self.sudo().browse(request_id)
+        advance = self.with_user(SUPERUSER_ID).browse(request_id)
         if not advance.exists():
             raise UserError(_('Advance salary request not found.'))
         if advance.state not in ('draft', 'submitted'):
             raise UserError(_('Only draft or submitted requests can be approved.'))
         self._get_employee(manager_employee_id)
-        advance.sudo().write({
+        advance.with_user(SUPERUSER_ID).write({
             'state': 'approved',
             'approved_by': manager_employee_id,
             'approved_date': fields.Date.today(),
@@ -98,13 +98,13 @@ class HrAdvanceSalary(models.Model):
     @api.model
     def refuse_advance_salary(self, request_id, manager_employee_id, reason):
         """Refuse an advance salary request with a reason. Returns True."""
-        advance = self.sudo().browse(request_id)
+        advance = self.with_user(SUPERUSER_ID).browse(request_id)
         if not advance.exists():
             raise UserError(_('Advance salary request not found.'))
         if advance.state not in ('draft', 'submitted'):
             raise UserError(_('Only draft or submitted requests can be refused.'))
         self._get_employee(manager_employee_id)
-        advance.sudo().write({
+        advance.with_user(SUPERUSER_ID).write({
             'state': 'refused',
             'approved_by': manager_employee_id,
             'reason_refusal': reason or '',
@@ -114,12 +114,12 @@ class HrAdvanceSalary(models.Model):
     @api.model
     def reset_advance_salary(self, request_id):
         """Reset an advance salary request to draft. Returns True."""
-        advance = self.sudo().browse(request_id)
+        advance = self.with_user(SUPERUSER_ID).browse(request_id)
         if not advance.exists():
             raise UserError(_('Advance salary request not found.'))
         if advance.state == 'approved':
             raise UserError(_('Approved requests cannot be reset to draft.'))
-        advance.sudo().write({'state': 'draft', 'reason_refusal': False})
+        advance.with_user(SUPERUSER_ID).write({'state': 'draft', 'reason_refusal': False})
         return True
 
     def _validate_advance_cap(self, employee, amount):
@@ -136,7 +136,7 @@ class HrAdvanceSalary(models.Model):
     def _get_basic_wage(self, employee):
         """Return the basic wage from the employee's active contract."""
         try:
-            contract = self.env['hr.contract'].sudo().search(
+            contract = self.env['hr.contract'].with_user(SUPERUSER_ID).search(
                 [('employee_id', '=', employee.id), ('state', 'in', ['open', 'draft'])],
                 order='date_start desc', limit=1,
             )

@@ -10,12 +10,9 @@
  *   Edit ACTIVE_BACKEND in .env, then restart Metro bundler.
  *
  *   mock   → axios-mock-adapter intercepts all calls locally (no server needed)
- *   odoo   → calls go directly to ODOO_BASE_URL
- *            ODOO_BASE_URL must include the /ess/api prefix so API_MAP paths append correctly
- *            e.g.  http://your-odoo-server.com/ess/api
+ *   odoo   → client server URL comes from user input at login (Step 1), stored in Redux
  *   django → calls go through the Django middleware at DJANGO_BASE_URL
  *            Django mirrors the same REST paths — API_MAP needs no change
- *            e.g.  https://api.ess-hr.app/v1
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
@@ -24,8 +21,8 @@
 // ─────────────────────────────────────────────────────────────────────────────
 import {
   ACTIVE_BACKEND,
+  MOCK_MODE,
   ESS_ADMIN_URL,
-  ODOO_BASE_URL,
   DJANGO_BASE_URL,
   MOCK_DELAY_MIN,
   MOCK_DELAY_MAX,
@@ -35,28 +32,19 @@ export type BackendMode = 'mock' | 'odoo' | 'django';
 
 const _backend = ACTIVE_BACKEND as BackendMode;
 
-function _resolveBaseUrl(mode: BackendMode): string {
-  if (mode === 'odoo')   {return ODOO_BASE_URL;}
-  if (mode === 'django') {return DJANGO_BASE_URL;}
-  return DJANGO_BASE_URL; // mock — value ignored; mock adapter intercepts all calls
-}
-
 export const ENV = {
   /** Active backend: 'mock' | 'odoo' | 'django' */
   ACTIVE_BACKEND: _backend,
-  /** True only in mock mode — enables axios-mock-adapter */
-  MOCK_MODE: _backend === 'mock',
-  /** Base URL prepended to every API_MAP path by the axios client */
-  API_BASE_URL: _resolveBaseUrl(_backend),
+  /** True when MOCK_MODE=true in .env — disables all network calls */
+  MOCK_MODE: MOCK_MODE === 'true',
   /**
    * Central ESS Admin server root URL (no path suffix).
-   * Used for Step 1 of login: POST /ess/admin/api/validate
-   * This is the ONLY server URL fixed in .env — all client URLs are user-entered.
+   * Used ONLY for Step 1 of login: POST /ess/admin/api/validate
+   * This is the ONLY server URL fixed in .env.
+   * All client server URLs come from user input at the LicenseActivation screen.
    */
   ESS_ADMIN_URL,
-  /** Odoo client server root + /ess/api prefix — dev fallback only */
-  ODOO_BASE_URL,
-  /** Django / middleware server root — edit in .env */
+  /** Django / middleware server root — used when ACTIVE_BACKEND=django */
   DJANGO_BASE_URL,
   MOCK_DELAY_MIN: Number(MOCK_DELAY_MIN),
   MOCK_DELAY_MAX: Number(MOCK_DELAY_MAX),

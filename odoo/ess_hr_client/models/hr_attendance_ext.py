@@ -1,5 +1,5 @@
 from datetime import datetime, date
-from odoo import models, fields, api, _
+from odoo import models, fields, api, _, SUPERUSER_ID
 from odoo.exceptions import UserError
 
 
@@ -36,7 +36,7 @@ class HrAttendanceExt(models.Model):
             'gps_longitude': longitude or 0.0,
         }
         # task_id is not a field on hr.attendance in Odoo 19 — removed
-        attendance = self.sudo().with_context(tracking_disable=True).create(vals)
+        attendance = self.with_user(SUPERUSER_ID).with_context(tracking_disable=True).create(vals)
         return self._format_attendance_record(attendance)
 
     @api.model
@@ -47,7 +47,7 @@ class HrAttendanceExt(models.Model):
         if not open_att:
             raise UserError(_('No open attendance found for this employee.'))
         check_out_dt = self._parse_timestamp(timestamp)
-        open_att.sudo().with_context(tracking_disable=True).write({
+        open_att.with_user(SUPERUSER_ID).with_context(tracking_disable=True).write({
             'check_out': check_out_dt,
             'checkout_latitude': latitude or 0.0,
             'checkout_longitude': longitude or 0.0,
@@ -87,9 +87,9 @@ class HrAttendanceExt(models.Model):
             ('check_in', '>=', date_from + ' 00:00:00'),
             ('check_in', '<=', date_to + ' 23:59:59'),
         ]
-        total = self.sudo().search_count(domain)
+        total = self.with_user(SUPERUSER_ID).search_count(domain)
         offset = (page - 1) * page_size
-        records = self.sudo().search(domain, order='check_in desc', limit=page_size, offset=offset)
+        records = self.with_user(SUPERUSER_ID).search(domain, order='check_in desc', limit=page_size, offset=offset)
         return {
             'total': total,
             'page': page,
@@ -108,7 +108,7 @@ class HrAttendanceExt(models.Model):
             ('check_in', '>=', date + ' 00:00:00'),
             ('check_in', '<=', date + ' 23:59:59'),
         ]
-        records = self.sudo().search(domain, order='check_in asc')
+        records = self.with_user(SUPERUSER_ID).search(domain, order='check_in asc')
         return [self._format_attendance_record(r) for r in records]
 
     @api.model
@@ -133,7 +133,7 @@ class HrAttendanceExt(models.Model):
                 ('check_in', '>=', day_date.strftime('%Y-%m-%d') + ' 00:00:00'),
                 ('check_in', '<=', day_date.strftime('%Y-%m-%d') + ' 23:59:59'),
             ]
-            day_records = self.sudo().search(domain)
+            day_records = self.with_user(SUPERUSER_ID).search(domain)
             total_hours = sum(r.worked_hours for r in day_records if r.worked_hours)
             result.append({
                 'date': day_date.strftime('%Y-%m-%d'),
@@ -147,7 +147,7 @@ class HrAttendanceExt(models.Model):
     def get_team_attendance(self, manager_employee_id, attendance_date=None):
         """Return attendance status for all direct reports of the manager on a given date."""
         manager = self._get_employee(manager_employee_id)
-        team = self.env['hr.employee'].sudo().search([('parent_id', '=', manager_employee_id)])
+        team = self.env['hr.employee'].with_user(SUPERUSER_ID).search([('parent_id', '=', manager_employee_id)])
         target_date = attendance_date or fields.Date.today()
         if isinstance(target_date, str):
             from datetime import datetime as _dt
@@ -163,9 +163,9 @@ class HrAttendanceExt(models.Model):
                 ('check_in', '>=', target_date.strftime('%Y-%m-%d') + ' 00:00:00'),
                 ('check_in', '<=', target_date.strftime('%Y-%m-%d') + ' 23:59:59'),
             ]
-            day_records = self.sudo().search(domain)
+            day_records = self.with_user(SUPERUSER_ID).search(domain)
             total_hours = sum(r.worked_hours for r in day_records if r.worked_hours)
-            open_att = self.sudo().search(
+            open_att = self.with_user(SUPERUSER_ID).search(
                 [('employee_id', '=', emp.id), ('check_out', '=', False)], limit=1
             )
             result.append({
@@ -193,12 +193,12 @@ class HrAttendanceExt(models.Model):
         }
         if check_out_str:
             vals['check_out'] = self._parse_timestamp(check_out_str)
-        attendance = self.sudo().with_context(tracking_disable=True).create(vals)
+        attendance = self.with_user(SUPERUSER_ID).with_context(tracking_disable=True).create(vals)
         return self._format_attendance_record(attendance)
 
     def _find_open_attendance(self, employee_id):
         """Find the open (no check_out) attendance record for an employee."""
-        return self.sudo().search(
+        return self.with_user(SUPERUSER_ID).search(
             [('employee_id', '=', employee_id), ('check_out', '=', False)],
             limit=1,
         )
@@ -211,7 +211,7 @@ class HrAttendanceExt(models.Model):
             ('check_in', '>=', str(today) + ' 00:00:00'),
             ('check_in', '<=', str(today) + ' 23:59:59'),
         ]
-        records = self.sudo().search(domain)
+        records = self.with_user(SUPERUSER_ID).search(domain)
         total = 0.0
         for r in records:
             if r.worked_hours:
@@ -225,7 +225,7 @@ class HrAttendanceExt(models.Model):
         """Determine the attendance status string for a given date."""
         if date_obj.weekday() >= 5:
             return 'Weekend'
-        leave = self.env['hr.leave'].sudo().search([
+        leave = self.env['hr.leave'].with_user(SUPERUSER_ID).search([
             ('employee_id', '=', employee_id),
             ('date_from', '<=', fields.Datetime.to_string(
                 datetime.combine(date_obj, datetime.min.time()))),
@@ -240,7 +240,7 @@ class HrAttendanceExt(models.Model):
             ('check_in', '>=', date_obj.strftime('%Y-%m-%d') + ' 00:00:00'),
             ('check_in', '<=', date_obj.strftime('%Y-%m-%d') + ' 23:59:59'),
         ]
-        records = self.sudo().search(domain, limit=1)
+        records = self.with_user(SUPERUSER_ID).search(domain, limit=1)
         if records:
             return 'Present'
         if date_obj <= fields.Date.today():

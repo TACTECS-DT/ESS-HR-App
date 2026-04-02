@@ -5,7 +5,7 @@ Any license key except "INVALID" → goes to login
 PIN: anything except 0000 → logs in successfully
 Password: anything except "wrong" → logs in successfully
 
-
+npx react-native start --reset-cache                                    
 ---run emulator  vs code terminal:
 
      emulator -list-avds

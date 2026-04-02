@@ -6,7 +6,7 @@ from .utils import call_and_log, get_body, get_auth_context
 
 class LoanController(http.Controller):
 
-    @http.route('/ess/api/loans/rules', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
+    @http.route('/ess/api/loans/rules', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
     def rules(self):
         kw = get_body()
         return call_and_log(
@@ -14,7 +14,7 @@ class LoanController(http.Controller):
             lambda: request.env['hr.loan'].sudo().get_loan_rules(kw.get('company_id')),
         )
 
-    @http.route('/ess/api/loans', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
+    @http.route('/ess/api/loans', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
     def loans(self):
         kw = get_body()
         employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
@@ -33,14 +33,14 @@ class LoanController(http.Controller):
             ),
         )
 
-    @http.route('/ess/api/loans/<int:loan_id>', type='http', auth='none', methods=['GET'], csrf=False)
+    @http.route('/ess/api/loans/<int:loan_id>', type='http', auth='none', methods=['GET'], csrf=False, readonly=False)
     def loan_by_id(self, loan_id):
         return call_and_log(
             '/ess/api/loans/<id>',
             lambda: request.env['hr.loan'].sudo().get_loan_detail(loan_id),
         )
 
-    @http.route('/ess/api/loans/approve', type='http', auth='none', methods=['POST'], csrf=False)
+    @http.route('/ess/api/loans/approve', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def approve(self):
         kw = get_body()
         approver_employee_id = kw.get('approver_employee_id') or get_auth_context().get('employee_id')
@@ -49,7 +49,7 @@ class LoanController(http.Controller):
             lambda: request.env['hr.loan'].sudo().approve_loan(kw.get('loan_id'), approver_employee_id),
         )
 
-    @http.route('/ess/api/loans/refuse', type='http', auth='none', methods=['POST'], csrf=False)
+    @http.route('/ess/api/loans/refuse', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def refuse(self):
         kw = get_body()
         approver_employee_id = kw.get('approver_employee_id') or get_auth_context().get('employee_id')

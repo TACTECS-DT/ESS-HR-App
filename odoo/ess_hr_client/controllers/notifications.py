@@ -6,7 +6,7 @@ from .utils import call_and_log, get_body, get_auth_context
 
 class NotificationsController(http.Controller):
 
-    @http.route('/ess/api/notifications', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
+    @http.route('/ess/api/notifications', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
     def list(self):
         kw = get_body()
         employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
@@ -17,7 +17,7 @@ class NotificationsController(http.Controller):
             ),
         )
 
-    @http.route('/ess/api/notifications/<int:notification_id>/read', type='http', auth='none', methods=['POST'], csrf=False)
+    @http.route('/ess/api/notifications/<int:notification_id>/read', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def mark_read(self, notification_id):
         kw = get_body()
         employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
@@ -28,7 +28,7 @@ class NotificationsController(http.Controller):
             ),
         )
 
-    @http.route('/ess/api/notifications/read-all', type='http', auth='none', methods=['POST'], csrf=False)
+    @http.route('/ess/api/notifications/read-all', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def mark_all_read(self):
         kw = get_body()
         employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')

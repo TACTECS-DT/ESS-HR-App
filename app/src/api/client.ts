@@ -19,15 +19,27 @@ apiClient.interceptors.request.use(
 
     // Dynamic base URL:
     //  - MOCK_MODE: leave baseURL unset so axios-mock-adapter receives the bare
-    //    relative path (e.g. /auth/companies) and can match its registered handlers.
-    //    Setting a baseURL here would make axios merge it into a full URL before the
-    //    adapter runs, breaking all mock registrations.
-    //  - Real mode: use the client server URL from Redux (set after Step 1), falling
-    //    back to ENV.API_BASE_URL for the first request before Step 1 completes.
-    if (!config.baseURL && !ENV.MOCK_MODE) {
-      config.baseURL = auth.serverUrl
-        ? auth.serverUrl.replace(/\/$/, '') + '/ess/api'
-        : ENV.API_BASE_URL;
+    //    relative path and can match its registered handlers.
+    //  - Real mode: use the client server URL from Redux (set after Step 1 succeeds).
+    //    If serverUrl is null the user hasn't completed Step 1 yet — reject the call
+    //    rather than silently hitting a wrong hardcoded server.
+    // Dynamic base URL resolution:
+    //  - mock:   serverUrl = 'mock', leave baseURL unset — mock adapter intercepts bare paths
+    //  - django: use DJANGO_BASE_URL from .env (fixed middleware address)
+    //  - odoo:   use serverUrl from Redux (user-entered at Step 1) + /ess/api suffix
+    //            if serverUrl is null, Step 1 hasn't completed — reject the call
+    if (!config.baseURL) {
+      if (ENV.MOCK_MODE || auth.serverUrl === 'mock') {
+        // leave unset — mock adapter handles it
+      } else if (ENV.ACTIVE_BACKEND === 'django') {
+        config.baseURL = ENV.DJANGO_BASE_URL.replace(/\/$/, '');
+      } else {
+        const serverUrl = auth.serverUrl;
+        if (!serverUrl) {
+          return Promise.reject(new Error('No client server URL — complete Step 1 (license activation) first.'));
+        }
+        config.baseURL = serverUrl.replace(/\/$/, '') + '/ess/api';
+      }
     }
 
     if (auth.accessToken) {

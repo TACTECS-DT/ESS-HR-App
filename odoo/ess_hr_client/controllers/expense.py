@@ -6,7 +6,7 @@ from .utils import call_and_log, get_body, get_auth_context
 
 class ExpenseController(http.Controller):
 
-    @http.route('/ess/api/expenses/categories', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
+    @http.route('/ess/api/expenses/categories', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
     def categories(self):
         kw = get_body()
         return call_and_log(
@@ -14,7 +14,7 @@ class ExpenseController(http.Controller):
             lambda: request.env['hr.expense'].sudo().get_expense_categories(),
         )
 
-    @http.route('/ess/api/expenses/currencies', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
+    @http.route('/ess/api/expenses/currencies', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
     def currencies(self):
         kw = get_body()
         return call_and_log(
@@ -22,7 +22,7 @@ class ExpenseController(http.Controller):
             lambda: request.env['hr.expense'].sudo().get_currencies(),
         )
 
-    @http.route('/ess/api/expenses/taxes', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
+    @http.route('/ess/api/expenses/taxes', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
     def taxes(self):
         kw = get_body()
         return call_and_log(
@@ -30,7 +30,7 @@ class ExpenseController(http.Controller):
             lambda: request.env['hr.expense'].sudo().get_purchase_taxes(kw.get('company_id')),
         )
 
-    @http.route('/ess/api/expenses', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
+    @http.route('/ess/api/expenses', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
     def expenses(self):
         kw = get_body()
         employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
@@ -53,7 +53,7 @@ class ExpenseController(http.Controller):
             ),
         )
 
-    @http.route('/ess/api/expenses/<int:expense_id>', type='http', auth='none', methods=['GET', 'PATCH', 'DELETE'], csrf=False)
+    @http.route('/ess/api/expenses/<int:expense_id>', type='http', auth='none', methods=['GET', 'PATCH', 'DELETE'], csrf=False, readonly=False)
     def expense_by_id(self, expense_id):
         kw = get_body()
         method = request.httprequest.method
@@ -74,7 +74,7 @@ class ExpenseController(http.Controller):
             lambda: request.env['hr.expense'].sudo().delete_expense(expense_id),
         )
 
-    @http.route('/ess/api/expenses/attach', type='http', auth='none', methods=['POST'], csrf=False)
+    @http.route('/ess/api/expenses/attach', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def attach(self):
         kw = get_body()
         return call_and_log(
@@ -84,7 +84,7 @@ class ExpenseController(http.Controller):
             ),
         )
 
-    @http.route('/ess/api/expenses/submit', type='http', auth='none', methods=['POST'], csrf=False)
+    @http.route('/ess/api/expenses/submit', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def submit(self):
         kw = get_body()
         return call_and_log(

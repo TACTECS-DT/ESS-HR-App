@@ -1,4 +1,4 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, SUPERUSER_ID
 
 
 class EssApiLog(models.Model):
@@ -35,13 +35,17 @@ class EssApiLog(models.Model):
         """Create one log entry for an API request. Called by the controller."""
         module, action = self._extract_module_action(endpoint)
         company_id = self._get_employee_company(employee_id)
-        self.sudo().create({
+        # Explicitly use SUPERUSER so create_uid/write_uid are never NULL.
+        # This is required in test and unauthenticated HTTP contexts where
+        # env.uid may be 0 (no session), which would violate the NOT NULL constraint.
+        orig_uid = self.env.uid
+        self.env(user=SUPERUSER_ID, su=True)['ess.api.log'].create({
             'endpoint': endpoint,
             'module': module,
             'action': action,
             'employee_id': employee_id or False,
             'company_id': company_id,
-            'odoo_uid': self.env.uid,
+            'odoo_uid': orig_uid,
             'ip_address': ip_address or '',
             'status': status,
             'error_message': error_message or False,
@@ -54,7 +58,7 @@ class EssApiLog(models.Model):
     def get_module_stats(self, date_from=None, date_to=None):
         """Return request totals grouped by module with success/error counts."""
         domain = self._build_date_domain(date_from, date_to)
-        logs = self.sudo().search(domain)
+        logs = self.with_user(SUPERUSER_ID).search(domain)
         stats = {}
         for log in logs:
             mod = log.module or 'unknown'
@@ -69,7 +73,7 @@ class EssApiLog(models.Model):
         """Return top employees ordered by request count."""
         domain = self._build_date_domain(date_from, date_to)
         domain += [('employee_id', '!=', False)]
-        logs = self.sudo().search(domain)
+        logs = self.with_user(SUPERUSER_ID).search(domain)
         emp_stats = {}
         for log in logs:
             eid = log.employee_id.id
@@ -88,7 +92,7 @@ class EssApiLog(models.Model):
     def get_hourly_distribution(self, date_from=None, date_to=None):
         """Return request count per hour of the day (0–23)."""
         domain = self._build_date_domain(date_from, date_to)
-        logs = self.sudo().search(domain)
+        logs = self.with_user(SUPERUSER_ID).search(domain)
         hours = {h: 0 for h in range(24)}
         for log in logs:
             if log.timestamp:
@@ -100,7 +104,7 @@ class EssApiLog(models.Model):
         """Return error counts grouped by endpoint, most frequent first."""
         domain = self._build_date_domain(date_from, date_to)
         domain += [('status', '=', 'error')]
-        logs = self.sudo().search(domain)
+        logs = self.with_user(SUPERUSER_ID).search(domain)
         endpoint_stats = {}
         for log in logs:
             ep = log.endpoint or 'unknown'
@@ -113,7 +117,7 @@ class EssApiLog(models.Model):
     def get_daily_totals(self, date_from=None, date_to=None):
         """Return total requests per calendar day with success/error split."""
         domain = self._build_date_domain(date_from, date_to)
-        logs = self.sudo().search(domain, order='timestamp asc')
+        logs = self.with_user(SUPERUSER_ID).search(domain, order='timestamp asc')
         day_stats = {}
         for log in logs:
             if log.timestamp:
@@ -140,7 +144,7 @@ class EssApiLog(models.Model):
         """Look up the company_id for the given employee_id, or return False."""
         if not employee_id:
             return False
-        emp = self.env['hr.employee'].sudo().browse(employee_id)
+        emp = self.env['hr.employee'].with_user(SUPERUSER_ID).browse(employee_id)
         return emp.company_id.id if emp.exists() and emp.company_id else False
 
     def _build_date_domain(self, date_from, date_to):

@@ -7,7 +7,7 @@ from .utils import call_and_log, get_body, get_auth_context
 
 class PendingApprovalsController(http.Controller):
 
-    @http.route('/ess/api/pending-approvals', type='http', auth='none', methods=['GET', 'POST'], csrf=False)
+    @http.route('/ess/api/pending-approvals', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
     def list(self):
         kw = get_body()
         employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
@@ -16,7 +16,7 @@ class PendingApprovalsController(http.Controller):
             lambda: _gather_pending(request, employee_id),
         )
 
-    @http.route('/ess/api/pending-approvals/<int:item_id>/action', type='http', auth='none', methods=['POST'], csrf=False)
+    @http.route('/ess/api/pending-approvals/<int:item_id>/action', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def action(self, item_id):
         kw = get_body()
         employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
