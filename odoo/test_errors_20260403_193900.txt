@@ -1,0 +1,259 @@
+======================================================================
+  ESS HR Odoo Test Run — 2026-04-03 19:39:08
+  Command : d:\odoo19\python\python.exe d:\odoo19\server\odoo-bin --config d:\odoo19\server\odoo.conf --database ess-19 --test-enable --stop-after-init --test-tags ess_leave --no-http --log-level test --log-handler odoo.tests:INFO --log-handler odoo.tests.runner:INFO --log-handler odoo.addons.ess_hr_client.tests:INFO --log-handler odoo.addons.ess_hr_admin.tests:INFO
+======================================================================
+
+SUMMARY
+----------------------------------------
+  Total run  : 0
+  Passed     : 0
+  Failed     : 12
+  Errors     : 0
+  Skipped    : 0
+  Duration   : 0.00s
+  Result     : FAILED
+
+FAILED / ERRORED TESTS
+----------------------------------------
+  FAIL   TestLeave.test_leave_approve_workflow
+  FAIL   TestLeave.test_leave_balances_returns_list
+  FAIL   TestLeave.test_leave_create_invalid_dates_fails
+  FAIL   TestLeave.test_leave_create_missing_dates_fails
+  FAIL   TestLeave.test_leave_create_success
+  FAIL   TestLeave.test_leave_get_by_id
+  FAIL   TestLeave.test_leave_get_nonexistent_fails
+  FAIL   TestLeave.test_leave_list_returns_list
+  FAIL   TestLeave.test_leave_refuse_workflow
+  FAIL   TestLeave.test_leave_reset_to_draft
+  FAIL   TestLeave.test_leave_types_returns_list
+  FAIL   TestLeave.test_team_balances_returns_list
+
+FAILURE DETAILS / TRACEBACKS
+======================================================================
+
+FAIL: TestLeave.test_leave_approve_workflow
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+
+----------------------------------------------------------------------
+
+FAIL: TestLeave.test_leave_balances_returns_list
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+
+----------------------------------------------------------------------
+
+FAIL: TestLeave.test_leave_create_invalid_dates_fails
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+
+----------------------------------------------------------------------
+
+FAIL: TestLeave.test_leave_create_missing_dates_fails
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+
+----------------------------------------------------------------------
+
+FAIL: TestLeave.test_leave_create_success
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+
+----------------------------------------------------------------------
+
+FAIL: TestLeave.test_leave_get_by_id
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+
+----------------------------------------------------------------------
+
+FAIL: TestLeave.test_leave_get_nonexistent_fails
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+
+----------------------------------------------------------------------
+
+FAIL: TestLeave.test_leave_list_returns_list
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+
+----------------------------------------------------------------------
+
+FAIL: TestLeave.test_leave_refuse_workflow
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+
+----------------------------------------------------------------------
+
+FAIL: TestLeave.test_leave_reset_to_draft
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+
+----------------------------------------------------------------------
+
+FAIL: TestLeave.test_leave_types_returns_list
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+
+----------------------------------------------------------------------
+
+FAIL: TestLeave.test_team_balances_returns_list
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+
+filestore gc 0 checked, 0 removed
+12 post-tests in 3.44s, 290 queries
+ess_hr_client: 14 tests 0.51s 53 queries
+12 failed, 0 error(s) of 12 tests when loading database 'ess-19'
+Initiating shutdown
+Hit CTRL-C again or send a second signal to force the shutdown.
+ConnectionPool(read/write;used=0/count=0/max=64): Closed 1 connections
+----------------------------------------------------------------------
+
+FULL ODOO OUTPUT
+======================================================================
+2026-04-03 17:39:01,210 9664 WARNING ? odoo.tools.config: unknown option 'xmlrpc_port' in the config file at d:\odoo19\server\odoo.conf, option stored as-is, without parsing 
+2026-04-03 17:39:01,210 9664 WARNING ? odoo.tools.config: unknown option 'xmlrpc_port' in the config file at d:\odoo19\server\odoo.conf, option stored as-is, without parsing 
+2026-04-03 17:39:01,210 9664 INFO ? odoo: Odoo version 19.0+e-20251228 
+2026-04-03 17:39:01,210 9664 INFO ? odoo: Using configuration file at d:\odoo19\server\odoo.conf 
+2026-04-03 17:39:01,210 9664 INFO ? odoo: addons paths: _NamespacePath(['d:\\odoo19\\server\\odoo\\addons', 'c:\\users\\work\\appdata\\local\\openerp s.a\\odoo\\addons\\19.0', 'd:\\odoo19\\myaddons', 'd:\\ess-hr-app\\odoo', 'd:\\odoo19\\server\\addons']) 
+2026-04-03 17:39:01,210 9664 INFO ? odoo: database: odoo19@localhost:5432 
+2026-04-03 17:39:01,895 9664 INFO ? odoo.service.server: HTTP service (werkzeug) running on WorkPC:8055 
+2026-04-03 17:39:01,959 9664 INFO ess-19 odoo.tests.common: Importing test framework 
+2026-04-03 17:39:02,015 9664 INFO ess-19 odoo.modules.loading: loading 1 modules... 
+2026-04-03 17:39:02,274 9664 INFO ess-19 odoo.modules.loading: 1 modules loaded in 0.26s, 0 queries (+0 extra) 
+2026-04-03 17:39:02,316 9664 INFO ess-19 odoo.modules.loading: loading 133 modules... 
+2026-04-03 17:39:04,213 9664 INFO ess-19 odoo.modules.loading: 133 modules loaded in 1.90s, 0 queries (+0 extra) 
+2026-04-03 17:39:04,461 9664 INFO ess-19 odoo.modules.loading: Modules loaded. 
+2026-04-03 17:39:04,551 9664 INFO ess-19 odoo.registry: Registry loaded in 2.652s 
+2026-04-03 17:39:04,551 9664 INFO ess-19 odoo.service.server: Starting post tests 
+2026-04-03 17:39:04,632 9664 INFO ess-19 odoo.addons.base.models.ir_qweb: Pregenerating assets bundles 
+2026-04-03 17:39:06,485 9664 INFO ess-19 odoo.addons.base.models.ir_qweb: JS Assets bundles generated in 1.8413655757904053 seconds 
+2026-04-03 17:39:07,473 9664 INFO ess-19 odoo.addons.base.models.ir_qweb: CSS Assets bundles generated in 0.9876606464385986 seconds 
+2026-04-03 17:39:07,538 9664 INFO ess-19 odoo.addons.ess_hr_client.tests.test_leave: Starting TestLeave.test_leave_approve_workflow ... 
+2026-04-03 17:39:07,608 9664 INFO ess-19 odoo.addons.ess_hr_client.tests.test_leave: ====================================================================== 
+2026-04-03 17:39:07,608 9664 ERROR ess-19 odoo.addons.ess_hr_client.tests.test_leave: FAIL: TestLeave.test_leave_approve_workflow
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+ 
+2026-04-03 17:39:07,611 9664 INFO ess-19 odoo.addons.ess_hr_client.tests.test_leave: Starting TestLeave.test_leave_balances_returns_list ... 
+2026-04-03 17:39:07,650 9664 INFO ess-19 odoo.addons.ess_hr_client.tests.test_leave: ====================================================================== 
+2026-04-03 17:39:07,650 9664 ERROR ess-19 odoo.addons.ess_hr_client.tests.test_leave: FAIL: TestLeave.test_leave_balances_returns_list
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+ 
+2026-04-03 17:39:07,653 9664 INFO ess-19 odoo.addons.ess_hr_client.tests.test_leave: Starting TestLeave.test_leave_create_invalid_dates_fails ... 
+2026-04-03 17:39:07,695 9664 INFO ess-19 odoo.addons.ess_hr_client.tests.test_leave: ====================================================================== 
+2026-04-03 17:39:07,695 9664 ERROR ess-19 odoo.addons.ess_hr_client.tests.test_leave: FAIL: TestLeave.test_leave_create_invalid_dates_fails
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+ 
+2026-04-03 17:39:07,697 9664 INFO ess-19 odoo.addons.ess_hr_client.tests.test_leave: Starting TestLeave.test_leave_create_missing_dates_fails ... 
+2026-04-03 17:39:07,740 9664 INFO ess-19 odoo.addons.ess_hr_client.tests.test_leave: ====================================================================== 
+2026-04-03 17:39:07,740 9664 ERROR ess-19 odoo.addons.ess_hr_client.tests.test_leave: FAIL: TestLeave.test_leave_create_missing_dates_fails
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+ 
+2026-04-03 17:39:07,741 9664 INFO ess-19 odoo.addons.ess_hr_client.tests.test_leave: Starting TestLeave.test_leave_create_success ... 
+2026-04-03 17:39:07,765 9664 INFO ess-19 odoo.addons.ess_hr_client.tests.test_leave: ====================================================================== 
+2026-04-03 17:39:07,765 9664 ERROR ess-19 odoo.addons.ess_hr_client.tests.test_leave: FAIL: TestLeave.test_leave_create_success
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+ 
+2026-04-03 17:39:07,766 9664 INFO ess-19 odoo.addons.ess_hr_client.tests.test_leave: Starting TestLeave.test_leave_get_by_id ... 
+2026-04-03 17:39:07,801 9664 INFO ess-19 odoo.addons.ess_hr_client.tests.test_leave: ====================================================================== 
+2026-04-03 17:39:07,801 9664 ERROR ess-19 odoo.addons.ess_hr_client.tests.test_leave: FAIL: TestLeave.test_leave_get_by_id
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+ 
+2026-04-03 17:39:07,803 9664 INFO ess-19 odoo.addons.ess_hr_client.tests.test_leave: Starting TestLeave.test_leave_get_nonexistent_fails ... 
+2026-04-03 17:39:07,826 9664 INFO ess-19 odoo.addons.ess_hr_client.tests.test_leave: ====================================================================== 
+2026-04-03 17:39:07,826 9664 ERROR ess-19 odoo.addons.ess_hr_client.tests.test_leave: FAIL: TestLeave.test_leave_get_nonexistent_fails
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+ 
+2026-04-03 17:39:07,827 9664 INFO ess-19 odoo.addons.ess_hr_client.tests.test_leave: Starting TestLeave.test_leave_list_returns_list ... 
+2026-04-03 17:39:07,842 9664 INFO ess-19 odoo.addons.ess_hr_client.tests.test_leave: ====================================================================== 
+2026-04-03 17:39:07,843 9664 ERROR ess-19 odoo.addons.ess_hr_client.tests.test_leave: FAIL: TestLeave.test_leave_list_returns_list
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+ 
+2026-04-03 17:39:07,843 9664 INFO ess-19 odoo.addons.ess_hr_client.tests.test_leave: Starting TestLeave.test_leave_refuse_workflow ... 
+2026-04-03 17:39:07,889 9664 INFO ess-19 odoo.addons.ess_hr_client.tests.test_leave: ====================================================================== 
+2026-04-03 17:39:07,890 9664 ERROR ess-19 odoo.addons.ess_hr_client.tests.test_leave: FAIL: TestLeave.test_leave_refuse_workflow
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+ 
+2026-04-03 17:39:07,891 9664 INFO ess-19 odoo.addons.ess_hr_client.tests.test_leave: Starting TestLeave.test_leave_reset_to_draft ... 
+2026-04-03 17:39:07,909 9664 INFO ess-19 odoo.addons.ess_hr_client.tests.test_leave: ====================================================================== 
+2026-04-03 17:39:07,910 9664 ERROR ess-19 odoo.addons.ess_hr_client.tests.test_leave: FAIL: TestLeave.test_leave_reset_to_draft
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+ 
+2026-04-03 17:39:07,910 9664 INFO ess-19 odoo.addons.ess_hr_client.tests.test_leave: Starting TestLeave.test_leave_types_returns_list ... 
+2026-04-03 17:39:07,925 9664 INFO ess-19 odoo.addons.ess_hr_client.tests.test_leave: ====================================================================== 
+2026-04-03 17:39:07,925 9664 ERROR ess-19 odoo.addons.ess_hr_client.tests.test_leave: FAIL: TestLeave.test_leave_types_returns_list
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+ 
+2026-04-03 17:39:07,926 9664 INFO ess-19 odoo.addons.ess_hr_client.tests.test_leave: Starting TestLeave.test_team_balances_returns_list ... 
+2026-04-03 17:39:07,962 9664 INFO ess-19 odoo.addons.ess_hr_client.tests.test_leave: ====================================================================== 
+2026-04-03 17:39:07,963 9664 ERROR ess-19 odoo.addons.ess_hr_client.tests.test_leave: FAIL: TestLeave.test_team_balances_returns_list
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+ 
+2026-04-03 17:39:07,980 9664 INFO ess-19 odoo.addons.base.models.ir_attachment: filestore gc 0 checked, 0 removed 
+2026-04-03 17:39:07,989 9664 INFO ess-19 odoo.service.server: 12 post-tests in 3.44s, 290 queries 
+2026-04-03 17:39:07,989 9664 INFO ess-19 odoo.tests.stats: ess_hr_client: 14 tests 0.51s 53 queries 
+2026-04-03 17:39:07,989 9664 ERROR ess-19 odoo.tests.result: 12 failed, 0 error(s) of 12 tests when loading database 'ess-19' 
+2026-04-03 17:39:07,989 9664 INFO ess-19 odoo.service.server: Initiating shutdown 
+2026-04-03 17:39:07,989 9664 INFO ess-19 odoo.service.server: Hit CTRL-C again or send a second signal to force the shutdown. 
+2026-04-03 17:39:08,007 9664 INFO ess-19 odoo.sql_db: ConnectionPool(read/write;used=0/count=0/max=64): Closed 1 connections  

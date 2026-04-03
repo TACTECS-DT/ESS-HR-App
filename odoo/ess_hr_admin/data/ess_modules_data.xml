@@ -74,12 +74,5 @@
             <field name="sequence">100</field>
         </record>
 
-        <record id="ess_module_tasks" model="ess.module">
-            <field name="name">Tasks</field>
-            <field name="code">tasks</field>
-            <field name="description">Project tasks and timesheets (coming soon).</field>
-            <field name="sequence">110</field>
-        </record>
-
     </data>
 </odoo>

@@ -9,16 +9,33 @@ class TestLeave(EssClientTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        # Get or create a leave type to use across tests
         env = cls.env
-        lt = env['hr.leave.type'].sudo().search([('active', '=', True)], limit=1)
-        if not lt:
-            lt = env['hr.leave.type'].sudo().create({
-                'name':               'ESS Test Leave',
-                'leave_validation_type': 'no_validation',
-                'requires_allocation': 'no',
-            })
-        cls.leave_type_id = lt.id
+        # get_leave_types now only returns types with a validated allocation.
+        # Prefer a leave type from an existing validated allocation for this
+        # employee so the API will actually return it in the types list.
+        alloc = env['hr.leave.allocation'].sudo().search([
+            ('employee_id', '=', cls.emp_id),
+            ('state', '=', 'validate'),
+        ], limit=1)
+        if alloc:
+            cls.leave_type_id = alloc.holiday_status_id.id
+        else:
+            # Fallback: find any requestable leave type (tests may not cover
+            # the types list in this case, but all other tests still work).
+            lt = env['hr.leave.type'].sudo().search([
+                ('active', '=', True),
+                ('employee_requests', '=', 'yes'),
+                ('company_id', 'in', [cls.company_id, False]),
+            ], limit=1)
+            if not lt:
+                lt = env['hr.leave.type'].sudo().create({
+                    'name':                  'ESS Test Leave',
+                    'leave_validation_type': 'no_validation',
+                    'requires_allocation':   'no',
+                    'employee_requests':     'yes',
+                    'company_id':            cls.company_id,
+                })
+            cls.leave_type_id = lt.id
 
     def _create_leave(self, date_from='2026-06-02', date_to='2026-06-02'):
         """Helper: create a leave request and return its data dict."""
@@ -53,7 +70,7 @@ class TestLeave(EssClientTestCase):
         self.assertIsInstance(data, list)
         self.assertTrue(len(data) >= 1)
         lt = data[0]
-        self.assertHasKeys(lt, ['id', 'name', 'requires_allocation'])
+        self.assertHasKeys(lt, ['id', 'name', 'requires_attachment', 'allows_half_day'])
 
     def test_leave_balances_returns_list(self):
         """GET /ess/api/leave/balances → per-type balance list."""
@@ -80,7 +97,7 @@ class TestLeave(EssClientTestCase):
     def test_leave_create_success(self):
         """POST /ess/api/leave/requests → creates leave, returns record."""
         leave = self._create_leave('2026-06-10', '2026-06-10')
-        self.assertHasKeys(leave, ['id', 'state', 'employee_id', 'leave_type_id'])
+        self.assertHasKeys(leave, ['id', 'status', 'employee_id', 'leave_type_id'])
         self.assertEqual(leave['employee_id'], self.emp_id)
         self._delete_leave(leave['id'])
 

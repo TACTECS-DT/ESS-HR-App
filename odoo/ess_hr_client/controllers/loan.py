@@ -9,9 +9,11 @@ class LoanController(http.Controller):
     @http.route('/ess/api/loans/rules', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
     def rules(self):
         kw = get_body()
+        ctx = get_auth_context()
+        company_id = kw.get('company_id') or ctx.get('company_id')
         return call_and_log(
             '/ess/api/loans/rules',
-            lambda: request.env['hr.loan'].sudo().get_loan_rules(kw.get('company_id')),
+            lambda: request.env['hr.loan'].sudo().get_loan_rules(company_id),
         )
 
     @http.route('/ess/api/loans', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)

@@ -161,7 +161,7 @@ def build_command(db: str, module: str, tags: str) -> list:
         '--test-enable',
         '--stop-after-init',
         '--test-tags',     test_tags,
-        '--no-http',                     # no HTTP server needed for tests
+        '--http-port',     '8056',       # use a different port to avoid conflict with live server on 8055
         '--log-level',     'test',
         '--log-handler',   'odoo.tests:INFO',
         '--log-handler',   'odoo.tests.runner:INFO',

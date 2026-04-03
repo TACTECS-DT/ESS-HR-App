@@ -16,27 +16,31 @@ class EssServer(models.Model):
     _name = 'ess.server'
     _description = 'ESS Client Server'
     _rec_name = 'name'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
 
-    name = fields.Char(string='Server Name', required=True)
+    name = fields.Char(string='Server Name', required=True, tracking=True)
     url = fields.Char(
         string='Server URL',
         required=True,
+        tracking=True,
         help='Base URL of the client Odoo server (e.g. https://company.odoo.com). '
              'Trailing slashes are ignored during validation.',
     )
-    active = fields.Boolean(string='Active', default=True)
+    active = fields.Boolean(string='Active', default=True, tracking=True)
 
     # ── License link ──────────────────────────────────────────────────────────
     license_id = fields.Many2one(
         'ess.license',
         string='License',
         ondelete='set null',
+        tracking=True,
     )
 
     # ── Per-server settings ───────────────────────────────────────────────────
     auto_logout_duration = fields.Integer(
         string='Auto Logout Duration (hours)',
         default=72,
+        tracking=True,
         help='Number of hours of inactivity before the mobile app auto-logs out. '
              'Default is 72 hours (3 days). Sent to the mobile app on each Step 1 validation.',
     )
@@ -72,12 +76,30 @@ class EssServer(models.Model):
         string='Status',
         default='active',
         readonly=True,
+        tracking=True,
     )
 
     _url_unique = models.Constraint(
         'UNIQUE(url)',
         'A server URL must be unique.',
     )
+
+    # ── Status wizard ─────────────────────────────────────────────────────────
+
+    def action_open_status_wizard(self):
+        """Open the Change Status wizard pre-filled with this server."""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Change Server Status'),
+            'res_model': 'ess.server.status.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_server_id': self.id,
+                'default_new_status': self.server_status,
+            },
+        }
 
     # ── Manual sync action ────────────────────────────────────────────────────
 
@@ -122,8 +144,6 @@ class EssServer(models.Model):
             stats = data.get('data', {})
             employee_count = int(stats.get('employee_count', 0))
             active_user_count = int(stats.get('active_user_count', 0))
-            # employee_list and active_user_list are also available in stats
-            # but are not stored — they're used only for real-time display if needed
             self.sudo().write({
                 'employee_count': employee_count,
                 'active_user_count': active_user_count,

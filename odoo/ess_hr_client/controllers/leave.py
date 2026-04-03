@@ -9,9 +9,11 @@ class LeaveController(http.Controller):
     @http.route('/ess/api/leave/types', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
     def types(self):
         kw = get_body()
+        ctx = get_auth_context()
+        employee_id = kw.get('employee_id') or ctx.get('employee_id')
         return call_and_log(
             '/ess/api/leave/types',
-            lambda: request.env['hr.leave.type'].sudo().get_leave_types(kw.get('company_id')),
+            lambda: request.env['hr.leave.type'].sudo().get_leave_types(employee_id),
         )
 
     @http.route('/ess/api/leave/balances', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
@@ -41,6 +43,17 @@ class LeaveController(http.Controller):
                 '/ess/api/leave/requests',
                 lambda: request.env['hr.leave'].sudo().get_leave_requests(employee_id, kw.get('state_filter')),
             )
+        # Derive half_day / am_pm from 'mode' when provided (mobile convention).
+        # Legacy half_day + am_pm params still work for backward compat.
+        mode = kw.get('mode', 'full_day')
+        half_day = kw.get('half_day', mode in ('half_day_am', 'half_day_pm'))
+        if kw.get('am_pm'):
+            am_pm = kw['am_pm']
+        else:
+            am_pm = 'morning' if mode != 'half_day_pm' else 'afternoon'
+        submit = kw.get('submit', True)
+        if isinstance(submit, str):
+            submit = submit.lower() not in ('false', '0', 'no')
         return call_and_log(
             '/ess/api/leave/requests',
             lambda: request.env['hr.leave'].sudo().create_leave_request(
@@ -48,9 +61,11 @@ class LeaveController(http.Controller):
                 kw.get('leave_type_id') or kw.get('holiday_status_id'),
                 kw.get('date_from'),
                 kw.get('date_to'),
-                kw.get('half_day', False),
-                kw.get('am_pm', 'morning'),
-                kw.get('description', '') or kw.get('name', ''),
+                mode=mode,
+                half_day=half_day,
+                am_pm=am_pm,
+                description=kw.get('description', '') or kw.get('name', ''),
+                submit=submit,
             ),
         )
 

@@ -43,6 +43,7 @@ export type AttendanceStackParamList = {
 // ─── Leaves Stack ─────────────────────────────────────────────
 export type LeavesStackParamList = {
   LeaveList: undefined;
+  LeaveBalance: undefined;
   LeaveCreate: undefined;
   LeaveDetail: {id: number};
   LeaveTeamBalance: undefined;

@@ -21,17 +21,15 @@ import LoadingSkeleton from '../../components/common/LoadingSkeleton';
 import {useTheme} from '../../hooks/useTheme';
 import {useRBAC} from '../../hooks/useRBAC';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
-import type {RequestsStackParamList} from '../../navigation/types';
-import type {LeaveRequest, LeaveBalance} from '../../api/mocks/leave.mock';
+import type {LeavesStackParamList} from '../../navigation/types';
+import type {LeaveRequest} from '../../api/mocks/leave.mock';
 import {API_MAP} from '../../api/apiMap';
 
-type Nav = StackNavigationProp<RequestsStackParamList>;
-type TabFilter = 'my_leaves' | 'pending' | 'approved' | 'refused';
-
-const BALANCE_COLORS = [colors.primary, colors.warning, colors.success, '#9c27b0', colors.info];
+type Nav = StackNavigationProp<LeavesStackParamList>;
+type TabFilter = 'all' | 'pending' | 'approved' | 'refused';
 
 const TABS: {key: TabFilter; labelKey: string}[] = [
-  {key: 'my_leaves', labelKey: 'leave.myLeaves'},
+  {key: 'all', labelKey: 'leave.myLeaves'},
   {key: 'pending', labelKey: 'leave.pending'},
   {key: 'approved', labelKey: 'leave.approved'},
   {key: 'refused', labelKey: 'leave.refused'},
@@ -43,9 +41,9 @@ export default function LeaveListScreen() {
   const navigation = useNavigation<Nav>();
   const {canViewTeamLeaveBalances} = useRBAC();
   const isAr = i18n.language === 'ar';
-  const [tab, setTab] = useState<TabFilter>('my_leaves');
+  const [tab, setTab] = useState<TabFilter>('all');
 
-  const {data: requests, isLoading: reqLoading, refetch} = useQuery({
+  const {data: requests, isLoading, refetch} = useQuery({
     queryKey: ['leave-requests'],
     queryFn: async () => {
       const res = await apiClient.get(API_MAP.leave.requests);
@@ -53,22 +51,14 @@ export default function LeaveListScreen() {
     },
   });
 
-  const {data: balances, isLoading: balLoading} = useQuery({
-    queryKey: ['leave-balances'],
-    queryFn: async () => {
-      const res = await apiClient.get(API_MAP.leave.balances);
-      return isApiSuccess(res.data) ? (res.data.data as LeaveBalance[]) : [];
-    },
-  });
-
   const filtered = (requests ?? []).filter(r => {
     if (tab === 'pending') {return r.status === 'pending';}
-    if (tab === 'approved') {return r.status === 'approved';}
+    if (tab === 'approved') {return r.status === 'approved' || r.status === 'validated';}
     if (tab === 'refused') {return r.status === 'refused';}
-    return true;
+    return true; // 'all'
   });
 
-  if (reqLoading || balLoading) {
+  if (isLoading) {
     return (
       <View style={[styles.container, {backgroundColor: theme.background}]}>
         <ScreenHeader title={t('leave.title')} showBack />
@@ -85,20 +75,20 @@ export default function LeaveListScreen() {
 
       {/* Tabs */}
       <View style={[styles.tabRow, {borderBottomColor: theme.border}]}>
-        {TABS.map(t_ => (
+        {TABS.map(tab_ => (
           <TouchableOpacity
-            key={t_.key}
+            key={tab_.key}
             style={[
               styles.tab,
-              tab === t_.key && {borderBottomColor: colors.primary, borderBottomWidth: 2},
+              tab === tab_.key && {borderBottomColor: colors.primary, borderBottomWidth: 2},
             ]}
-            onPress={() => setTab(t_.key)}>
+            onPress={() => setTab(tab_.key)}>
             <Text
               style={[
                 styles.tabText,
-                {color: tab === t_.key ? colors.primary : theme.textSecondary},
+                {color: tab === tab_.key ? colors.primary : theme.textSecondary},
               ]}>
-              {t(t_.labelKey)}
+              {t(tab_.labelKey)}
             </Text>
           </TouchableOpacity>
         ))}
@@ -106,50 +96,31 @@ export default function LeaveListScreen() {
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={false} onRefresh={refetch} />}>
+        refreshControl={<RefreshControl refreshing={false} onRefresh={refetch} />}
+        contentContainerStyle={styles.listContent}>
 
-        {/* Leave Balance Card */}
-        <View style={[styles.balanceCard, {backgroundColor: theme.surface, borderColor: theme.border}]}>
-          <Text style={[styles.cardTitle, {color: theme.text}]}>{t('leave.balance')}</Text>
-          {(balances ?? []).map((b, idx) => {
-            const pct = b.allocated > 0 ? Math.min(b.used / b.allocated, 1) : 0;
-            const barColor = BALANCE_COLORS[idx % BALANCE_COLORS.length];
-            return (
-              <View key={b.leave_type_id} style={styles.balanceRow}>
-                <View style={styles.balanceRowHeader}>
-                  <Text style={[styles.balanceType, {color: theme.text}]}>
-                    {isAr ? b.leave_type_name_ar : b.leave_type_name}
-                  </Text>
-                  <Text style={[styles.balanceRatio, {color: theme.textSecondary}]}>
-                    {b.used} / {b.allocated} {t('leave.days')}
-                  </Text>
-                </View>
-                <View style={[styles.progressTrack, {backgroundColor: theme.border}]}>
-                  <View
-                    style={[
-                      styles.progressFill,
-                      {width: `${Math.round(pct * 100)}%` as any, backgroundColor: barColor},
-                    ]}
-                  />
-                </View>
-              </View>
-            );
-          })}
-        </View>
-
-        {canViewTeamLeaveBalances ? (
+        {/* Quick-access buttons */}
+        <View style={styles.quickRow}>
           <TouchableOpacity
-            style={[styles.teamBtn, {borderColor: theme.border, backgroundColor: theme.surface}]}
-            onPress={() => navigation.navigate('LeaveTeamBalance')}>
-            <Text style={{color: colors.primary, fontSize: fontSize.sm, fontWeight: '600'}}>
-              👥 {t('leave.teamBalance')}
+            style={[styles.quickBtn, {borderColor: theme.border, backgroundColor: theme.surface}]}
+            onPress={() => navigation.navigate('LeaveBalance')}>
+            <Text style={[styles.quickBtnText, {color: colors.primary}]}>
+              📊 {t('leave.balance')}
             </Text>
           </TouchableOpacity>
-        ) : null}
 
-        {/* Recent Requests */}
-        <Text style={[styles.sectionTitle, {color: theme.text}]}>{t('leave.recentRequests')}</Text>
+          {canViewTeamLeaveBalances ? (
+            <TouchableOpacity
+              style={[styles.quickBtn, {borderColor: theme.border, backgroundColor: theme.surface}]}
+              onPress={() => navigation.navigate('LeaveTeamBalance')}>
+              <Text style={[styles.quickBtnText, {color: colors.primary}]}>
+                👥 {t('leave.teamBalance')}
+              </Text>
+            </TouchableOpacity>
+          ) : null}
+        </View>
 
+        {/* Leave list */}
         {filtered.length === 0 ? (
           <EmptyState
             title={t('common.noData')}
@@ -164,7 +135,7 @@ export default function LeaveListScreen() {
                 style={[styles.card, {backgroundColor: theme.surface, borderColor: theme.border}]}
                 onPress={() => navigation.navigate('LeaveDetail', {id: item.id})}>
                 <View style={styles.cardTop}>
-                  <Text style={[styles.leaveType, {color: theme.text}]}>
+                  <Text style={[styles.leaveType, {color: theme.text}]} numberOfLines={1}>
                     {isAr ? item.leave_type_ar : item.leave_type}
                   </Text>
                   <StatusChip status={item.status} label={t(`common.status.${item.status}`)} />
@@ -213,44 +184,28 @@ const styles = StyleSheet.create({
   },
   tabText: {fontSize: fontSize.sm, fontWeight: '600'},
 
-  balanceCard: {
-    margin: spacing.md,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    padding: spacing.md,
-    gap: spacing.sm,
-  },
-  cardTitle: {fontSize: fontSize.md, fontWeight: '700', marginBottom: spacing.xs},
-  balanceRow: {gap: 6},
-  balanceRowHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  balanceType: {fontSize: fontSize.sm, fontWeight: '500'},
-  balanceRatio: {fontSize: fontSize.xs, fontWeight: '600'},
-  progressTrack: {height: 6, borderRadius: 3, overflow: 'hidden'},
-  progressFill: {height: 6, borderRadius: 3},
+  listContent: {paddingBottom: 90},
 
-  teamBtn: {
-    marginHorizontal: spacing.md,
-    marginBottom: spacing.sm,
+  quickRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.sm,
+  },
+  quickBtn: {
+    flex: 1,
     padding: spacing.sm,
     borderRadius: radius.md,
     borderWidth: 1,
     alignItems: 'center',
   },
+  quickBtnText: {fontSize: fontSize.sm, fontWeight: '600'},
 
-  sectionTitle: {
-    fontSize: fontSize.md,
-    fontWeight: '700',
-    paddingHorizontal: spacing.md,
-    paddingBottom: spacing.sm,
-  },
-  list: {paddingHorizontal: spacing.md, paddingBottom: 90, gap: spacing.sm},
+  list: {paddingHorizontal: spacing.md, gap: spacing.sm},
   card: {borderRadius: radius.md, borderWidth: 1, padding: spacing.md, gap: spacing.xs},
-  cardTop: {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'},
-  leaveType: {fontSize: fontSize.md, fontWeight: '700'},
+  cardTop: {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: spacing.sm},
+  leaveType: {flex: 1, fontSize: fontSize.md, fontWeight: '700'},
   employee: {fontSize: fontSize.xs},
   dates: {fontSize: fontSize.sm},
   mode: {fontSize: fontSize.xs},

@@ -23,6 +23,15 @@
         <field name="model">ess.license</field>
         <field name="arch" type="xml">
             <form string="ESS License">
+                <header>
+                    <button name="action_open_status_wizard"
+                            string="Change Status"
+                            type="object"
+                            class="btn-secondary"/>
+                    <field name="license_status" widget="statusbar"
+                           statusbar_visible="active,inactive"
+                           readonly="1"/>
+                </header>
                 <sheet>
                     <group>
                         <group string="License Info">
@@ -41,16 +50,18 @@
                     </group>
 
                     <group string="Allowed Modules">
-                        <field name="module_ids" widget="many2many_tags" nolabel="1"
+                        <field name="module_ids" widget="many2many_tags"
+                               string="Allowed Modules"
                                help="Leave empty to allow all active modules."/>
                     </group>
 
-                    <group string="Authorized Servers">
-                        <field name="server_ids" nolabel="1">
+                    <group string="Authorized Servers"
+                           help="Servers are managed from the Client Servers page. Assign a license from the server form.">
+                        <field name="server_ids" nolabel="1" readonly="1">
                             <list string="Servers">
                                 <field name="name"/>
                                 <field name="url"/>
-                                <field name="employee_count" readonly="1"/>
+                                <field name="employee_count"/>
                                 <field name="auto_logout_duration"/>
                                 <field name="server_status" widget="badge"
                                        decoration-success="server_status == 'active'"
@@ -66,6 +77,7 @@
                         <field name="deactivation_reason" readonly="1"/>
                     </group>
                 </sheet>
+                <chatter/>
             </form>
         </field>
     </record>
@@ -74,6 +86,8 @@
         <field name="name">Licenses</field>
         <field name="res_model">ess.license</field>
         <field name="view_mode">list,form</field>
+        <!-- Show all licenses including deactivated (active=False) ones -->
+        <field name="context">{'active_test': False}</field>
     </record>
 
 </odoo>

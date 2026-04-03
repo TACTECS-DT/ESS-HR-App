@@ -39,25 +39,27 @@ type ServiceItem = {
   homeScreen?: string; // navigate within HomeStack directly
   /** If set, item is hidden unless the role has this permission */
   requiresPermission?: 'canViewTeamWidgets' | 'canAccessPendingApprovals' | 'canAccessAnalytics' | 'canAccessTeamHours';
+  /** If set, item is hidden unless this code is in allowedModules (empty list = all allowed) */
+  moduleCode?: string;
 };
 
 const ALL_SERVICES: ServiceItem[] = [
-  {icon: '⏰', labelKey: 'attendance.title',           tab: 'AttendanceTab'},
-  {icon: '🏖', labelKey: 'leave.title',                tab: 'LeavesTab'},
-  {icon: '💰', labelKey: 'payslip.title',              tab: 'PayslipTab'},
-  {icon: '🧾', labelKey: 'expense.title',              screenTab: 'MoreTab', screen: 'ExpenseList'},
-  {icon: '🏦', labelKey: 'loan.title',                 screenTab: 'MoreTab', screen: 'LoanList'},
-  {icon: '💵', labelKey: 'advanceSalary.title',        screenTab: 'MoreTab', screen: 'AdvanceSalaryList'},
-  {icon: '📄', labelKey: 'hrLetters.title',            screenTab: 'MoreTab', screen: 'HRLetterList'},
-  {icon: '📋', labelKey: 'documentRequests.title',     screenTab: 'MoreTab', screen: 'DocumentRequestList'},
-  {icon: '🎓', labelKey: 'experienceCertificates.title', screenTab: 'MoreTab', screen: 'ExperienceCertList'},
-  {icon: '🔧', labelKey: 'businessServices.title',     screenTab: 'MoreTab', screen: 'BusinessServiceList'},
+  {icon: '⏰', labelKey: 'attendance.title',           tab: 'AttendanceTab',                                        moduleCode: 'attendance'},
+  {icon: '🏖', labelKey: 'leave.title',                tab: 'LeavesTab',                                            moduleCode: 'leave'},
+  {icon: '💰', labelKey: 'payslip.title',              tab: 'PayslipTab',                                           moduleCode: 'payslip'},
+  {icon: '🧾', labelKey: 'expense.title',              screenTab: 'MoreTab', screen: 'ExpenseList',                 moduleCode: 'expense'},
+  {icon: '🏦', labelKey: 'loan.title',                 screenTab: 'MoreTab', screen: 'LoanList',                   moduleCode: 'loan'},
+  {icon: '💵', labelKey: 'advanceSalary.title',        screenTab: 'MoreTab', screen: 'AdvanceSalaryList',           moduleCode: 'advance_salary'},
+  {icon: '📄', labelKey: 'hrLetters.title',            screenTab: 'MoreTab', screen: 'HRLetterList',               moduleCode: 'hr_services'},
+  {icon: '📋', labelKey: 'documentRequests.title',     screenTab: 'MoreTab', screen: 'DocumentRequestList',        moduleCode: 'hr_services'},
+  {icon: '🎓', labelKey: 'experienceCertificates.title', screenTab: 'MoreTab', screen: 'ExperienceCertList',       moduleCode: 'hr_services'},
+  {icon: '🔧', labelKey: 'businessServices.title',     screenTab: 'MoreTab', screen: 'BusinessServiceList',        moduleCode: 'hr_services'},
   // Tasks & Timesheets — disabled (work with res.users, not hr.employee — re-enable later)
-  // {icon: '✅', labelKey: 'tasks.title',                screenTab: 'MoreTab', screen: 'TaskList'},
+  // {icon: '✅', labelKey: 'tasks.title',                screenTab: 'MoreTab', screen: 'TaskList',                moduleCode: 'tasks'},
   // {icon: '🕐', labelKey: 'timesheets.title',           screenTab: 'MoreTab', screen: 'TimesheetWeekly'},
   // Manager/HR/Admin only
   {icon: '👥', labelKey: 'home.myTeam',               screenTab: 'LeavesTab', screen: 'LeaveTeamBalance', requiresPermission: 'canViewTeamWidgets'},
-  {icon: '⏳', labelKey: 'home.pendingApprovals',      homeScreen: 'PendingApprovals',                   requiresPermission: 'canAccessPendingApprovals'},
+  {icon: '⏳', labelKey: 'home.pendingApprovals',      homeScreen: 'PendingApprovals',                    requiresPermission: 'canAccessPendingApprovals'},
   // Always visible
   {icon: '⚙️', labelKey: 'settings.title',             screenTab: 'MoreTab', screen: 'Settings'},
   {icon: '☰',  labelKey: 'home.more',                  screenTab: 'MoreTab', screen: 'MoreHub'},
@@ -73,11 +75,17 @@ export default function HomeScreen() {
   const darkMode = useAppSelector(state => state.settings.darkMode);
   const currentLanguage = useAppSelector(state => state.settings.language);
   const rbac = useRBAC();
+  const allowedModules = useAppSelector(s => s.auth.allowedModules ?? []);
 
-  // Filter services based on role permissions
+  function isModuleAllowed(code?: string): boolean {
+    if (!code) {return true;}
+    return allowedModules.some(m => m.code === code);
+  }
+
+  // Filter services based on role permissions and allowed modules from admin
   const SERVICES = ALL_SERVICES.filter(svc => {
-    if (!svc.requiresPermission) {return true;}
-    return rbac[svc.requiresPermission] === true;
+    if (svc.requiresPermission && !rbac[svc.requiresPermission]) {return false;}
+    return isModuleAllowed(svc.moduleCode);
   });
   const isAr = i18n.language === 'ar';
 

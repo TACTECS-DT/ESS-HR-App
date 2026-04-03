@@ -5,3 +5,7 @@ access_ess_server_user,ess.server user,model_ess_server,ess_hr_admin.ess_admin_g
 access_ess_server_system,ess.server system,model_ess_server,base.group_system,1,1,1,1
 access_ess_license_user,ess.license user,model_ess_license,ess_hr_admin.ess_admin_group,1,0,0,0
 access_ess_license_system,ess.license system,model_ess_license,base.group_system,1,1,1,1
+access_ess_server_status_wizard,ess.server.status.wizard admin,model_ess_server_status_wizard,ess_hr_admin.ess_admin_group,1,1,1,1
+access_ess_license_status_wizard,ess.license.status.wizard admin,model_ess_license_status_wizard,ess_hr_admin.ess_admin_group,1,1,1,1
+access_ess_api_call_user,ess.api.call user,model_ess_api_call,ess_hr_admin.ess_admin_group,1,0,0,0
+access_ess_api_call_system,ess.api.call system,model_ess_api_call,base.group_system,1,1,1,1

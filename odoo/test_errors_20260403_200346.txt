@@ -1,0 +1,92 @@
+======================================================================
+  ESS HR Odoo Test Run — 2026-04-03 20:03:55
+  Command : d:\odoo19\python\python.exe d:\odoo19\server\odoo-bin --config d:\odoo19\server\odoo.conf --database ess-19 --test-enable --stop-after-init --test-tags ess_auth --http-port 8056 --log-level test --log-handler odoo.tests:INFO --log-handler odoo.tests.runner:INFO --log-handler odoo.addons.ess_hr_client.tests:INFO --log-handler odoo.addons.ess_hr_admin.tests:INFO
+======================================================================
+
+SUMMARY
+----------------------------------------
+  Total run  : 10
+  Passed     : 10
+  Failed     : 0
+  Errors     : 0
+  Skipped    : 0
+  Duration   : 3.88s
+  Result     : PASSED
+
+FULL ODOO OUTPUT
+======================================================================
+2026-04-03 18:03:47,262 26764 WARNING ? odoo.tools.config: unknown option 'xmlrpc_port' in the config file at d:\odoo19\server\odoo.conf, option stored as-is, without parsing 
+2026-04-03 18:03:47,262 26764 WARNING ? odoo.tools.config: unknown option 'xmlrpc_port' in the config file at d:\odoo19\server\odoo.conf, option stored as-is, without parsing 
+2026-04-03 18:03:47,262 26764 INFO ? odoo: Odoo version 19.0+e-20251228 
+2026-04-03 18:03:47,262 26764 INFO ? odoo: Using configuration file at d:\odoo19\server\odoo.conf 
+2026-04-03 18:03:47,262 26764 INFO ? odoo: addons paths: _NamespacePath(['d:\\odoo19\\server\\odoo\\addons', 'c:\\users\\work\\appdata\\local\\openerp s.a\\odoo\\addons\\19.0', 'd:\\odoo19\\myaddons', 'd:\\ess-hr-app\\odoo', 'd:\\odoo19\\server\\addons']) 
+2026-04-03 18:03:47,262 26764 INFO ? odoo: database: odoo19@localhost:5432 
+2026-04-03 18:03:47,812 26764 INFO ? odoo.service.server: HTTP service (werkzeug) running on WorkPC:8056 
+2026-04-03 18:03:47,867 26764 INFO ess-19 odoo.tests.common: Importing test framework 
+2026-04-03 18:03:47,921 26764 INFO ess-19 odoo.modules.loading: loading 1 modules... 
+2026-04-03 18:03:48,177 26764 INFO ess-19 odoo.modules.loading: 1 modules loaded in 0.25s, 0 queries (+0 extra) 
+2026-04-03 18:03:48,218 26764 INFO ess-19 odoo.modules.loading: loading 133 modules... 
+2026-04-03 18:03:50,144 26764 INFO ess-19 odoo.modules.loading: 133 modules loaded in 1.93s, 0 queries (+0 extra) 
+2026-04-03 18:03:50,425 26764 INFO ess-19 odoo.modules.loading: Modules loaded. 
+2026-04-03 18:03:50,509 26764 INFO ess-19 odoo.registry: Registry loaded in 2.694s 
+2026-04-03 18:03:50,509 26764 INFO ess-19 odoo.service.server: Starting post tests 
+2026-04-03 18:03:50,579 26764 INFO ess-19 odoo.addons.base.models.ir_qweb: Pregenerating assets bundles 
+2026-04-03 18:03:52,491 26764 INFO ess-19 odoo.addons.base.models.ir_qweb: JS Assets bundles generated in 1.900343656539917 seconds 
+2026-04-03 18:03:53,338 26764 INFO ess-19 odoo.addons.base.models.ir_qweb: CSS Assets bundles generated in 0.8464782238006592 seconds 
+2026-04-03 18:03:53,405 26764 INFO ess-19 odoo.addons.ess_hr_client.tests.test_auth: Starting TestAuth.test_by_user_missing_user_id ... 
+2026-04-03 18:03:53,430 26764 INFO ess-19 odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-04-03 18:03:53,505 26764 INFO ess-19 werkzeug: 127.0.0.1 - - [03/Apr/2026 18:03:53] "POST /ess/api/auth/login HTTP/1.1" 200 - 18 0.020 0.058
+2026-04-03 18:03:53,539 26764 INFO ess-19 werkzeug: 127.0.0.1 - - [03/Apr/2026 18:03:53] "GET /ess/api/auth/by-user HTTP/1.1" 400 - 6 0.009 0.008
+[API] GET    /ess/api/auth/by-user                              400  ERR  VALIDATION_ERROR
+2026-04-03 18:03:53,545 26764 INFO ess-19 odoo.addons.ess_hr_client.tests.test_auth: Starting TestAuth.test_by_user_with_valid_user_id ... 
+2026-04-03 18:03:53,570 26764 INFO ess-19 odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-04-03 18:03:53,625 26764 INFO ess-19 werkzeug: 127.0.0.1 - - [03/Apr/2026 18:03:53] "POST /ess/api/auth/login HTTP/1.1" 200 - 18 0.015 0.042
+2026-04-03 18:03:53,660 26764 INFO ess-19 werkzeug: 127.0.0.1 - - [03/Apr/2026 18:03:53] "GET /ess/api/auth/by-user HTTP/1.1" 400 - 6 0.007 0.006
+[API] GET    /ess/api/auth/by-user                              400  ERR  VALIDATION_ERROR
+2026-04-03 18:03:53,662 26764 INFO ess-19 odoo.addons.ess_hr_client.tests.test_auth: Starting TestAuth.test_companies_returns_list ... 
+2026-04-03 18:03:53,668 26764 INFO ess-19 odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-04-03 18:03:53,712 26764 INFO ess-19 werkzeug: 127.0.0.1 - - [03/Apr/2026 18:03:53] "POST /ess/api/auth/login HTTP/1.1" 200 - 18 0.007 0.037
+2026-04-03 18:03:53,724 26764 INFO ess-19 werkzeug: 127.0.0.1 - - [03/Apr/2026 18:03:53] "GET /ess/api/auth/companies HTTP/1.1" 200 - 6 0.002 0.005
+[API] GET    /ess/api/auth/companies                            200  OK  list[2]
+2026-04-03 18:03:53,725 26764 INFO ess-19 odoo.addons.ess_hr_client.tests.test_auth: Starting TestAuth.test_login_badge_pin_success ... 
+2026-04-03 18:03:53,741 26764 INFO ess-19 odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-04-03 18:03:53,783 26764 INFO ess-19 werkzeug: 127.0.0.1 - - [03/Apr/2026 18:03:53] "POST /ess/api/auth/login HTTP/1.1" 200 - 18 0.007 0.036
+2026-04-03 18:03:53,823 26764 INFO ess-19 werkzeug: 127.0.0.1 - - [03/Apr/2026 18:03:53] "POST /ess/api/auth/login HTTP/1.1" 200 - 12 0.011 0.010
+[API] POST   /ess/api/auth/login                                200  OK  {user, tokens}
+2026-04-03 18:03:53,825 26764 INFO ess-19 odoo.addons.ess_hr_client.tests.test_auth: Starting TestAuth.test_login_no_credentials_fails ... 
+2026-04-03 18:03:53,829 26764 INFO ess-19 odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-04-03 18:03:53,867 26764 INFO ess-19 werkzeug: 127.0.0.1 - - [03/Apr/2026 18:03:53] "POST /ess/api/auth/login HTTP/1.1" 200 - 18 0.009 0.029
+2026-04-03 18:03:53,882 26764 INFO ess-19 werkzeug: 127.0.0.1 - - [03/Apr/2026 18:03:53] "POST /ess/api/auth/login HTTP/1.1" 400 - 0 0.000 0.001
+[API] POST   /ess/api/auth/login                                400  ERR  VALIDATION_ERROR
+2026-04-03 18:03:53,885 26764 INFO ess-19 odoo.addons.ess_hr_client.tests.test_auth: Starting TestAuth.test_login_unknown_badge_fails ... 
+2026-04-03 18:03:53,888 26764 INFO ess-19 odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-04-03 18:03:53,927 26764 INFO ess-19 werkzeug: 127.0.0.1 - - [03/Apr/2026 18:03:53] "POST /ess/api/auth/login HTTP/1.1" 200 - 18 0.009 0.031
+2026-04-03 18:03:53,935 26764 INFO ess-19 werkzeug: 127.0.0.1 - - [03/Apr/2026 18:03:53] "POST /ess/api/auth/login HTTP/1.1" 400 - 5 0.001 0.005
+[API] POST   /ess/api/auth/login                                400  ERR  VALIDATION_ERROR
+2026-04-03 18:03:53,937 26764 INFO ess-19 odoo.addons.ess_hr_client.tests.test_auth: Starting TestAuth.test_login_wrong_pin_fails ... 
+2026-04-03 18:03:53,940 26764 INFO ess-19 odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-04-03 18:03:53,995 26764 INFO ess-19 werkzeug: 127.0.0.1 - - [03/Apr/2026 18:03:53] "POST /ess/api/auth/login HTTP/1.1" 200 - 18 0.013 0.042
+2026-04-03 18:03:54,006 26764 INFO ess-19 werkzeug: 127.0.0.1 - - [03/Apr/2026 18:03:54] "POST /ess/api/auth/login HTTP/1.1" 400 - 7 0.003 0.004
+[API] POST   /ess/api/auth/login                                400  ERR  VALIDATION_ERROR
+2026-04-03 18:03:54,008 26764 INFO ess-19 odoo.addons.ess_hr_client.tests.test_auth: Starting TestAuth.test_logout_returns_ok ... 
+2026-04-03 18:03:54,024 26764 INFO ess-19 odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-04-03 18:03:54,072 26764 INFO ess-19 werkzeug: 127.0.0.1 - - [03/Apr/2026 18:03:54] "POST /ess/api/auth/login HTTP/1.1" 200 - 18 0.012 0.037
+2026-04-03 18:03:54,098 26764 INFO ess-19 werkzeug: 127.0.0.1 - - [03/Apr/2026 18:03:54] "POST /ess/api/auth/logout HTTP/1.1" 200 - 6 0.006 0.005
+[API] POST   /ess/api/auth/logout                               200  OK  {logged_out}
+2026-04-03 18:03:54,100 26764 INFO ess-19 odoo.addons.ess_hr_client.tests.test_auth: Starting TestAuth.test_protected_endpoint_without_token_fails ... 
+2026-04-03 18:03:54,105 26764 INFO ess-19 odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-04-03 18:03:54,153 26764 INFO ess-19 werkzeug: 127.0.0.1 - - [03/Apr/2026 18:03:54] "POST /ess/api/auth/login HTTP/1.1" 200 - 18 0.013 0.035
+2026-04-03 18:03:54,184 26764 INFO ess-19 werkzeug: 127.0.0.1 - - [03/Apr/2026 18:03:54] "GET /ess/api/profile HTTP/1.1" 401 - 0 0.000 0.004
+[API] GET    /ess/api/profile                                   401  ERR  UNAUTHENTICATED
+2026-04-03 18:03:54,187 26764 INFO ess-19 odoo.addons.ess_hr_client.tests.test_auth: Starting TestAuth.test_refresh_returns_ok ... 
+2026-04-03 18:03:54,193 26764 INFO ess-19 odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-04-03 18:03:54,348 26764 INFO ess-19 werkzeug: 127.0.0.1 - - [03/Apr/2026 18:03:54] "POST /ess/api/auth/login HTTP/1.1" 200 - 18 0.010 0.146
+2026-04-03 18:03:54,364 26764 INFO ess-19 werkzeug: 127.0.0.1 - - [03/Apr/2026 18:03:54] "POST /ess/api/auth/refresh HTTP/1.1" 200 - 6 0.004 0.005
+[API] POST   /ess/api/auth/refresh                              200  OK  {refreshed}
+2026-04-03 18:03:54,384 26764 INFO ess-19 odoo.addons.base.models.ir_attachment: filestore gc 0 checked, 0 removed 
+2026-04-03 18:03:54,394 26764 INFO ess-19 odoo.service.server: 10 post-tests in 3.88s, 516 queries 
+2026-04-03 18:03:54,394 26764 INFO ess-19 odoo.tests.stats: ess_hr_client: 12 tests 1.05s 279 queries 
+2026-04-03 18:03:54,394 26764 INFO ess-19 odoo.tests.result: 0 failed, 0 error(s) of 10 tests when loading database 'ess-19' 
+2026-04-03 18:03:54,394 26764 INFO ess-19 odoo.service.server: Initiating shutdown 
+2026-04-03 18:03:54,394 26764 INFO ess-19 odoo.service.server: Hit CTRL-C again or send a second signal to force the shutdown. 
+2026-04-03 18:03:54,863 26764 INFO ess-19 odoo.sql_db: ConnectionPool(read/write;used=0/count=0/max=64): Closed 1 connections  

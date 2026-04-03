@@ -17,17 +17,19 @@ class EssLicense(models.Model):
     _name = 'ess.license'
     _description = 'ESS Mobile License'
     _rec_name = 'name'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
 
-    name = fields.Char(string='License Name', required=True)
-    license_key = fields.Char(string='License Key', required=True, copy=False)
+    name = fields.Char(string='License Name', required=True, tracking=True)
+    license_key = fields.Char(string='License Key', required=True, copy=False, tracking=True)
     tier = fields.Selection(
         selection=[('basic', 'Basic'), ('standard', 'Standard'), ('premium', 'Premium')],
         string='Tier',
         required=True,
         default='basic',
+        tracking=True,
     )
-    active = fields.Boolean(string='Active', default=True)
-    expiry_date = fields.Date(string='Expiry Date')
+    active = fields.Boolean(string='Active', default=True, tracking=True)
+    expiry_date = fields.Date(string='Expiry Date', tracking=True)
 
     # ── Authorized servers ────────────────────────────────────────────────────
     server_ids = fields.One2many(
@@ -40,11 +42,13 @@ class EssLicense(models.Model):
     max_employees = fields.Integer(
         string='Max Employees',
         default=50,
+        tracking=True,
         help='Maximum number of active employees allowed across servers under this license.',
     )
     employee_overage_allowed = fields.Integer(
         string='Overage Employees Allowed',
         default=5,
+        tracking=True,
         help='How many employees above Max Employees are tolerated before the license is '
              'automatically deactivated. For example, if Max=50 and Overage=5, deactivation '
              'triggers when employee count exceeds 55.',
@@ -57,18 +61,49 @@ class EssLicense(models.Model):
         'license_id',
         'module_id',
         string='Allowed Modules',
+        tracking=True,
         help='Modules the mobile app will show for this license. '
              'If empty, all active modules are allowed.',
     )
 
     # ── Deactivation tracking ─────────────────────────────────────────────────
-    deactivation_reason = fields.Text(string='Deactivation Reason', readonly=True)
-    deactivation_date = fields.Datetime(string='Deactivated On', readonly=True)
+    deactivation_reason = fields.Text(string='Deactivation Reason', readonly=True, tracking=True)
+    deactivation_date = fields.Datetime(string='Deactivated On', readonly=True, tracking=True)
+
+    # ── Computed display status (for statusbar widget in form header) ──────────
+    license_status = fields.Selection(
+        selection=[('active', 'Active'), ('inactive', 'Inactive')],
+        string='Status',
+        compute='_compute_license_status',
+        store=False,
+    )
+
+    @api.depends('active')
+    def _compute_license_status(self):
+        for rec in self:
+            rec.license_status = 'active' if rec.active else 'inactive'
 
     _license_key_unique = models.Constraint(
         'UNIQUE(license_key)',
         'License key must be unique.',
     )
+
+    # ── Status wizard ─────────────────────────────────────────────────────────
+
+    def action_open_status_wizard(self):
+        """Open the Change Status wizard pre-filled with this license."""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Change License Status'),
+            'res_model': 'ess.license.status.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_license_id': self.id,
+                'default_action': 'activate' if not self.active else 'deactivate',
+            },
+        }
 
     # ── Validation (called by admin API controller on Step 1) ─────────────────
 
@@ -129,13 +164,20 @@ class EssLicense(models.Model):
                     'EMPLOYEE_LIMIT',
                 )
 
-        # Allowed modules — only what is explicitly assigned to the license.
-        # Empty list means no modules are permitted.
-        allowed_modules = [
-            {'name': m.name, 'code': m.code}
-            for m in license_rec.module_ids
-            if m.active
-        ]
+        # Allowed modules — empty module_ids means all active modules are permitted.
+        if license_rec.module_ids:
+            allowed_modules = [
+                {'name': m.name, 'code': m.code}
+                for m in license_rec.module_ids
+                if m.active
+            ]
+        else:
+            allowed_modules = [
+                {'name': m.name, 'code': m.code}
+                for m in self.env['ess.module'].sudo().search(
+                    [('active', '=', True)], order='sequence'
+                )
+            ]
 
         return {
             'status': 'valid',

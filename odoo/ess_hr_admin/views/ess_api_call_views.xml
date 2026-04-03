@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ── List view ──────────────────────────────────────────────────────────── -->
+
+    <record id="view_ess_api_call_list" model="ir.ui.view">
+        <field name="name">ess.api.call.list</field>
+        <field name="model">ess.api.call</field>
+        <field name="arch" type="xml">
+            <list string="API Call Logs"
+                  create="false" edit="false" delete="false"
+                  decoration-danger="not success"
+                  decoration-success="success">
+                <field name="call_date"/>
+                <field name="endpoint"/>
+                <field name="license_id"/>
+                <field name="server_id"/>
+                <field name="server_url" optional="hide"/>
+                <field name="success"/>
+                <field name="error_code" optional="show"/>
+                <field name="ip_address" optional="hide"/>
+                <field name="duration_ms" string="ms" optional="show"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ── Search view ────────────────────────────────────────────────────────── -->
+    <!-- NOTE: <group> in Odoo 19 search views (common.rng) does NOT support
+         the 'expand' or 'string' attributes — only name/colspan/etc. are valid.
+         Group-by filters are recognised by the UI via context={'group_by':...}
+         regardless of wrapping <group>. -->
+
+    <record id="view_ess_api_call_search" model="ir.ui.view">
+        <field name="name">ess.api.call.search</field>
+        <field name="model">ess.api.call</field>
+        <field name="arch" type="xml">
+            <search string="Search API Calls">
+                <field name="server_id"/>
+                <field name="endpoint"/>
+                <field name="error_code"/>
+                <field name="ip_address"/>
+
+                <filter name="filter_success" string="Successful" domain="[('success', '=', True)]"/>
+                <filter name="filter_failed"  string="Failed"     domain="[('success', '=', False)]"/>
+
+                <separator/>
+
+                <filter name="group_license"  string="License"      context="{'group_by': 'license_id'}"/>
+                <filter name="group_server"   string="Server"       context="{'group_by': 'server_id'}"/>
+                <filter name="group_endpoint" string="Endpoint"     context="{'group_by': 'endpoint'}"/>
+                <filter name="group_success"  string="Success/Fail" context="{'group_by': 'success'}"/>
+                <filter name="group_error"    string="Error Code"   context="{'group_by': 'error_code'}"/>
+                <filter name="group_day"      string="Day"          context="{'group_by': 'call_date:day'}"/>
+                <filter name="group_week"     string="Week"         context="{'group_by': 'call_date:week'}"/>
+                <filter name="group_month"    string="Month"        context="{'group_by': 'call_date:month'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- ── Pivot view ─────────────────────────────────────────────────────────── -->
+
+    <record id="view_ess_api_call_pivot" model="ir.ui.view">
+        <field name="name">ess.api.call.pivot</field>
+        <field name="model">ess.api.call</field>
+        <field name="arch" type="xml">
+            <pivot string="API Call Reports">
+                <field name="call_date" interval="day" type="row"/>
+                <field name="server_id" type="col"/>
+                <field name="duration_ms" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- ── Graph view ────────────────────────────────────────────────────────── -->
+
+    <record id="view_ess_api_call_graph" model="ir.ui.view">
+        <field name="name">ess.api.call.graph</field>
+        <field name="model">ess.api.call</field>
+        <field name="arch" type="xml">
+            <graph string="API Calls" type="bar">
+                <field name="call_date" interval="day" type="row"/>
+                <field name="success" type="col"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- ── Action ────────────────────────────────────────────────────────────── -->
+
+    <record id="action_ess_api_call" model="ir.actions.act_window">
+        <field name="name">API Call Logs</field>
+        <field name="res_model">ess.api.call</field>
+        <field name="view_mode">list,pivot,graph</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No API calls recorded yet.
+            </p>
+            <p>
+                Every call to the ESS Admin API (Step 1 license validation) is
+                automatically logged here for reporting and monitoring.
+            </p>
+        </field>
+    </record>
+
+</odoo>

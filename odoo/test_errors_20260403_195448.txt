@@ -1,0 +1,225 @@
+======================================================================
+  ESS HR Odoo Test Run — 2026-04-03 19:54:56
+  Command : d:\odoo19\python\python.exe d:\odoo19\server\odoo-bin --config d:\odoo19\server\odoo.conf --database ess-19 --test-enable --stop-after-init --test-tags ess_auth --no-http --log-level test --log-handler odoo.tests:INFO --log-handler odoo.tests.runner:INFO --log-handler odoo.addons.ess_hr_client.tests:INFO --log-handler odoo.addons.ess_hr_admin.tests:INFO
+======================================================================
+
+SUMMARY
+----------------------------------------
+  Total run  : 0
+  Passed     : 0
+  Failed     : 10
+  Errors     : 0
+  Skipped    : 0
+  Duration   : 0.00s
+  Result     : FAILED
+
+FAILED / ERRORED TESTS
+----------------------------------------
+  FAIL   TestAuth.test_by_user_missing_user_id
+  FAIL   TestAuth.test_by_user_with_valid_user_id
+  FAIL   TestAuth.test_companies_returns_list
+  FAIL   TestAuth.test_login_badge_pin_success
+  FAIL   TestAuth.test_login_no_credentials_fails
+  FAIL   TestAuth.test_login_unknown_badge_fails
+  FAIL   TestAuth.test_login_wrong_pin_fails
+  FAIL   TestAuth.test_logout_returns_ok
+  FAIL   TestAuth.test_protected_endpoint_without_token_fails
+  FAIL   TestAuth.test_refresh_returns_ok
+
+FAILURE DETAILS / TRACEBACKS
+======================================================================
+
+FAIL: TestAuth.test_by_user_missing_user_id
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+
+----------------------------------------------------------------------
+
+FAIL: TestAuth.test_by_user_with_valid_user_id
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+
+----------------------------------------------------------------------
+
+FAIL: TestAuth.test_companies_returns_list
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+
+----------------------------------------------------------------------
+
+FAIL: TestAuth.test_login_badge_pin_success
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+
+----------------------------------------------------------------------
+
+FAIL: TestAuth.test_login_no_credentials_fails
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+
+----------------------------------------------------------------------
+
+FAIL: TestAuth.test_login_unknown_badge_fails
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+
+----------------------------------------------------------------------
+
+FAIL: TestAuth.test_login_wrong_pin_fails
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+
+----------------------------------------------------------------------
+
+FAIL: TestAuth.test_logout_returns_ok
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+
+----------------------------------------------------------------------
+
+FAIL: TestAuth.test_protected_endpoint_without_token_fails
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+
+----------------------------------------------------------------------
+
+FAIL: TestAuth.test_refresh_returns_ok
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+
+filestore gc 0 checked, 0 removed
+10 post-tests in 3.41s, 282 queries
+ess_hr_client: 12 tests 0.56s 45 queries
+10 failed, 0 error(s) of 10 tests when loading database 'ess-19'
+Initiating shutdown
+Hit CTRL-C again or send a second signal to force the shutdown.
+ConnectionPool(read/write;used=0/count=0/max=64): Closed 1 connections
+----------------------------------------------------------------------
+
+FULL ODOO OUTPUT
+======================================================================
+2026-04-03 17:54:49,553 6956 WARNING ? odoo.tools.config: unknown option 'xmlrpc_port' in the config file at d:\odoo19\server\odoo.conf, option stored as-is, without parsing 
+2026-04-03 17:54:49,553 6956 WARNING ? odoo.tools.config: unknown option 'xmlrpc_port' in the config file at d:\odoo19\server\odoo.conf, option stored as-is, without parsing 
+2026-04-03 17:54:49,553 6956 INFO ? odoo: Odoo version 19.0+e-20251228 
+2026-04-03 17:54:49,553 6956 INFO ? odoo: Using configuration file at d:\odoo19\server\odoo.conf 
+2026-04-03 17:54:49,553 6956 INFO ? odoo: addons paths: _NamespacePath(['d:\\odoo19\\server\\odoo\\addons', 'c:\\users\\work\\appdata\\local\\openerp s.a\\odoo\\addons\\19.0', 'd:\\odoo19\\myaddons', 'd:\\ess-hr-app\\odoo', 'd:\\odoo19\\server\\addons']) 
+2026-04-03 17:54:49,554 6956 INFO ? odoo: database: odoo19@localhost:5432 
+2026-04-03 17:54:50,225 6956 INFO ? odoo.service.server: HTTP service (werkzeug) running on WorkPC:8055 
+2026-04-03 17:54:50,282 6956 INFO ess-19 odoo.tests.common: Importing test framework 
+2026-04-03 17:54:50,345 6956 INFO ess-19 odoo.modules.loading: loading 1 modules... 
+2026-04-03 17:54:50,611 6956 INFO ess-19 odoo.modules.loading: 1 modules loaded in 0.27s, 0 queries (+0 extra) 
+2026-04-03 17:54:50,651 6956 INFO ess-19 odoo.modules.loading: loading 133 modules... 
+2026-04-03 17:54:52,503 6956 INFO ess-19 odoo.modules.loading: 133 modules loaded in 1.85s, 0 queries (+0 extra) 
+2026-04-03 17:54:52,724 6956 INFO ess-19 odoo.modules.loading: Modules loaded. 
+2026-04-03 17:54:52,827 6956 INFO ess-19 odoo.registry: Registry loaded in 2.600s 
+2026-04-03 17:54:52,827 6956 INFO ess-19 odoo.service.server: Starting post tests 
+2026-04-03 17:54:52,900 6956 INFO ess-19 odoo.addons.base.models.ir_qweb: Pregenerating assets bundles 
+2026-04-03 17:54:54,822 6956 INFO ess-19 odoo.addons.base.models.ir_qweb: JS Assets bundles generated in 1.9102344512939453 seconds 
+2026-04-03 17:54:55,671 6956 INFO ess-19 odoo.addons.base.models.ir_qweb: CSS Assets bundles generated in 0.8482871055603027 seconds 
+2026-04-03 17:54:55,724 6956 INFO ess-19 odoo.addons.ess_hr_client.tests.test_auth: Starting TestAuth.test_by_user_missing_user_id ... 
+2026-04-03 17:54:55,797 6956 INFO ess-19 odoo.addons.ess_hr_client.tests.test_auth: ====================================================================== 
+2026-04-03 17:54:55,797 6956 ERROR ess-19 odoo.addons.ess_hr_client.tests.test_auth: FAIL: TestAuth.test_by_user_missing_user_id
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+ 
+2026-04-03 17:54:55,800 6956 INFO ess-19 odoo.addons.ess_hr_client.tests.test_auth: Starting TestAuth.test_by_user_with_valid_user_id ... 
+2026-04-03 17:54:55,843 6956 INFO ess-19 odoo.addons.ess_hr_client.tests.test_auth: ====================================================================== 
+2026-04-03 17:54:55,843 6956 ERROR ess-19 odoo.addons.ess_hr_client.tests.test_auth: FAIL: TestAuth.test_by_user_with_valid_user_id
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+ 
+2026-04-03 17:54:55,844 6956 INFO ess-19 odoo.addons.ess_hr_client.tests.test_auth: Starting TestAuth.test_companies_returns_list ... 
+2026-04-03 17:54:55,878 6956 INFO ess-19 odoo.addons.ess_hr_client.tests.test_auth: ====================================================================== 
+2026-04-03 17:54:55,878 6956 ERROR ess-19 odoo.addons.ess_hr_client.tests.test_auth: FAIL: TestAuth.test_companies_returns_list
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+ 
+2026-04-03 17:54:55,879 6956 INFO ess-19 odoo.addons.ess_hr_client.tests.test_auth: Starting TestAuth.test_login_badge_pin_success ... 
+2026-04-03 17:54:55,925 6956 INFO ess-19 odoo.addons.ess_hr_client.tests.test_auth: ====================================================================== 
+2026-04-03 17:54:55,925 6956 ERROR ess-19 odoo.addons.ess_hr_client.tests.test_auth: FAIL: TestAuth.test_login_badge_pin_success
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+ 
+2026-04-03 17:54:55,926 6956 INFO ess-19 odoo.addons.ess_hr_client.tests.test_auth: Starting TestAuth.test_login_no_credentials_fails ... 
+2026-04-03 17:54:55,971 6956 INFO ess-19 odoo.addons.ess_hr_client.tests.test_auth: ====================================================================== 
+2026-04-03 17:54:55,971 6956 ERROR ess-19 odoo.addons.ess_hr_client.tests.test_auth: FAIL: TestAuth.test_login_no_credentials_fails
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+ 
+2026-04-03 17:54:55,972 6956 INFO ess-19 odoo.addons.ess_hr_client.tests.test_auth: Starting TestAuth.test_login_unknown_badge_fails ... 
+2026-04-03 17:54:56,016 6956 INFO ess-19 odoo.addons.ess_hr_client.tests.test_auth: ====================================================================== 
+2026-04-03 17:54:56,016 6956 ERROR ess-19 odoo.addons.ess_hr_client.tests.test_auth: FAIL: TestAuth.test_login_unknown_badge_fails
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+ 
+2026-04-03 17:54:56,019 6956 INFO ess-19 odoo.addons.ess_hr_client.tests.test_auth: Starting TestAuth.test_login_wrong_pin_fails ... 
+2026-04-03 17:54:56,062 6956 INFO ess-19 odoo.addons.ess_hr_client.tests.test_auth: ====================================================================== 
+2026-04-03 17:54:56,063 6956 ERROR ess-19 odoo.addons.ess_hr_client.tests.test_auth: FAIL: TestAuth.test_login_wrong_pin_fails
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+ 
+2026-04-03 17:54:56,064 6956 INFO ess-19 odoo.addons.ess_hr_client.tests.test_auth: Starting TestAuth.test_logout_returns_ok ... 
+2026-04-03 17:54:56,111 6956 INFO ess-19 odoo.addons.ess_hr_client.tests.test_auth: ====================================================================== 
+2026-04-03 17:54:56,112 6956 ERROR ess-19 odoo.addons.ess_hr_client.tests.test_auth: FAIL: TestAuth.test_logout_returns_ok
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+ 
+2026-04-03 17:54:56,113 6956 INFO ess-19 odoo.addons.ess_hr_client.tests.test_auth: Starting TestAuth.test_protected_endpoint_without_token_fails ... 
+2026-04-03 17:54:56,161 6956 INFO ess-19 odoo.addons.ess_hr_client.tests.test_auth: ====================================================================== 
+2026-04-03 17:54:56,161 6956 ERROR ess-19 odoo.addons.ess_hr_client.tests.test_auth: FAIL: TestAuth.test_protected_endpoint_without_token_fails
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+ 
+2026-04-03 17:54:56,163 6956 INFO ess-19 odoo.addons.ess_hr_client.tests.test_auth: Starting TestAuth.test_refresh_returns_ok ... 
+2026-04-03 17:54:56,204 6956 INFO ess-19 odoo.addons.ess_hr_client.tests.test_auth: ====================================================================== 
+2026-04-03 17:54:56,204 6956 ERROR ess-19 odoo.addons.ess_hr_client.tests.test_auth: FAIL: TestAuth.test_refresh_returns_ok
+Traceback (most recent call last):
+  File "d:\ess-hr-app\odoo\ess_hr_client\tests\common.py", line 129, in setUp
+    self.assertTrue(result.get('success'), f'Test login failed: {result}')
+AssertionError: False is not true : Test login failed: {'success': False, 'error': {'code': 'VALIDATION_ERROR', 'message': 'Employee not found for badge ID: ESS_TEST_BADGE_01', 'message_ar': 'Employee not found for badge ID: ESS_TEST_BADGE_01'}}
+ 
+2026-04-03 17:54:56,228 6956 INFO ess-19 odoo.addons.base.models.ir_attachment: filestore gc 0 checked, 0 removed 
+2026-04-03 17:54:56,235 6956 INFO ess-19 odoo.service.server: 10 post-tests in 3.41s, 282 queries 
+2026-04-03 17:54:56,236 6956 INFO ess-19 odoo.tests.stats: ess_hr_client: 12 tests 0.56s 45 queries 
+2026-04-03 17:54:56,236 6956 ERROR ess-19 odoo.tests.result: 10 failed, 0 error(s) of 10 tests when loading database 'ess-19' 
+2026-04-03 17:54:56,236 6956 INFO ess-19 odoo.service.server: Initiating shutdown 
+2026-04-03 17:54:56,236 6956 INFO ess-19 odoo.service.server: Hit CTRL-C again or send a second signal to force the shutdown. 
+2026-04-03 17:54:56,324 6956 INFO ess-19 odoo.sql_db: ConnectionPool(read/write;used=0/count=0/max=64): Closed 1 connections  

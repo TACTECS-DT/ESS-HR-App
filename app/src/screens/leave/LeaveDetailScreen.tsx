@@ -9,6 +9,7 @@ import apiClient from '../../api/client';
 import {isApiSuccess} from '../../types/api';
 import ScreenHeader from '../../components/common/ScreenHeader';
 import StatusChip from '../../components/common/StatusChip';
+import LoadingSkeleton from '../../components/common/LoadingSkeleton';
 import {useTheme} from '../../hooks/useTheme';
 import {useAppSelector} from '../../hooks/useAppSelector';
 import {useRBAC} from '../../hooks/useRBAC';
@@ -28,6 +29,12 @@ function InfoRow({label, value, theme}: {label: string; value: string; theme: an
   );
 }
 
+function stepDotColor(status: string): string {
+  if (status === 'approved' || status === 'validated') {return colors.success;}
+  if (status === 'refused') {return colors.error;}
+  return colors.warning;
+}
+
 export default function LeaveDetailScreen() {
   const {t, i18n} = useTranslation();
   const theme = useTheme();
@@ -40,51 +47,78 @@ export default function LeaveDetailScreen() {
 
   const [comment, setComment] = useState('');
 
-  const {data: requests} = useQuery({
-    queryKey: ['leave-requests'],
+  const {data: request, isLoading} = useQuery({
+    queryKey: ['leave-detail', id],
     queryFn: async () => {
-      const res = await apiClient.get(API_MAP.leave.requests);
-      return isApiSuccess(res.data) ? (res.data.data as LeaveRequest[]) : [];
+      const res = await apiClient.get(API_MAP.leave.requestById(id));
+      return isApiSuccess(res.data) ? (res.data.data as LeaveRequest) : null;
     },
   });
 
-  const request = requests?.find(r => r.id === id);
-
-  function stepDotColor(status: string): string {
-    if (status === 'approved') {return colors.success;}
-    if (status === 'refused') {return colors.error;}
-    return colors.warning;
+  function invalidate() {
+    queryClient.invalidateQueries({queryKey: ['leave-detail', id]});
+    queryClient.invalidateQueries({queryKey: ['leave-requests']});
+    queryClient.invalidateQueries({queryKey: ['leave-balances']});
   }
 
-  const isOwnRequest = request?.employee_id === user?.id || !request?.employee_id;
-  // 1st-level approve (Manager): only when pending
-  const canApprove = canApproveLeave && request?.status === 'pending';
-  // 2nd-level validate (HR Officer): only when manager has already approved
-  const canValidate = canValidateLeave && request?.status === 'approved';
-  // Refuse: manager can refuse pending; HR/Admin can also refuse manager-approved
-  const canRefuse = canRefuseLeave && (
-    request?.status === 'pending' ||
-    (request?.status === 'approved' && canValidateLeave)
-  );
-  // Reset: role must have permission. Employees can only reset their own.
-  const canReset = canResetLeave && request?.status === 'refused' &&
-    (isOwnRequest || !isOwnRequest); // managers can reset any; employees only own (isOwnRequest)
-  const canDelete = canDeleteDraftLeave && request?.status === 'draft';
-
-  const patchMutation = useMutation({
-    mutationFn: async (action: string) => {
-      await apiClient.patch(API_MAP.leave.requestById(id), {action, comment});
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ['leave-requests']});
-    },
+  const approveMutation = useMutation({
+    mutationFn: async () =>
+      apiClient.post(API_MAP.leave.approve, {leave_id: id}),
+    onSuccess: invalidate,
+    onError: () => Alert.alert(t('common.error')),
   });
 
-  function confirmAction(action: string, label: string) {
+  const refuseMutation = useMutation({
+    mutationFn: async () =>
+      apiClient.post(API_MAP.leave.refuse, {leave_id: id, reason: comment}),
+    onSuccess: () => { setComment(''); invalidate(); },
+    onError: () => Alert.alert(t('common.error')),
+  });
+
+  const validateMutation = useMutation({
+    mutationFn: async () =>
+      apiClient.post(API_MAP.leave.validate, {leave_id: id}),
+    onSuccess: invalidate,
+    onError: () => Alert.alert(t('common.error')),
+  });
+
+  const resetMutation = useMutation({
+    mutationFn: async () =>
+      apiClient.post(API_MAP.leave.reset, {leave_id: id}),
+    onSuccess: invalidate,
+    onError: () => Alert.alert(t('common.error')),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async () =>
+      apiClient.delete(API_MAP.leave.requestById(id)),
+    onSuccess: invalidate,
+    onError: () => Alert.alert(t('common.error')),
+  });
+
+  const anyPending =
+    approveMutation.isPending ||
+    refuseMutation.isPending ||
+    validateMutation.isPending ||
+    resetMutation.isPending ||
+    deleteMutation.isPending;
+
+  function confirmAction(label: string, onConfirm: () => void) {
     Alert.alert(label, `${t('common.confirm')}?`, [
       {text: t('common.cancel'), style: 'cancel'},
-      {text: label, onPress: () => patchMutation.mutate(action)},
+      {text: label, onPress: onConfirm},
     ]);
+  }
+
+  if (isLoading) {
+    return (
+      <View style={[styles.container, {backgroundColor: theme.background}]}>
+        <ScreenHeader title={t('leave.title')} showBack />
+        <View style={styles.skeletons}>
+          {[0, 1, 2].map(i => <LoadingSkeleton key={i} height={80} style={styles.skeleton} />)}
+        </View>
+      </View>
+    );
   }
 
   if (!request) {
@@ -100,6 +134,17 @@ export default function LeaveDetailScreen() {
 
   const leaveTypeName = isAr ? request.leave_type_ar : request.leave_type;
   const modeName = t(`leave.mode.${request.mode}`);
+  const isOwnRequest = request.employee_id === user?.id;
+
+  // Action visibility based on status + RBAC
+  const canApprove = canApproveLeave && request.status === 'pending';
+  const canValidate = canValidateLeave && request.status === 'approved';
+  const canRefuse = canRefuseLeave && (
+    request.status === 'pending' ||
+    (request.status === 'approved' && canValidateLeave)
+  );
+  const canReset = canResetLeave && request.status === 'refused';
+  const canDelete = canDeleteDraftLeave && request.status === 'draft' && isOwnRequest;
 
   return (
     <View style={[styles.container, {backgroundColor: theme.background}]}>
@@ -130,35 +175,37 @@ export default function LeaveDetailScreen() {
         </View>
 
         {/* Approval Timeline */}
-        <Text style={[styles.sectionTitle, {color: theme.text}]}>{t('leave.approvalHistory')}</Text>
-        <View style={[styles.card, {backgroundColor: theme.surface, borderColor: theme.border}]}>
-          {request.approval_history.map((step, idx) => {
-            const dotColor = stepDotColor(step.status);
-            const isLast = idx === request.approval_history.length - 1;
-            return (
-              <View key={idx} style={styles.timelineItem}>
-                {/* Vertical line + dot */}
-                <View style={styles.timelineLeft}>
-                  <View style={[styles.dot, {backgroundColor: dotColor}]} />
-                  {!isLast && <View style={[styles.line, {backgroundColor: theme.border}]} />}
-                </View>
-                {/* Content */}
-                <View style={styles.timelineContent}>
-                  <Text style={[styles.stepApprover, {color: theme.text}]}>
-                    {isAr ? step.approver_ar : step.approver}
-                  </Text>
-                  <StatusChip status={step.status} label={t(`common.status.${step.status}`)} />
-                  {step.date ? (
-                    <Text style={[styles.stepDate, {color: theme.textSecondary}]}>{step.date}</Text>
-                  ) : null}
-                  {step.note ? (
-                    <Text style={[styles.stepNote, {color: theme.textSecondary}]}>{step.note}</Text>
-                  ) : null}
-                </View>
-              </View>
-            );
-          })}
-        </View>
+        {request.approval_history.length > 0 ? (
+          <>
+            <Text style={[styles.sectionTitle, {color: theme.text}]}>{t('leave.approvalHistory')}</Text>
+            <View style={[styles.card, {backgroundColor: theme.surface, borderColor: theme.border}]}>
+              {request.approval_history.map((step, idx) => {
+                const dotColor = stepDotColor(step.status);
+                const isLast = idx === request.approval_history.length - 1;
+                return (
+                  <View key={idx} style={styles.timelineItem}>
+                    <View style={styles.timelineLeft}>
+                      <View style={[styles.dot, {backgroundColor: dotColor}]} />
+                      {!isLast && <View style={[styles.line, {backgroundColor: theme.border}]} />}
+                    </View>
+                    <View style={styles.timelineContent}>
+                      <Text style={[styles.stepApprover, {color: theme.text}]}>
+                        {isAr ? step.approver_ar : step.approver}
+                      </Text>
+                      <StatusChip status={step.status} label={t(`common.status.${step.status}`)} />
+                      {step.date ? (
+                        <Text style={[styles.stepDate, {color: theme.textSecondary}]}>{step.date}</Text>
+                      ) : null}
+                      {step.note ? (
+                        <Text style={[styles.stepNote, {color: theme.textSecondary}]}>{step.note}</Text>
+                      ) : null}
+                    </View>
+                  </View>
+                );
+              })}
+            </View>
+          </>
+        ) : null}
 
         {/* Approval Actions */}
         {(canApprove || canValidate || canRefuse) ? (
@@ -170,24 +217,24 @@ export default function LeaveDetailScreen() {
               {canApprove ? (
                 <TouchableOpacity
                   style={[styles.actionBtn, {backgroundColor: colors.success}]}
-                  onPress={() => confirmAction('approve', t('leave.actions.approve'))}
-                  disabled={patchMutation.isPending}>
+                  onPress={() => confirmAction(t('leave.actions.approve'), () => approveMutation.mutate())}
+                  disabled={anyPending}>
                   <Text style={styles.actionBtnText}>{'✓ '}{t('leave.actions.approve')}</Text>
                 </TouchableOpacity>
               ) : null}
               {canValidate ? (
                 <TouchableOpacity
                   style={[styles.actionBtn, {backgroundColor: colors.primary}]}
-                  onPress={() => confirmAction('validate', t('leave.actions.validate'))}
-                  disabled={patchMutation.isPending}>
+                  onPress={() => confirmAction(t('leave.actions.validate'), () => validateMutation.mutate())}
+                  disabled={anyPending}>
                   <Text style={styles.actionBtnText}>{'✓✓ '}{t('leave.actions.validate')}</Text>
                 </TouchableOpacity>
               ) : null}
               {canRefuse ? (
                 <TouchableOpacity
                   style={[styles.actionBtn, {backgroundColor: colors.error}]}
-                  onPress={() => confirmAction('refuse', t('leave.actions.refuse'))}
-                  disabled={patchMutation.isPending}>
+                  onPress={() => confirmAction(t('leave.actions.refuse'), () => refuseMutation.mutate())}
+                  disabled={anyPending}>
                   <Text style={styles.actionBtnText}>{'✗ '}{t('leave.actions.refuse')}</Text>
                 </TouchableOpacity>
               ) : null}
@@ -207,8 +254,8 @@ export default function LeaveDetailScreen() {
         {canReset ? (
           <TouchableOpacity
             style={[styles.secondaryBtn, {borderColor: colors.primary}]}
-            onPress={() => confirmAction('reset', t('leave.actions.resetToDraft'))}
-            disabled={patchMutation.isPending}>
+            onPress={() => confirmAction(t('leave.actions.resetToDraft'), () => resetMutation.mutate())}
+            disabled={anyPending}>
             <Text style={[styles.secondaryBtnText, {color: colors.primary}]}>
               {t('leave.actions.resetToDraft')}
             </Text>
@@ -218,8 +265,8 @@ export default function LeaveDetailScreen() {
         {canDelete ? (
           <TouchableOpacity
             style={[styles.dangerBtn, {backgroundColor: colors.error}]}
-            onPress={() => confirmAction('delete', t('common.delete'))}
-            disabled={patchMutation.isPending}>
+            onPress={() => confirmAction(t('common.delete'), () => deleteMutation.mutate())}
+            disabled={anyPending}>
             <Text style={styles.dangerBtnText}>{t('common.delete')}</Text>
           </TouchableOpacity>
         ) : null}
@@ -232,6 +279,8 @@ export default function LeaveDetailScreen() {
 const styles = StyleSheet.create({
   container: {flex: 1},
   center: {flex: 1, justifyContent: 'center', alignItems: 'center'},
+  skeletons: {padding: spacing.md, gap: spacing.sm},
+  skeleton: {borderRadius: radius.md},
   content: {padding: spacing.md, gap: spacing.md, paddingBottom: spacing.xl},
 
   card: {

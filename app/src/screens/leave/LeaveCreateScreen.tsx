@@ -110,37 +110,45 @@ export default function LeaveCreateScreen() {
 
   const showCalcCard = selectedTypeId && (dateFrom || segment !== 'full_day');
 
-  const mutation = useMutation({
-    mutationFn: async () => {
+  const submitMutation = useMutation({
+    mutationFn: async (submit: boolean) => {
+      const dateTo_ = segment === 'full_day' ? dateTo : dateFrom; // half-day uses same day
       const res = await apiClient.post(API_MAP.leave.requests, {
         leave_type_id: selectedTypeId,
         mode: leaveMode,
         date_from: dateFrom,
-        date_to: dateTo,
+        date_to: dateTo_,
         description,
+        submit,
       });
       return res.data;
     },
-    onSuccess: () => {
+    onSuccess: (_data, submit) => {
       queryClient.invalidateQueries({queryKey: ['leave-requests']});
       queryClient.invalidateQueries({queryKey: ['leave-balances']});
-      Alert.alert(t('common.done'), t('leave.request') + ' ✓');
+      Alert.alert(
+        t('common.done'),
+        submit ? t('leave.request') + ' ✓' : t('leave.saveDraft') + ' ✓',
+      );
       navigation.goBack();
     },
     onError: () => Alert.alert(t('common.error')),
   });
 
   function handleSubmit() {
-    if (!selectedTypeId || !dateFrom || !dateTo) {
+    if (!selectedTypeId || !dateFrom || (segment === 'full_day' && !dateTo)) {
       Alert.alert(t('common.error'), 'Please fill all required fields');
       return;
     }
-    mutation.mutate();
+    submitMutation.mutate(true);
   }
 
   function handleSaveDraft() {
-    Alert.alert(t('common.done'), t('leave.saveDraft') + ' ✓');
-    navigation.goBack();
+    if (!selectedTypeId || !dateFrom) {
+      Alert.alert(t('common.error'), 'Please select a leave type and start date');
+      return;
+    }
+    submitMutation.mutate(false);
   }
 
   const isHourly = segment === 'hourly';
@@ -260,16 +268,17 @@ export default function LeaveCreateScreen() {
         {/* Buttons */}
         <View style={styles.btnRow}>
           <TouchableOpacity
-            style={[styles.btnOutline, {borderColor: colors.primary}]}
-            onPress={handleSaveDraft}>
+            style={[styles.btnOutline, {borderColor: colors.primary}, submitMutation.isPending && {opacity: 0.6}]}
+            onPress={handleSaveDraft}
+            disabled={submitMutation.isPending}>
             <Text style={[styles.btnOutlineText, {color: colors.primary}]}>
               {t('leave.saveDraft')}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.btnPrimary, {backgroundColor: colors.primary}, mutation.isPending && {opacity: 0.6}]}
+            style={[styles.btnPrimary, {backgroundColor: colors.primary}, submitMutation.isPending && {opacity: 0.6}]}
             onPress={handleSubmit}
-            disabled={mutation.isPending}>
+            disabled={submitMutation.isPending}>
             <Text style={styles.btnPrimaryText}>{t('leave.submitRequest')}</Text>
           </TouchableOpacity>
         </View>

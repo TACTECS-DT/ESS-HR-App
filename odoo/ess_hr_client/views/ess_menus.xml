@@ -6,35 +6,39 @@
         id="menu_ess_client_root"
         name="ESS HR Client"
         sequence="5"
-        groups="ess_mobile_group"/>
+        groups="ess_hr_client.ess_mobile_group"/>
 
     <!-- ── Monitoring sub-menu ─────────────────────────────────────────────── -->
     <menuitem
         id="menu_ess_monitoring"
         name="Monitoring"
         parent="menu_ess_client_root"
-        sequence="10"/>
+        sequence="10"
+        groups="ess_hr_client.ess_mobile_group"/>
 
     <menuitem
         id="menu_ess_api_logs"
         name="All Requests"
         parent="menu_ess_monitoring"
         action="action_ess_api_log"
-        sequence="10"/>
+        sequence="10"
+        groups="ess_hr_client.ess_mobile_group"/>
 
     <menuitem
         id="menu_ess_employee_activity"
         name="Employee Activity"
         parent="menu_ess_monitoring"
         action="action_ess_api_log_employee"
-        sequence="20"/>
+        sequence="20"
+        groups="ess_hr_client.ess_mobile_group"/>
 
     <menuitem
         id="menu_ess_error_monitor"
         name="Error Monitor"
         parent="menu_ess_monitoring"
         action="action_ess_api_log_errors"
-        sequence="30"/>
+        sequence="30"
+        groups="ess_hr_client.ess_mobile_group"/>
 
     <!-- Employee credentials are managed from the employee form (ESS Mobile tab)
          and are not exposed as a standalone menu item per the architecture spec. -->

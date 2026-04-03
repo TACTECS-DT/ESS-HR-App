@@ -13,6 +13,8 @@
         'views/ess_module_views.xml',
         'views/ess_server_views.xml',
         'views/ess_license_views.xml',
+        'views/ess_status_wizard_views.xml',
+        'views/ess_api_call_views.xml',
         'views/ess_menus.xml',
     ],
     'installable': True,

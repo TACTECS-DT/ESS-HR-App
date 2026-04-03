@@ -173,7 +173,11 @@ class AccountAnalyticLineExt(models.Model):
         manager = self.env['hr.employee'].with_user(SUPERUSER_ID).browse(manager_employee_id)
         if not manager.exists():
             raise UserError(_('Employee not found.'))
-        team = self.env['hr.employee'].with_user(SUPERUSER_ID).search([('parent_id', '=', manager_employee_id)])
+        company_id = manager.company_id.id if manager.company_id else False
+        team_domain = [('parent_id', '=', manager_employee_id), ('active', '=', True)]
+        if company_id:
+            team_domain.append(('company_id', '=', company_id))
+        team = self.env['hr.employee'].with_user(SUPERUSER_ID).search(team_domain)
         if not team:
             return []
         team_ids = team.ids

@@ -257,10 +257,12 @@ class HrServicesController(http.Controller):
     @http.route('/ess/api/business-services/types', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
     def business_service_types(self):
         kw = get_body()
+        ctx = get_auth_context()
+        company_id = kw.get('company_id') or ctx.get('company_id')
         return call_and_log(
             '/ess/api/business-services/types',
             lambda: request.env['hr.business.service.request'].sudo().get_business_service_types(
-                kw.get('company_id'),
+                company_id,
             ),
         )
 

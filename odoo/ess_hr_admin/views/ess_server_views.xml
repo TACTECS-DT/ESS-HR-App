@@ -39,6 +39,11 @@
                         type="object"
                         class="btn-primary"
                         help="Immediately pull employee and user stats from this server."/>
+                    <button
+                        name="action_open_status_wizard"
+                        string="Change Status"
+                        type="object"
+                        class="btn-secondary"/>
                     <field name="server_status" widget="statusbar"
                            statusbar_visible="active,unreachable,deactivated"
                            readonly="1"/>
@@ -73,6 +78,7 @@
                         <field name="last_sync_error" nolabel="1" readonly="1"/>
                     </group>
                 </sheet>
+                <chatter/>
             </form>
         </field>
     </record>

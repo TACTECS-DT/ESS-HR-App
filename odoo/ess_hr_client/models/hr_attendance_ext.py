@@ -147,7 +147,11 @@ class HrAttendanceExt(models.Model):
     def get_team_attendance(self, manager_employee_id, attendance_date=None):
         """Return attendance status for all direct reports of the manager on a given date."""
         manager = self._get_employee(manager_employee_id)
-        team = self.env['hr.employee'].with_user(SUPERUSER_ID).search([('parent_id', '=', manager_employee_id)])
+        company_id = manager.company_id.id if manager.company_id else False
+        team_domain = [('parent_id', '=', manager_employee_id), ('active', '=', True)]
+        if company_id:
+            team_domain.append(('company_id', '=', company_id))
+        team = self.env['hr.employee'].with_user(SUPERUSER_ID).search(team_domain)
         target_date = attendance_date or fields.Date.today()
         if isinstance(target_date, str):
             from datetime import datetime as _dt

@@ -36,9 +36,9 @@ class ValidateController(http.Controller):
     @http.route('/ess/admin/api/validate', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def validate(self):
         kw = get_body()
+        server_url = kw.get('server_url')
         return call_admin(
             '/ess/admin/api/validate',
-            lambda: request.env['ess.license'].sudo().validate_for_mobile(
-                kw.get('server_url'),
-            ),
+            lambda: request.env['ess.license'].sudo().validate_for_mobile(server_url),
+            server_url=server_url,
         )

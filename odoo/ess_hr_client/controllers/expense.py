@@ -25,9 +25,11 @@ class ExpenseController(http.Controller):
     @http.route('/ess/api/expenses/taxes', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
     def taxes(self):
         kw = get_body()
+        ctx = get_auth_context()
+        company_id = kw.get('company_id') or ctx.get('company_id')
         return call_and_log(
             '/ess/api/expenses/taxes',
-            lambda: request.env['hr.expense'].sudo().get_purchase_taxes(kw.get('company_id')),
+            lambda: request.env['hr.expense'].sudo().get_purchase_taxes(company_id),
         )
 
     @http.route('/ess/api/expenses', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
