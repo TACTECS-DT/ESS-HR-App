@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ── Server Status Wizard ──────────────────────────────────────────────── -->
+
+    <record id="view_ess_server_status_wizard_form" model="ir.ui.view">
+        <field name="name">ess.server.status.wizard.form</field>
+        <field name="model">ess.server.status.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Change Server Status">
+                <group>
+                    <field name="server_id" readonly="1"/>
+                    <field name="current_status" readonly="1" widget="badge"
+                           decoration-success="current_status == 'active'"
+                           decoration-danger="current_status == 'deactivated'"
+                           decoration-warning="current_status == 'unreachable'"/>
+                    <field name="new_status" required="1"/>
+                    <field name="reason"
+                           placeholder="Reason for status change (required when deactivating)…"
+                           invisible="new_status != 'deactivated'"/>
+                </group>
+                <footer>
+                    <button name="action_apply" string="Apply" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- ── License Status Wizard ─────────────────────────────────────────────── -->
+
+    <record id="view_ess_license_status_wizard_form" model="ir.ui.view">
+        <field name="name">ess.license.status.wizard.form</field>
+        <field name="model">ess.license.status.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Change License Status">
+                <group>
+                    <field name="license_id" readonly="1"/>
+                    <field name="current_active" readonly="1" widget="boolean_toggle"/>
+                    <field name="action" required="1"/>
+                    <field name="reason"
+                           placeholder="Reason for deactivation (required)…"
+                           invisible="action != 'deactivate'"/>
+                </group>
+                <footer>
+                    <button name="action_apply" string="Apply" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

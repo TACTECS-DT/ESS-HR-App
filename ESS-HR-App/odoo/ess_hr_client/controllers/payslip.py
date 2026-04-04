@@ -1,0 +1,33 @@
+from odoo import http
+from odoo.http import request
+
+from .utils import call_and_log, get_body, get_auth_context
+
+
+class PayslipController(http.Controller):
+
+    @http.route('/ess/api/payslip', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
+    def list(self):
+        kw = get_body()
+        employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
+        return call_and_log(
+            '/ess/api/payslip',
+            lambda: request.env['hr.payslip'].sudo().get_payslips(
+                employee_id, kw.get('year'), kw.get('month'),
+            ),
+        )
+
+    @http.route('/ess/api/payslip/<int:payslip_id>', type='http', auth='none', methods=['GET'], csrf=False, readonly=False)
+    def by_id(self, payslip_id):
+        return call_and_log(
+            '/ess/api/payslip/<id>',
+            lambda: request.env['hr.payslip'].sudo().get_payslip_detail(payslip_id),
+        )
+
+    @http.route('/ess/api/payslip/pdf', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
+    def pdf(self):
+        kw = get_body()
+        return call_and_log(
+            '/ess/api/payslip/pdf',
+            lambda: request.env['hr.payslip'].sudo().get_payslip_pdf(kw.get('payslip_id')),
+        )

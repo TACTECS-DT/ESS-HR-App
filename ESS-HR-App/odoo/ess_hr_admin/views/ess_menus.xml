@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ── Root application menu ────────────────────────────────────────────── -->
+    <menuitem
+        id="menu_ess_admin_root"
+        name="ESS Admin"
+        sequence="5"
+        groups="ess_hr_admin.ess_admin_group"
+        web_icon="ess_hr_admin,static/description/icon.png"/>
+
+    <!-- ── Licenses ─────────────────────────────────────────────────────────── -->
+    <menuitem
+        id="menu_ess_licenses"
+        name="Licenses"
+        parent="menu_ess_admin_root"
+        action="action_ess_license"
+        sequence="10"
+        groups="ess_hr_admin.ess_admin_group"/>
+
+    <!-- ── Client Servers ───────────────────────────────────────────────────── -->
+    <menuitem
+        id="menu_ess_servers"
+        name="Client Servers"
+        parent="menu_ess_admin_root"
+        action="action_ess_server"
+        sequence="20"
+        groups="ess_hr_admin.ess_admin_group"/>
+
+    <!-- ── API Call Logs ────────────────────────────────────────────────────── -->
+    <menuitem
+        id="menu_ess_api_calls"
+        name="API Call Logs"
+        parent="menu_ess_admin_root"
+        action="action_ess_api_call"
+        sequence="30"
+        groups="ess_hr_admin.ess_admin_group"/>
+
+    <!-- ── Configuration ────────────────────────────────────────────────────── -->
+    <menuitem
+        id="menu_ess_admin_config"
+        name="Configuration"
+        parent="menu_ess_admin_root"
+        sequence="90"
+        groups="ess_hr_admin.ess_admin_group"/>
+
+    <menuitem
+        id="menu_ess_modules"
+        name="Mobile Modules"
+        parent="menu_ess_admin_config"
+        action="action_ess_module"
+        sequence="10"
+        groups="ess_hr_admin.ess_admin_group"/>
+
+</odoo>

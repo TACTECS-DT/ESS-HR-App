@@ -1,0 +1,120 @@
+ESS System Architecture – Production-Grade Secure Version
+
+1) Mobile App
+-------------------
+- User enters server URL(s)
+- Caches:
+    - Server URLs
+    - JWT tokens (short-lived)
+- Security:
+    - HTTPS only + certificate pinning
+    - HMAC signed requests (App ID + Device ID + nonce + timestamp)
+    - Public key for verifying Admin-signed JWTs
+    - Optional: Device attestation (SafetyNet / DeviceCheck)
+
+Step 1: License Validation + Config
+-----------------------------------
+Mobile → Admin Server:
+    - Payload: App ID, Device ID, server URL, timestamp, nonce, HMAC signature
+Admin validates:
+    - HMAC signature
+    - Timestamp + nonce (prevent replay)
+    - App ID + device approval
+Admin → Mobile:
+    - Signed JWT (RS256/ECDSA)
+        - Claims: device ID, allowed modules, auto logout duration, expiry
+    - Expiry: short-lived (e.g., 5–15 min)
+Mobile verifies:
+    - JWT signature using Admin public key
+    - Expiry + device binding
+    - Rejects if invalid
+Behavior:
+    - If Step 1 fails → block login
+    - Allowed modules & auto logout come from Admin
+
+Step 2: Client Login
+-------------------
+Mobile → Client Server:
+    - Sends user credentials + Admin JWT token
+Client Server validates:
+    - JWT signature using Admin public key
+    - Expiry
+    - Device ID matches claim
+    - Optional: verify with Admin server token endpoint
+If valid → allow login, return business data
+Behavior:
+    - Mobile shows only allowed modules
+    - Auto logout enforced based on JWT claim
+    - If token invalid/expired → block access, logout user
+
+2) Client Server (Odoo ESS Client Module)
+-------------------
+- Owns all business logic and user data
+- Handles authentication (Step 2) & mobile APIs
+- Never trusts mobile alone
+- Security:
+    - Verify Admin JWT on every request
+    - Optional: token verification with Admin server
+    - Rate limiting, HMAC request verification
+- Sends stats to Admin server (background jobs):
+    - Employee count, active users, etc.
+    - Uses server-to-server signed JWT (longer expiry)
+- Returns business data to mobile only if token valid
+
+3) Admin Server (Odoo ESS Admin Module)
+-------------------
+- Central license manager
+- Stores:
+    - Client server URL(s)
+    - Max employees + grace limit
+    - Allowed modules per license
+    - Auto logout duration
+    - Device registration info (device ID, App ID, last login)
+    - Private key for JWT signing
+- Step 1:
+    - Validates mobile request (HMAC, timestamp, App ID, Device ID)
+    - Issues signed JWT to mobile (short-lived)
+- Background jobs:
+    - Fetch client stats using server-to-server JWT
+    - Check limits & license validity
+    - Deactivate license if:
+        - Employee limit exceeded
+        - Server unreachable
+        - Token/device revoked
+- Revocation:
+    - Admin can revoke JWTs per device remotely
+
+4) Security Principles
+-------------------
+- HTTPS + certificate pinning for all communication
+- JWT signed asymmetrically (RS256/ECDSA) → mobile cannot forge
+- Device-bound tokens prevent token reuse on other devices
+- Short-lived tokens minimize risk if stolen
+- HMAC + nonce + timestamp prevents request tampering & replay
+- Rate limiting + auditing
+- Optional device attestation ensures real mobile app
+
+5) Data Flow Summary
+-------------------
+Mobile → Admin:
+    - License validation, receive signed JWT, allowed modules, auto logout
+Mobile → Client:
+    - Login + Admin JWT
+Client → Admin:
+    - Stats (employees, active users) using server-to-server JWT
+Admin → Mobile:
+    - Only in Step 1: JWT, allowed modules, auto logout
+Admin → Client:
+    - Server-to-server validation & stats requests
+
+6) Login Decision Logic
+-------------------
+Step 1:
+    - Mobile validates Admin JWT
+    - If invalid → stop
+Step 2:
+    - Mobile logs into Client using JWT
+    - Client validates JWT
+    - If invalid → stop
+All access:
+    - Only allowed if JWT valid, device bound, and license active

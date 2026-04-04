@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ess_module_list" model="ir.ui.view">
+        <field name="name">ess.module.list</field>
+        <field name="model">ess.module</field>
+        <field name="arch" type="xml">
+            <list string="ESS Modules">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="description"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ess_module_form" model="ir.ui.view">
+        <field name="name">ess.module.form</field>
+        <field name="model">ess.module</field>
+        <field name="arch" type="xml">
+            <form string="ESS Module">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="code" help="Used by mobile app to enable/disable this module."/>
+                        <field name="sequence"/>
+                        <field name="active"/>
+                    </group>
+                    <group string="Description">
+                        <field name="description" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search view — no <group> wrapper (expand/string not valid in Odoo 19 search schema) -->
+    <record id="view_ess_module_search" model="ir.ui.view">
+        <field name="name">ess.module.search</field>
+        <field name="model">ess.module</field>
+        <field name="arch" type="xml">
+            <search string="Search Modules">
+                <field name="name"/>
+                <field name="code"/>
+                <filter name="filter_active"   string="Active"   domain="[('active', '=', True)]"/>
+                <filter name="filter_archived" string="Archived" domain="[('active', '=', False)]"/>
+                <filter name="filter_all"      string="All"      domain="[]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_ess_module" model="ir.actions.act_window">
+        <field name="name">Mobile Modules</field>
+        <field name="res_model">ess.module</field>
+        <field name="view_mode">list,form</field>
+        <!-- Show all modules (active + archived) so archived are always reachable -->
+        <field name="context">{'active_test': False, 'search_default_filter_active': 1}</field>
+    </record>
+
+</odoo>

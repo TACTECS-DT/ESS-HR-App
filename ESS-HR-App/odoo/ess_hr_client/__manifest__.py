@@ -1,0 +1,21 @@
+{
+    'name': 'ESS HR Client',
+    'version': '19.1',
+    'summary': 'Client-side API layer for ESS Mobile App — exposes HR data and actions over REST',
+    'category': 'Human Resources',
+    'author': 'ESS',
+    'depends': ['hr', 'hr_attendance', 'hr_holidays', 'hr_payroll', 'hr_expense', 'project', 'account', 'analytic', 'hr_timesheet'],
+    'data': [
+        'security/security.xml',
+        'security/ir.model.access.csv',
+        'data/ess_data.xml',
+        'views/ess_employee_credential_views.xml',
+        'views/ess_api_log_views.xml',
+        'views/ess_menus.xml',
+    ],
+    'post_init_hook': 'post_init_hook',
+    'installable': True,
+    'demo': [],
+    'application': False,
+    'license': 'LGPL-3',
+}
