@@ -22,6 +22,7 @@ import Button from '../../components/common/Button';
 import EmptyState from '../../components/common/EmptyState';
 import LoadingSkeleton from '../../components/common/LoadingSkeleton';
 import {useTheme} from '../../hooks/useTheme';
+import {useApiError} from '../../hooks/useApiError';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {PersonalNote} from '../../api/mocks/personal-notes.mock';
 import {API_MAP} from '../../api/apiMap';
@@ -53,6 +54,8 @@ export default function PersonalNotesScreen() {
   const theme = useTheme();
   const queryClient = useQueryClient();
 
+  const {showError, showValidationError} = useApiError();
+
   const [selectedMonth, setSelectedMonth] = useState<string | 'all'>('all');
   const [modalVisible, setModalVisible] = useState(false);
   const [editingNote, setEditingNote] = useState<PersonalNote | null>(null);
@@ -82,7 +85,7 @@ export default function PersonalNotesScreen() {
       setTitleField('');
       setContentField('');
     },
-    onError: () => Alert.alert(t('common.error')),
+    onError: (err) => showError(err),
   });
 
   const deleteMutation = useMutation({
@@ -90,7 +93,7 @@ export default function PersonalNotesScreen() {
       await apiClient.delete(API_MAP.personalNotes.byId(id));
     },
     onSuccess: () => queryClient.invalidateQueries({queryKey: ['personal-notes']}),
-    onError: () => Alert.alert(t('common.error')),
+    onError: (err) => showError(err),
   });
 
   const allNotes = data ?? [];
@@ -118,7 +121,7 @@ export default function PersonalNotesScreen() {
 
   function handleSave() {
     if (!titleField.trim()) {
-      Alert.alert(t('common.error'), t('personalNotes.title_field'));
+      showValidationError(t('personalNotes.title_field'));
       return;
     }
     saveMutation.mutate({

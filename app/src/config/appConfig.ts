@@ -152,11 +152,21 @@ export const fontWeight = {
   bold:     '700' as const,
 };
 
-/** Map a record status string to its display color. */
+/** Map a record status string to its display color.
+ *  Handles both Odoo 19 hr.leave state keys (confirm/validate1/validate/refuse/cancel)
+ *  and generic values used by other modules (pending/approved/refused/draft/etc.).
+ */
 export function statusColor(status: string): string {
   switch (status) {
-    case 'draft':                                        return colors.statusDraft;
-    case 'pending':                                      return colors.statusPending;
+    // Odoo 19 leave states
+    case 'confirm':                                       return colors.statusPending;
+    case 'validate1':                                     return colors.statusValidated; // second approval — in progress
+    case 'validate':                                      return colors.statusApproved;
+    case 'refuse':                                        return colors.statusRefused;
+    case 'cancel':                                        return colors.statusDraft;
+    // Generic values used by other modules
+    case 'draft':    case 'cancelled':                   return colors.statusDraft;
+    case 'pending':  case 'waiting':                     return colors.statusPending;
     case 'approved': case 'validated': case 'paid':
     case 'done':     case 'active':                      return colors.statusApproved;
     case 'refused':  case 'rejected':                   return colors.statusRefused;

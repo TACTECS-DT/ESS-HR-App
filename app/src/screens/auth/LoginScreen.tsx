@@ -110,7 +110,7 @@ export default function LoginScreen() {
       }
     } catch (err: any) {
       const msg = err?.response?.data?.error?.message;
-      setError(msg || t('common.error'));
+      setError(msg || t('common.errorGeneric', 'An error occurred. Please try again.'));
     } finally {
       setLoading(false);
       Keyboard.dismiss();   // drop keyboard so nothing stays focused

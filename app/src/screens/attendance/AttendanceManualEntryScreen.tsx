@@ -18,6 +18,7 @@ import ScreenHeader from '../../components/common/ScreenHeader';
 import AccessDenied from '../../components/common/AccessDenied';
 import {useTheme} from '../../hooks/useTheme';
 import {useRBAC} from '../../hooks/useRBAC';
+import {useApiError} from '../../hooks/useApiError';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {EmployeeListItem} from '../../api/mocks/profile.mock';
 import {API_MAP} from '../../api/apiMap';
@@ -29,6 +30,8 @@ export default function AttendanceManualEntryScreen() {
   const queryClient = useQueryClient();
   const {canManualEditAttendance} = useRBAC();
   const isAr = i18n.language === 'ar';
+
+  const {showError, showValidationError} = useApiError();
 
   const [selectedEmployee, setSelectedEmployee] = useState<EmployeeListItem | null>(null);
   const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
@@ -58,7 +61,7 @@ export default function AttendanceManualEntryScreen() {
       Alert.alert(t('common.done'), t('attendance.manualEntrySuccess', 'Attendance record saved.'));
       navigation.goBack();
     },
-    onError: () => Alert.alert(t('common.error')),
+    onError: (err) => showError(err),
   });
 
   function handleSelectEmployee() {
@@ -78,11 +81,11 @@ export default function AttendanceManualEntryScreen() {
 
   function handleSubmit() {
     if (!selectedEmployee) {
-      Alert.alert(t('common.error'), t('attendance.selectEmployee', 'Please select an employee.'));
+      showValidationError(t('attendance.selectEmployee', 'Please select an employee.'));
       return;
     }
     if (!date || !checkIn) {
-      Alert.alert(t('common.error'), t('attendance.fillRequired', 'Date and check-in time are required.'));
+      showValidationError(t('attendance.fillRequired', 'Date and check-in time are required.'));
       return;
     }
     submitMutation.mutate();

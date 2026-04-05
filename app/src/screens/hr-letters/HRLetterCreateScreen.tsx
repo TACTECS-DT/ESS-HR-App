@@ -22,6 +22,7 @@ import SelectField from '../../components/common/SelectField';
 import StatusChip from '../../components/common/StatusChip';
 import {useTheme} from '../../hooks/useTheme';
 import {useAppSelector} from '../../hooks/useAppSelector';
+import {useApiError} from '../../hooks/useApiError';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {HRLetter, SalaryType} from '../../api/mocks/hr-letters.mock';
 import {API_MAP} from '../../api/apiMap';
@@ -43,6 +44,8 @@ export default function HRLetterCreateScreen() {
     label: isAr ? s.ar : s.en,
     value: s.key,
   }));
+
+  const {showError, showValidationError} = useApiError();
 
   const [letterTitle, setLetterTitle] = useState('');
   const [directedTo, setDirectedTo] = useState('');
@@ -74,12 +77,12 @@ export default function HRLetterCreateScreen() {
       Alert.alert(t('common.done'), t('hrLetter.request') + ' ✓');
       navigation.goBack();
     },
-    onError: () => Alert.alert(t('common.error')),
+    onError: (err) => showError(err),
   });
 
   function handleSubmit() {
     if (!letterTitle.trim() || !directedTo.trim() || !requiredDate.trim() || !purpose.trim()) {
-      Alert.alert(t('common.error'), 'Please fill all required fields');
+      showValidationError('Please fill all required fields');
       return;
     }
     mutation.mutate();

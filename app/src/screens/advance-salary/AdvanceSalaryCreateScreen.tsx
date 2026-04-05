@@ -21,6 +21,7 @@ import StatusChip from '../../components/common/StatusChip';
 import LoadingSkeleton from '../../components/common/LoadingSkeleton';
 import {useTheme} from '../../hooks/useTheme';
 import {useAppSelector} from '../../hooks/useAppSelector';
+import {useApiError} from '../../hooks/useApiError';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {AdvanceSalary} from '../../api/mocks/advance-salary.mock';
 import {API_MAP} from '../../api/apiMap';
@@ -41,6 +42,8 @@ export default function AdvanceSalaryCreateScreen() {
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');
   const [reason, setReason] = useState('');
+
+  const {showError, showValidationError} = useApiError();
 
   const {data: info, isLoading: infoLoading} = useQuery({
     queryKey: ['advance-salary-info'],
@@ -72,24 +75,21 @@ export default function AdvanceSalaryCreateScreen() {
       Alert.alert(t('common.done'), t('advanceSalary.request') + ' ✓');
       navigation.goBack();
     },
-    onError: () => Alert.alert(t('common.error')),
+    onError: (err) => showError(err),
   });
 
   function handleSubmit() {
     const parsedAmount = parseFloat(amount);
     if (!amount) {
-      Alert.alert(t('common.error'), 'Please enter an amount');
+      showValidationError('Please enter an amount');
       return;
     }
     if (isNaN(parsedAmount) || parsedAmount <= 0) {
-      Alert.alert(t('common.error'), 'Please enter a valid amount');
+      showValidationError('Please enter a valid amount');
       return;
     }
     if (info && parsedAmount > info.max_advance) {
-      Alert.alert(
-        t('common.error'),
-        `${t('advanceSalary.maxAdvance')}: ${info.max_advance.toLocaleString()} SAR`,
-      );
+      showValidationError(`${t('advanceSalary.maxAdvance')}: ${info.max_advance.toLocaleString()} SAR`);
       return;
     }
     mutation.mutate();
@@ -150,7 +150,7 @@ export default function AdvanceSalaryCreateScreen() {
         />
 
         <TextInput
-          label={`${t('advanceSalary.amount')} * (${t('advanceSalary.maxAllowed')}: ${info?.max_advance.toLocaleString() ?? '—'} SAR)`}
+          label={`${t('advanceSalary.amount')} * (${t('advanceSalary.maxAllowed')}: ${info != null ? info.max_advance.toLocaleString() : '—'} SAR)`}
           placeholder="0.00"
           value={amount}
           onChangeText={setAmount}

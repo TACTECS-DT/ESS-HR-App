@@ -11,6 +11,7 @@ import ScreenHeader from '../../components/common/ScreenHeader';
 import StatusChip from '../../components/common/StatusChip';
 import {useTheme} from '../../hooks/useTheme';
 import {useRBAC} from '../../hooks/useRBAC';
+import {useApiError} from '../../hooks/useApiError';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
 import type {DocumentRequest} from '../../api/mocks/document-requests.mock';
@@ -42,6 +43,8 @@ export default function DocumentRequestDetailScreen() {
   const isAr = i18n.language === 'ar';
   const {id} = route.params;
 
+  const {showError} = useApiError();
+
   const {data: requests} = useQuery({
     queryKey: ['document-requests'],
     queryFn: async () => {
@@ -64,7 +67,7 @@ export default function DocumentRequestDetailScreen() {
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['document-requests']});
     },
-    onError: () => Alert.alert(t('common.error')),
+    onError: (err) => showError(err),
   });
 
   function confirmAction(action: string, label: string) {

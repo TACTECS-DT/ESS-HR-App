@@ -26,13 +26,15 @@ import type {LeaveRequest} from '../../api/mocks/leave.mock';
 import {API_MAP} from '../../api/apiMap';
 
 type Nav = StackNavigationProp<LeavesStackParamList>;
-type TabFilter = 'all' | 'pending' | 'approved' | 'refused';
+// Tab filter values match Odoo 19 state keys for consistency
+type TabFilter = 'all' | 'confirm' | 'validate' | 'refuse' | 'cancel';
 
 const TABS: {key: TabFilter; labelKey: string}[] = [
-  {key: 'all', labelKey: 'leave.myLeaves'},
-  {key: 'pending', labelKey: 'leave.pending'},
-  {key: 'approved', labelKey: 'leave.approved'},
-  {key: 'refused', labelKey: 'leave.refused'},
+  {key: 'all',      labelKey: 'leave.myLeaves'},
+  {key: 'confirm',  labelKey: 'common.status.confirm'},
+  {key: 'validate', labelKey: 'common.status.validate'},
+  {key: 'refuse',   labelKey: 'common.status.refuse'},
+  {key: 'cancel',   labelKey: 'common.status.cancel'},
 ];
 
 export default function LeaveListScreen() {
@@ -52,9 +54,11 @@ export default function LeaveListScreen() {
   });
 
   const filtered = (requests ?? []).filter(r => {
-    if (tab === 'pending') {return r.status === 'pending';}
-    if (tab === 'approved') {return r.status === 'approved' || r.status === 'validated';}
-    if (tab === 'refused') {return r.status === 'refused';}
+    if (tab === 'confirm')  {return r.status === 'confirm';}
+    // 'validate' tab shows both first-level (validate1) and fully approved (validate)
+    if (tab === 'validate') {return r.status === 'validate1' || r.status === 'validate';}
+    if (tab === 'refuse')   {return r.status === 'refuse';}
+    if (tab === 'cancel')   {return r.status === 'cancel';}
     return true; // 'all'
   });
 

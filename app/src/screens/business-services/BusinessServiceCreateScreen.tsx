@@ -21,6 +21,7 @@ import DatePickerField from '../../components/common/DatePickerField';
 import SelectField from '../../components/common/SelectField';
 import {useTheme} from '../../hooks/useTheme';
 import {useAppSelector} from '../../hooks/useAppSelector';
+import {useApiError} from '../../hooks/useApiError';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {ServiceType} from '../../api/mocks/business-services.mock';
 import {API_MAP} from '../../api/apiMap';
@@ -32,6 +33,8 @@ export default function BusinessServiceCreateScreen() {
   const queryClient = useQueryClient();
   const isAr = i18n.language === 'ar';
   const user = useAppSelector(state => state.auth.user);
+
+  const {showError, showValidationError} = useApiError();
 
   const [serviceTitle, setServiceTitle] = useState('');
   const [selectedTypeId, setSelectedTypeId] = useState<number | null>(null);
@@ -62,12 +65,12 @@ export default function BusinessServiceCreateScreen() {
       Alert.alert(t('common.done'), t('businessService.request') + ' ✓');
       navigation.goBack();
     },
-    onError: () => Alert.alert(t('common.error')),
+    onError: (err) => showError(err),
   });
 
   function handleSubmit(isDraft: boolean) {
     if (!serviceTitle.trim() || !selectedTypeId || !reason.trim()) {
-      Alert.alert(t('common.error'), 'Please fill all required fields');
+      showValidationError('Please fill all required fields');
       return;
     }
     mutation.mutate(isDraft);

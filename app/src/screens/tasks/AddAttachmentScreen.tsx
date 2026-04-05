@@ -17,6 +17,7 @@ import {isApiSuccess} from '../../types/api';
 import ScreenHeader from '../../components/common/ScreenHeader';
 import Button from '../../components/common/Button';
 import {useTheme} from '../../hooks/useTheme';
+import {useApiError} from '../../hooks/useApiError';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {MoreStackParamList} from '../../navigation/types';
 import type {Task} from '../../api/mocks/tasks.mock';
@@ -40,6 +41,8 @@ export default function AddAttachmentScreen() {
   const paramTaskId = route.params?.taskId ?? 0;
   const paramTaskName = route.params?.taskName ?? '';
   const isStandalone = !paramTaskId;
+
+  const {showError, showValidationError} = useApiError();
 
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -76,16 +79,16 @@ export default function AddAttachmentScreen() {
       Alert.alert(t('common.done'), t('tasks.uploadAttachment') + ' ✓');
       navigation.goBack();
     },
-    onError: () => Alert.alert(t('common.error')),
+    onError: (err) => showError(err),
   });
 
   function handleUpload() {
     if (isStandalone && !selectedTask) {
-      Alert.alert(t('common.error'), t('tasks.task'));
+      showValidationError(t('tasks.task'));
       return;
     }
     if (!selectedOption) {
-      Alert.alert(t('common.error'), t('tasks.tapToSelect'));
+      showValidationError(t('tasks.tapToSelect'));
       return;
     }
     uploadMutation.mutate();

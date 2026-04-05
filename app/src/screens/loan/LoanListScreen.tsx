@@ -72,7 +72,7 @@ export default function LoanListScreen() {
               <Text style={[styles.infoIcon]}>💡</Text>
               <View style={{flex: 1}}>
                 <Text style={[styles.infoTitle, {color: colors.primary}]}>
-                  {t('loan.maxAmount')}: {rules.max_amount.toLocaleString()} {t('common.sar')}
+                  {t('loan.maxAmount')}: {(rules.max_amount ?? 0).toLocaleString()} {t('common.sar')}
                 </Text>
                 <Text style={[styles.infoSub, {color: theme.textSecondary}]}>
                   {rules.eligible ? t('loan.eligible') : (rules.ineligibility_reason ?? t('loan.notEligible'))}
@@ -96,7 +96,7 @@ export default function LoanListScreen() {
             <View style={styles.cardTop}>
               <View>
                 <Text style={[styles.amount, {color: colors.primary}]}>
-                  {item.amount.toLocaleString()} {t('common.sar')}
+                  {(item.amount ?? 0).toLocaleString()} {t('common.sar')}
                 </Text>
                 <Text style={[styles.detail, {color: theme.textSecondary}]}>
                   {item.duration_months} {t('loan.months')}
@@ -110,7 +110,7 @@ export default function LoanListScreen() {
             <View style={[styles.installRow, {backgroundColor: theme.background, borderRadius: radius.sm}]}>
               <Text style={[styles.installLabel, {color: theme.textSecondary}]}>{t('loan.monthlyInstallment')}:</Text>
               <Text style={[styles.installAmount, {color: theme.text}]}>
-                {item.monthly_installment.toLocaleString()} {t('common.sar')}
+                {(item.monthly_installment ?? 0).toLocaleString()} {t('common.sar')}
               </Text>
             </View>
             <Text style={[styles.detail, {color: theme.textSecondary}]}>

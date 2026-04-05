@@ -66,15 +66,23 @@ class HrExpenseExt(models.Model):
         vals = {
             'employee_id': employee_id,
             'product_id': product_id,
-            'total_amount': float(total_amount) if total_amount else 0.0,
+            # Set total_amount_currency (expense-currency amount) in vals together with
+            # company_id so Odoo 19's precompute chain resolves correctly.
+            'total_amount_currency': float(total_amount) if total_amount else 0.0,
             'currency_id': currency_id,
             'payment_mode': payment_mode or 'own_account',
             'name': name or product.name,
             'date': date or fields.Date.today(),
+            'company_id': employee.company_id.id,
         }
         if tax_ids:
             vals['tax_ids'] = [(6, 0, tax_ids)]
-        expense = self.with_company(employee.company_id).with_user(SUPERUSER_ID).create(vals)
+        # Use with_user(SUPERUSER_ID) + explicit allowed_company_ids context so that
+        # Odoo 19's precomputed fields (is_multiple_currency, company_currency_id)
+        # resolve correctly for cross-currency expenses.
+        expense = self.with_user(SUPERUSER_ID).with_context(
+            allowed_company_ids=[employee.company_id.id]
+        ).create(vals)
         return self._format_expense_record(expense)
 
     @api.model
@@ -154,6 +162,7 @@ class HrExpenseExt(models.Model):
         self._validate_expense_editable(expense)
         employee = expense.employee_id
         expense.with_user(SUPERUSER_ID).action_submit()
+        expense.env.flush_all()          # trigger deferred constraints inside try/except
         expense.invalidate_recordset()
         return self._format_expense_record(expense)
 

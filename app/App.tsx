@@ -22,6 +22,7 @@ import './src/i18n'; // Initialize i18n
 
 import AppNavigator from './src/AppNavigator';
 import {navigationRef} from './src/navigation/navigationRef';
+import {ErrorModalProvider} from './src/context/ErrorModalContext';
 
 // Initialize mock API and Axios interceptors once
 setupMocks();
@@ -43,9 +44,11 @@ export default function App() {
         <ReduxProvider store={store}>
           <PersistGate persistor={persistor} loading={null}>
             <QueryClientProvider client={queryClient}>
-              <NavigationContainer ref={navigationRef}>
-                <AppNavigator />
-              </NavigationContainer>
+              <ErrorModalProvider>
+                <NavigationContainer ref={navigationRef}>
+                  <AppNavigator />
+                </NavigationContainer>
+              </ErrorModalProvider>
             </QueryClientProvider>
           </PersistGate>
         </ReduxProvider>

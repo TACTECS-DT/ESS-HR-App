@@ -20,6 +20,7 @@ import TextInput from '../../components/common/TextInput';
 import DatePickerField from '../../components/common/DatePickerField';
 import {useTheme} from '../../hooks/useTheme';
 import {useAppSelector} from '../../hooks/useAppSelector';
+import {useApiError} from '../../hooks/useApiError';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 
 export default function ExperienceCertCreateScreen() {
@@ -29,6 +30,8 @@ export default function ExperienceCertCreateScreen() {
   const queryClient = useQueryClient();
   const isAr = i18n.language === 'ar';
   const user = useAppSelector(state => state.auth.user);
+
+  const {showError, showValidationError} = useApiError();
 
   const [certTitle, setCertTitle] = useState('');
   const [directedTo, setDirectedTo] = useState('');
@@ -51,12 +54,12 @@ export default function ExperienceCertCreateScreen() {
       Alert.alert(t('common.done'), t('expCert.request') + ' ✓');
       navigation.goBack();
     },
-    onError: () => Alert.alert(t('common.error')),
+    onError: (err) => showError(err),
   });
 
   function handleSubmit(isDraft: boolean) {
     if (!certTitle.trim() || !directedTo.trim()) {
-      Alert.alert(t('common.error'), 'Please fill all required fields');
+      showValidationError('Please fill all required fields');
       return;
     }
     mutation.mutate(isDraft);

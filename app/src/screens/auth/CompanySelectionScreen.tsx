@@ -34,7 +34,7 @@ export default function CompanySelectionScreen() {
 
   useEffect(() => {
     if (!serverUrl) {
-      setError(t('common.error'));
+      setError(t('common.errorGeneric', 'An error occurred. Please try again.'));
       setLoading(false);
       return;
     }

@@ -17,7 +17,7 @@ import type {MoreStackParamList} from '../../navigation/types';
 import {useTheme} from '../../hooks/useTheme';
 import {useAppDispatch} from '../../hooks/useAppDispatch';
 import {useAppSelector} from '../../hooks/useAppSelector';
-import {setLanguage, toggleDarkMode} from '../../store/slices/settingsSlice';
+import {setLanguage, toggleDarkMode, toggleDevMode} from '../../store/slices/settingsSlice';
 import {clearAuth} from '../../store/slices/authSlice';
 import {toggleLanguage} from '../../i18n/';
 import {clearTokens} from '../../utils/secureStorage';
@@ -31,6 +31,7 @@ export default function SettingsScreen() {
   const dispatch = useAppDispatch();
   const navigation = useNavigation<StackNavigationProp<MoreStackParamList>>();
   const darkMode = useAppSelector(state => state.settings.darkMode);
+  const devMode = useAppSelector(state => state.settings.devMode);
   const currentLanguage = useAppSelector(state => state.settings.language);
 
   const [pushNotifications, setPushNotifications] = useState(true);
@@ -174,6 +175,27 @@ export default function SettingsScreen() {
               <Text style={[styles.settingLabel, {color: theme.text}]}>🔒 {t('settings.changePin')}</Text>
             </View>
             <Text style={[styles.linkText, {color: colors.primary}]}>{'▸'}</Text>
+          </View>
+        </View>
+
+        {/* Developer */}
+        <Text style={[styles.sectionTitle, {color: theme.text}]}>Developer</Text>
+        <View style={[styles.card, {backgroundColor: theme.surface, borderColor: theme.border}]}>
+          <View style={styles.settingRow}>
+            <View style={styles.settingLeft}>
+              <Text style={[styles.settingLabel, {color: theme.text}]}>🛠 Developer Mode</Text>
+              <Text style={[styles.settingSubLabel, {color: theme.textSecondary}]}>
+                {devMode
+                  ? 'Error alerts show code + HTTP status'
+                  : 'Error alerts show user-friendly messages'}
+              </Text>
+            </View>
+            <Switch
+              value={devMode}
+              onValueChange={() => dispatch(toggleDevMode())}
+              trackColor={{false: colors.gray300, true: colors.primary}}
+              thumbColor={colors.white}
+            />
           </View>
         </View>
 

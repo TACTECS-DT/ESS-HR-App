@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   Modal,
   TextInput,
-  Alert,
   ScrollView,
 } from 'react-native';
 import {useTranslation} from 'react-i18next';
@@ -18,6 +17,7 @@ import {isApiSuccess} from '../../types/api';
 import {useTheme} from '../../hooks/useTheme';
 import {useRBAC} from '../../hooks/useRBAC';
 import {useAppSelector} from '../../hooks/useAppSelector';
+import {useApiError} from '../../hooks/useApiError';
 import ScreenHeader from '../../components/common/ScreenHeader';
 import EmptyState from '../../components/common/EmptyState';
 import LoadingSkeleton from '../../components/common/LoadingSkeleton';
@@ -52,6 +52,8 @@ export default function AnnouncementsScreen() {
   const {canCreateAnnouncements} = useRBAC();
   const user = useAppSelector(state => state.auth.user);
 
+  const {showError, showValidationError} = useApiError();
+
   const [modalOpen, setModalOpen] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [newBody, setNewBody] = useState('');
@@ -76,12 +78,12 @@ export default function AnnouncementsScreen() {
       setNewBody('');
       setNewPriority('general');
     },
-    onError: () => Alert.alert(t('common.error')),
+    onError: (err) => showError(err),
   });
 
   function handleCreate() {
     if (!newTitle.trim() || !newBody.trim()) {
-      Alert.alert(t('common.error'), t('announcements.fillRequired', 'Please fill in title and body.'));
+      showValidationError(t('announcements.fillRequired', 'Please fill in title and body.'));
       return;
     }
     createMutation.mutate();

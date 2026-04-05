@@ -1,6 +1,12 @@
 import {ApiSuccess} from '../../types/api';
 
-export type LeaveStatus = 'draft' | 'pending' | 'approved' | 'refused' | 'validated';
+// Exact Odoo 19 hr.leave state keys — sent as-is from the backend.
+//   confirm   → To Approve       (submitted, awaiting manager)
+//   validate1 → Second Approval  (first manager approved, awaiting second)
+//   validate  → Approved         (fully approved)
+//   refuse    → Refused
+//   cancel    → Cancelled
+export type LeaveStatus = 'confirm' | 'validate1' | 'validate' | 'refuse' | 'cancel';
 export type LeaveMode = 'full_day' | 'half_day_am' | 'half_day_pm' | 'hourly';
 
 export interface LeaveType {
@@ -9,7 +15,11 @@ export interface LeaveType {
   name_ar: string;
   requires_attachment: boolean;
   requires_description: boolean;
+  /** Odoo hr.leave.type.request_unit — drives which input mode is shown */
+  request_unit: 'day' | 'half_day' | 'hour';
+  /** true when request_unit === 'half_day' */
   allows_half_day: boolean;
+  /** true when request_unit === 'hour' */
   allows_hourly: boolean;
 }
 
@@ -53,11 +63,11 @@ export interface LeaveRequest {
 export const MOCK_LEAVE_TYPES: ApiSuccess<LeaveType[]> = {
   success: true,
   data: [
-    {id: 1, name: 'Annual Leave', name_ar: 'إجازة سنوية', requires_attachment: false, requires_description: false, allows_half_day: true, allows_hourly: false},
-    {id: 2, name: 'Sick Leave', name_ar: 'إجازة مرضية', requires_attachment: true, requires_description: true, allows_half_day: true, allows_hourly: false},
-    {id: 3, name: 'Emergency Leave', name_ar: 'إجازة طارئة', requires_attachment: false, requires_description: true, allows_half_day: false, allows_hourly: false},
-    {id: 4, name: 'Unpaid Leave', name_ar: 'إجازة بدون راتب', requires_attachment: false, requires_description: true, allows_half_day: false, allows_hourly: false},
-    {id: 5, name: 'Maternity Leave', name_ar: 'إجازة أمومة', requires_attachment: true, requires_description: false, allows_half_day: false, allows_hourly: false},
+    {id: 1, name: 'Annual Leave',   name_ar: 'إجازة سنوية',    requires_attachment: false, requires_description: false, request_unit: 'day',      allows_half_day: false, allows_hourly: false},
+    {id: 2, name: 'Sick Leave',     name_ar: 'إجازة مرضية',   requires_attachment: true,  requires_description: true,  request_unit: 'half_day', allows_half_day: true,  allows_hourly: false},
+    {id: 3, name: 'Emergency Leave',name_ar: 'إجازة طارئة',   requires_attachment: false, requires_description: true,  request_unit: 'day',      allows_half_day: false, allows_hourly: false},
+    {id: 4, name: 'Unpaid Leave',   name_ar: 'إجازة بدون راتب',requires_attachment: false, requires_description: true,  request_unit: 'day',      allows_half_day: false, allows_hourly: false},
+    {id: 5, name: 'Maternity Leave',name_ar: 'إجازة أمومة',   requires_attachment: true,  requires_description: false, request_unit: 'day',      allows_half_day: false, allows_hourly: false},
   ],
 };
 
@@ -89,7 +99,7 @@ export const ALL_LEAVE_REQUESTS: LeaveRequest[] = [
     date_from: '2026-03-15',
     date_to: '2026-03-17',
     duration: 3,
-    status: 'pending',
+    status: 'confirm',                                         // To Approve
     approval_history: [
       {step: 1, approver: 'Manager', approver_ar: 'المدير', status: 'pending'},
     ],
@@ -106,7 +116,7 @@ export const ALL_LEAVE_REQUESTS: LeaveRequest[] = [
     date_from: '2026-02-20',
     date_to: '2026-02-20',
     duration: 1,
-    status: 'approved',
+    status: 'validate',                                        // Approved (fully)
     description: 'Doctor appointment',
     approval_history: [
       {step: 1, approver: 'Manager', approver_ar: 'المدير', status: 'approved', date: '2026-02-18'},
@@ -125,7 +135,7 @@ export const ALL_LEAVE_REQUESTS: LeaveRequest[] = [
     date_from: '2026-01-10',
     date_to: '2026-01-10',
     duration: 1,
-    status: 'refused',
+    status: 'refuse',                                          // Refused
     description: 'Family emergency',
     approval_history: [
       {step: 1, approver: 'Manager', approver_ar: 'المدير', status: 'refused', date: '2026-01-09', note: 'Critical project deadline'},
@@ -143,7 +153,7 @@ export const ALL_LEAVE_REQUESTS: LeaveRequest[] = [
     date_from: '2026-03-18',
     date_to: '2026-03-18',
     duration: 1,
-    status: 'pending',
+    status: 'confirm',                                         // To Approve
     description: 'Not feeling well',
     approval_history: [
       {step: 1, approver: 'Manager', approver_ar: 'المدير', status: 'pending'},
@@ -162,7 +172,7 @@ export const ALL_LEAVE_REQUESTS: LeaveRequest[] = [
     date_from: '2026-04-05',
     date_to: '2026-04-09',
     duration: 5,
-    status: 'approved',
+    status: 'validate',                                        // Approved (fully)
     approval_history: [
       {step: 1, approver: 'HR', approver_ar: 'الموارد البشرية', status: 'approved', date: '2026-03-20'},
     ],
@@ -179,7 +189,7 @@ export const ALL_LEAVE_REQUESTS: LeaveRequest[] = [
     date_from: '2026-02-12',
     date_to: '2026-02-12',
     duration: 0.5,
-    status: 'approved',
+    status: 'validate1',                                       // Second Approval (waiting for HR)
     description: 'Medical checkup',
     approval_history: [
       {step: 1, approver: 'HR', approver_ar: 'الموارد البشرية', status: 'approved', date: '2026-02-11'},
@@ -198,7 +208,7 @@ export const ALL_LEAVE_REQUESTS: LeaveRequest[] = [
     date_from: '2026-03-22',
     date_to: '2026-03-26',
     duration: 5,
-    status: 'pending',
+    status: 'confirm',                                         // To Approve
     approval_history: [
       {step: 1, approver: 'Khalid Al-Mansouri', approver_ar: 'خالد المنصوري', status: 'pending'},
     ],
@@ -215,7 +225,7 @@ export const ALL_LEAVE_REQUESTS: LeaveRequest[] = [
     date_from: '2026-02-05',
     date_to: '2026-02-06',
     duration: 2,
-    status: 'approved',
+    status: 'validate',                                        // Approved (fully)
     description: 'Family matter',
     approval_history: [
       {step: 1, approver: 'Khalid Al-Mansouri', approver_ar: 'خالد المنصوري', status: 'approved', date: '2026-02-04'},
@@ -235,7 +245,7 @@ export const ALL_LEAVE_REQUESTS: LeaveRequest[] = [
     date_from: '2026-03-10',
     date_to: '2026-03-14',
     duration: 5,
-    status: 'approved',
+    status: 'validate',                                        // Approved (fully)
     description: 'Personal reasons',
     approval_history: [
       {step: 1, approver: 'Khalid Al-Mansouri', approver_ar: 'خالد المنصوري', status: 'approved', date: '2026-03-08'},
@@ -254,14 +264,14 @@ export const ALL_LEAVE_REQUESTS: LeaveRequest[] = [
     date_from: '2026-01-20',
     date_to: '2026-01-21',
     duration: 2,
-    status: 'refused',
+    status: 'refuse',                                          // Refused
     description: 'Cold',
     approval_history: [
       {step: 1, approver: 'Khalid Al-Mansouri', approver_ar: 'خالد المنصوري', status: 'refused', date: '2026-01-19', note: 'Insufficient documentation'},
     ],
     created_at: '2026-01-18',
   },
-  // ── Subordinate 3 — Noor (pending — needs manager approval) ──
+  // ── Subordinate 3 — Noor (confirm — needs manager approval) ──
   {
     id: 211,
     employee_id: 112,
@@ -273,7 +283,7 @@ export const ALL_LEAVE_REQUESTS: LeaveRequest[] = [
     date_from: '2026-03-28',
     date_to: '2026-04-01',
     duration: 5,
-    status: 'pending',
+    status: 'confirm',                                         // To Approve
     approval_history: [
       {step: 1, approver: 'Khalid Al-Mansouri', approver_ar: 'خالد المنصوري', status: 'pending'},
     ],
@@ -291,8 +301,10 @@ export const ALL_LEAVE_REQUESTS: LeaveRequest[] = [
     date_from: '2026-05-01',
     date_to: '2026-05-05',
     duration: 5,
-    status: 'draft',
-    approval_history: [],
+    status: 'confirm',                                         // To Approve
+    approval_history: [
+      {step: 1, approver: 'HR Manager', approver_ar: 'مدير الموارد البشرية', status: 'pending'},
+    ],
     created_at: '2026-03-22',
   },
   // ── Admin's own leave (id=103) ─────────────────────────────
@@ -307,7 +319,7 @@ export const ALL_LEAVE_REQUESTS: LeaveRequest[] = [
     date_from: '2026-06-15',
     date_to: '2026-06-19',
     duration: 5,
-    status: 'approved',
+    status: 'validate',                                        // Approved (fully)
     approval_history: [
       {step: 1, approver: 'HR', approver_ar: 'الموارد البشرية', status: 'approved', date: '2026-03-15'},
     ],

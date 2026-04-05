@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Alert,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
@@ -21,6 +20,7 @@ import DatePickerField from '../../components/common/DatePickerField';
 import SelectField from '../../components/common/SelectField';
 import {useTheme} from '../../hooks/useTheme';
 import {useAppSelector} from '../../hooks/useAppSelector';
+import {useApiError} from '../../hooks/useApiError';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {ExpenseCategory} from '../../api/mocks/expense.mock';
 import {API_MAP} from '../../api/apiMap';
@@ -36,6 +36,8 @@ export default function ExpenseCreateScreen() {
   const queryClient = useQueryClient();
   const isAr = i18n.language === 'ar';
   const user = useAppSelector(state => state.auth.user);
+
+  const {showError, showValidationError} = useApiError();
 
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const [description, setDescription] = useState('');
@@ -91,17 +93,17 @@ export default function ExpenseCreateScreen() {
       queryClient.invalidateQueries({queryKey: ['expenses']});
       navigation.goBack();
     },
-    onError: () => Alert.alert(t('common.error')),
+    onError: (err) => showError(err),
   });
 
   function validate(): boolean {
     if (!selectedCategoryId || !amount || !description) {
-      Alert.alert(t('common.error'), 'Please fill all required fields');
+      showValidationError('Please fill all required fields');
       return false;
     }
     const parsed = parseFloat(amount);
     if (isNaN(parsed) || parsed <= 0) {
-      Alert.alert(t('common.error'), 'Please enter a valid amount');
+      showValidationError('Please enter a valid amount');
       return false;
     }
     return true;

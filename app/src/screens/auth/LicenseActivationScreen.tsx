@@ -136,7 +136,7 @@ export default function LicenseActivationScreen() {
     // ── Real mode: validate URL and call admin server ──────────────────────────
     const raw = (urlOverride ?? serverUrl).trim();
     if (!raw) {
-      showError('GENERIC', t('common.error'));
+      showError('GENERIC', t('common.errorGeneric', 'An error occurred. Please try again.'));
       return;
     }
     if (!/^https?:\/\/.+/.test(raw)) {
@@ -166,14 +166,14 @@ export default function LicenseActivationScreen() {
         }));
         navigation.navigate('CompanySelection');
       } else {
-        showError((data as any).error?.code, (data as any).error?.message || t('common.error'));
+        showError((data as any).error?.code, (data as any).error?.message || t('common.errorGeneric', 'An error occurred. Please try again.'));
       }
     } catch (err: any) {
       if (!err?.response) {
         showError('SERVER_UNREACHABLE', '');
       } else {
         const errData = err.response.data?.error;
-        showError(errData?.code, errData?.message || t('common.error'));
+        showError(errData?.code, errData?.message || t('common.errorGeneric', 'An error occurred. Please try again.'));
       }
     } finally {
       setLoading(false);

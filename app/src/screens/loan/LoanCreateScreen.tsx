@@ -22,6 +22,7 @@ import LoadingSkeleton from '../../components/common/LoadingSkeleton';
 import SelectField from '../../components/common/SelectField';
 import {useTheme} from '../../hooks/useTheme';
 import {useAppSelector} from '../../hooks/useAppSelector';
+import {useApiError} from '../../hooks/useApiError';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {LoanRules} from '../../api/mocks/loan.mock';
 import {API_MAP} from '../../api/apiMap';
@@ -46,6 +47,8 @@ export default function LoanCreateScreen() {
     label: isAr ? m.ar : m.en,
     value: m.key,
   }));
+
+  const {showError, showValidationError} = useApiError();
 
   const [loanTitle, setLoanTitle] = useState('');
   const [amount, setAmount] = useState('');
@@ -94,21 +97,21 @@ export default function LoanCreateScreen() {
       Alert.alert(t('common.done'), t('loan.apply') + ' ✓');
       navigation.goBack();
     },
-    onError: () => Alert.alert(t('common.error')),
+    onError: (err) => showError(err),
   });
 
   function handleSubmit() {
     if (!loanTitle.trim() || !amount || !startDate || !endDate) {
-      Alert.alert(t('common.error'), 'Please fill all required fields');
+      showValidationError('Please fill all required fields');
       return;
     }
     const parsedAmount = parseFloat(amount);
     if (isNaN(parsedAmount) || parsedAmount <= 0) {
-      Alert.alert(t('common.error'), 'Please enter a valid amount');
+      showValidationError('Please enter a valid amount');
       return;
     }
     if (rules && parsedAmount > rules.max_amount) {
-      Alert.alert(t('common.error'), `${t('loan.maxAmount')}: ${rules.max_amount.toLocaleString()}`);
+      showValidationError(`${t('loan.maxAmount')}: ${rules.max_amount.toLocaleString()}`);
       return;
     }
     mutation.mutate();

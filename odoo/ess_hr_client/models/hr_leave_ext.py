@@ -2,14 +2,13 @@ from datetime import datetime
 from odoo import models, fields, api, _, SUPERUSER_ID
 from odoo.exceptions import UserError, ValidationError
 
-# Odoo state → frontend status
-_STATE_TO_STATUS = {
-    'draft': 'draft',
-    'confirm': 'pending',
-    'validate1': 'approved',
-    'validate': 'validated',
-    'refuse': 'refused',
-}
+# Odoo 19 hr.leave state values (sent as-is to the app — no remapping).
+#   confirm   → To Approve    (employee submitted, awaiting manager)
+#   validate1 → Second Approval
+#   validate  → Approved
+#   refuse    → Refused
+#   cancel    → Cancelled
+_ODOO_STATES = {'confirm', 'validate1', 'validate', 'refuse', 'cancel'}
 
 
 class HrLeaveTypeExt(models.Model):
@@ -24,35 +23,85 @@ class HrLeaveTypeExt(models.Model):
     def get_leave_types(self, employee_id=None):
         """Return leave types available for the employee to request.
 
-        For types that require allocation: only included when the employee
-        has a validated allocation. For no-allocation types: included if
-        the employee can request them (employee_requests='yes') within their company.
+        Replicates Odoo 19's exact form domain (hr_leave_views.xml lines 354-367):
+
+          '|'
+            requires_allocation = False         → no allocation needed, always include
+            '&'
+              has_valid_allocation = True        → state='validate' allocation exists this year
+              '|'
+                allows_negative = True           → can go into negative balance
+                virtual_remaining_leaves > 0    → has days remaining
+
+        Also mirrors Odoo's record rule (hr_holidays_status_rule_multi_company):
+          company_id = employee's company
+          OR (company_id = False AND country_id = employee's country OR False)
+        Global leave types (company_id=False) that belong to a different country
+        are excluded — same as Odoo's record rule.
+
+        Allocation check uses the same logic as _search_valid (state='validate' +
+        current-year date overlap) rather than _compute_valid, matching what the
+        form search actually produces.
         """
-        # Collect validated allocation type IDs for this employee
-        allocated_type_ids = set()
         employee = None
         if employee_id:
-            try:
-                employee = self._get_employee(employee_id)
-                allocations = self.env['hr.leave.allocation'].with_user(SUPERUSER_ID).search([
-                    ('employee_id', '=', employee_id),
-                    ('state', '=', 'validate'),
-                ])
-                allocated_type_ids = set(allocations.mapped('holiday_status_id.id'))
-            except Exception:
-                pass
+            employee = self._get_employee(employee_id)
 
+        # ── domain: mirror Odoo's multi-company record rule ──────────────────
         company_id = employee.company_id.id if employee and employee.company_id else False
-        domain = [('active', '=', True), ('employee_requests', '=', 'yes')]
+        country_id = (
+            employee.company_id.country_id.id
+            if employee and employee.company_id and employee.company_id.country_id
+            else False
+        )
+
         if company_id:
-            domain.append(('company_id', 'in', [company_id, False]))
+            # Mirrors hr_holidays_status_rule_multi_company:
+            #   type.company_id = employee_company
+            #   OR (type.company_id = False AND type.country_id in [company_country, False])
+            domain = [
+                ('active', '=', True),
+                '|',
+                    ('company_id', '=', company_id),
+                    '&',
+                        ('company_id', '=', False),
+                        ('country_id', 'in', [country_id, False] if country_id else [False]),
+            ]
+        else:
+            domain = [('active', '=', True)]
 
         leave_types = self.with_user(SUPERUSER_ID).search(domain)
+
+        # ── find types that have a validated allocation for this employee ─────
+        # Mirrors _search_valid: state='validate', overlap with current calendar year.
+        # Single bulk query — much more efficient than calling _compute_valid per type.
+        allocated_type_ids = set()
+        if employee_id:
+            today = fields.Date.today()
+            year_start = today.replace(month=1, day=1)
+            year_end = today.replace(month=12, day=31)
+            validated_allocs = self.env['hr.leave.allocation'].with_user(SUPERUSER_ID).search([
+                ('employee_id', '=', employee_id),
+                ('state', '=', 'validate'),
+                ('date_from', '<=', year_end),
+                '|',
+                    ('date_to', '>=', year_start),
+                    ('date_to', '=', False),
+            ])
+            allocated_type_ids = set(validated_allocs.mapped('holiday_status_id.id'))
+
         result = []
         for lt in leave_types:
-            # Only show types for which this employee has a validated allocation
-            if employee_id and lt.id not in allocated_type_ids:
-                continue
+            if employee_id:
+                if lt.requires_allocation:
+                    # Condition 1: has_valid_allocation (state='validate' alloc exists)
+                    if lt.id not in allocated_type_ids:
+                        continue
+                    # Condition 2: allows_negative OR virtual_remaining_leaves > 0
+                    if not lt.allows_negative:
+                        if lt.with_context(employee_id=employee_id).virtual_remaining_leaves <= 0:
+                            continue
+                # requires_allocation=False → always include
 
             req_unit = getattr(lt, 'request_unit', 'day')
             result.append({
@@ -61,6 +110,7 @@ class HrLeaveTypeExt(models.Model):
                 'name_ar': lt.name_ar or lt.name,
                 'requires_attachment': lt.mobile_require_attachment,
                 'requires_description': lt.mobile_require_description,
+                'request_unit': req_unit,          # 'day' | 'half_day' | 'hour'
                 'allows_half_day': req_unit == 'half_day',
                 'allows_hourly': req_unit == 'hour',
             })
@@ -117,58 +167,94 @@ class HrLeaveExt(models.Model):
 
     @api.model
     def create_leave_request(self, employee_id, leave_type_id, date_from, date_to,
-                             mode='full_day', half_day=False, am_pm='morning',
-                             description='', submit=True):
-        """Create a new leave request and return the leave dict.
+                             mode='full_day', hour_from=None, hour_to=None,
+                             description=''):
+        """Create and immediately submit a leave request (always confirm state).
 
-        ``mode`` is the canonical param from the mobile app:
-          'full_day' | 'half_day_am' | 'half_day_pm' | 'hourly'
+        ``mode`` — 'full_day' | 'half_day_am' | 'half_day_pm' | 'hourly'
 
-        Legacy ``half_day`` + ``am_pm`` params are still accepted for
-        backward compatibility and take precedence over ``mode``.
+        For half_day modes: only ``date_from`` is required (single day).
+        For hourly mode: ``hour_from`` / ``hour_to`` are float hours (e.g. 8.5 = 08:30).
+
+        We set Odoo's ``request_date_from`` / ``request_date_to`` (Date) and
+        the mode-specific fields so that Odoo's own ``_compute_date_from_to``
+        derives the correct ``date_from`` / ``date_to`` datetimes from the
+        employee's work calendar — same as the web form does.
         """
-        # Derive half_day / am_pm from mode when not explicitly passed
-        if not half_day and mode in ('half_day_am', 'half_day_pm'):
-            half_day = True
-            am_pm = 'morning' if mode == 'half_day_am' else 'afternoon'
+        if not date_from:
+            raise ValidationError(_('Leave start date is required.'))
+        try:
+            d_from = datetime.strptime(date_from, '%Y-%m-%d').date()
+        except ValueError:
+            raise ValidationError(_('Invalid date format. Use YYYY-MM-DD.'))
 
-        self._validate_leave_dates(date_from, date_to)
-        employee = self._get_employee(employee_id)
+        is_half_day = mode in ('half_day_am', 'half_day_pm')
+        is_hourly = mode == 'hourly'
+
+        # half_day and hourly are always single-day; full_day requires date_to
+        if is_half_day or is_hourly:
+            d_to = d_from
+        else:
+            if not date_to:
+                raise ValidationError(_('Leave end date is required.'))
+            try:
+                d_to = datetime.strptime(date_to, '%Y-%m-%d').date()
+            except ValueError:
+                raise ValidationError(_('Invalid date format. Use YYYY-MM-DD.'))
+            if d_from > d_to:
+                raise ValidationError(_('Leave start date must be before or equal to end date.'))
+
+        self._get_employee(employee_id)
         leave_type = self.env['hr.leave.type'].with_user(SUPERUSER_ID).browse(leave_type_id)
         if not leave_type.exists():
             raise UserError(_('Leave type not found.'))
 
-        if half_day:
-            if am_pm == 'morning':
-                date_from_dt = datetime.strptime(date_from + ' 08:00:00', '%Y-%m-%d %H:%M:%S')
-                date_to_dt = datetime.strptime(date_from + ' 13:00:00', '%Y-%m-%d %H:%M:%S')
-            else:
-                date_from_dt = datetime.strptime(date_from + ' 13:00:00', '%Y-%m-%d %H:%M:%S')
-                date_to_dt = datetime.strptime(date_from + ' 18:00:00', '%Y-%m-%d %H:%M:%S')
-        else:
-            date_from_dt = datetime.strptime(date_from + ' 00:00:00', '%Y-%m-%d %H:%M:%S')
-            date_to_dt = datetime.strptime(date_to + ' 23:59:59', '%Y-%m-%d %H:%M:%S')
-
+        # Build vals using Odoo's request_* Date fields so _compute_date_from_to
+        # derives date_from/date_to using the employee's work calendar.
         vals = {
             'employee_id': employee_id,
             'holiday_status_id': leave_type_id,
-            'date_from': date_from_dt,
-            'date_to': date_to_dt,
+            'request_date_from': d_from,
+            'request_date_to': d_to,
             'name': description or '/',
         }
-        # Set Odoo half-day fields when supported
-        if half_day:
-            vals['request_unit_half'] = True
-            vals['request_date_from_period'] = 'am' if am_pm == 'morning' else 'pm'
+
+        if is_half_day:
+            # request_date_from_period: 'am' (morning) or 'pm' (afternoon)
+            vals['request_date_from_period'] = 'am' if mode == 'half_day_am' else 'pm'
+        elif is_hourly:
+            # hour_from / hour_to are floats: 8.0 = 08:00, 8.5 = 08:30
+            if hour_from is not None:
+                vals['request_hour_from'] = float(hour_from)
+            if hour_to is not None:
+                vals['request_hour_to'] = float(hour_to)
 
         env = self.with_user(SUPERUSER_ID).with_context(mail_notify_force_send=False)
-        leave = env.create(vals)
-
-        if submit:
-            try:
-                leave.action_confirm()
-            except Exception:
-                pass  # leave remains in draft if confirm fails
+        # In Odoo 19, hr.leave.state defaults to 'confirm' — no draft state.
+        #
+        # WHY SAVEPOINT + flush_all():
+        #   Odoo 19 defers stored-field recomputes and @api.constrains checks
+        #   until flush_all() is called (not immediately inside create()).
+        #   Without an explicit flush inside the try block, create() returns
+        #   successfully, we release the SAVEPOINT, and the constraint fires
+        #   later — leaving the record committed in the DB.
+        #
+        #   flush_all() forces: recompute date_from/date_to → _check_date runs.
+        #   If it raises (overlap, insufficient balance, etc.) we're still inside
+        #   the SAVEPOINT and can roll back cleanly.
+        #
+        #   invalidate_all(flush=False) after rollback clears the stale in-memory
+        #   ORM cache so the rolled-back record doesn't bleed into later queries.
+        cr = self.env.cr
+        cr.execute('SAVEPOINT ess_create_leave')
+        try:
+            leave = env.create(vals)
+            env.env.flush_all()                  # trigger deferred constraints NOW
+            cr.execute('RELEASE SAVEPOINT ess_create_leave')
+        except Exception:
+            cr.execute('ROLLBACK TO SAVEPOINT ess_create_leave')
+            env.env.invalidate_all(flush=False)  # clear stale ORM cache
+            raise  # propagate to call_and_log → proper 400 error to the app
 
         return self._format_leave_record(leave)
 
@@ -177,9 +263,9 @@ class HrLeaveExt(models.Model):
         """Return list of leave requests for the employee, optionally filtered by state."""
         domain = [('employee_id', '=', employee_id)]
         if state_filter:
-            # Accept both Odoo state keys and frontend status values
-            odoo_state = {v: k for k, v in _STATE_TO_STATUS.items()}.get(state_filter, state_filter)
-            domain.append(('state', '=', odoo_state))
+            # state_filter is an Odoo state key: confirm/validate1/validate/refuse/cancel
+            if state_filter in _ODOO_STATES:
+                domain.append(('state', '=', state_filter))
         leaves = self.with_user(SUPERUSER_ID).search(domain, order='date_from desc')
         return [self._format_leave_record(l) for l in leaves]
 
@@ -199,7 +285,7 @@ class HrLeaveExt(models.Model):
         leave = self.with_user(SUPERUSER_ID).browse(leave_id)
         if not leave.exists():
             raise UserError(_('Leave request not found.'))
-        if leave.state not in ('draft', 'confirm'):
+        if leave.state != 'confirm':
             raise UserError(_('Only draft or pending leave requests can be updated.'))
         allowed = ['name']
         write_vals = {k: v for k, v in vals.items() if k in allowed}
@@ -209,16 +295,29 @@ class HrLeaveExt(models.Model):
 
     @api.model
     def cancel_leave_request(self, leave_id):
-        """Cancel a leave request. Returns True."""
+        """Delete a leave request. Returns True.
+
+        Deletable states (Odoo 19):
+          confirm   → employee's own pending request, not yet acted on
+          refuse    → already refused, just cleaning up
+          cancel    → already cancelled
+
+        Approved leaves (validate1 / validate) are blocked — they affect
+        calendar entries and allocation balances that should be reversed through
+        the proper approval workflow, not deleted silently.
+
+        unlink() calls _post_leave_cancel() internally, which removes calendar
+        entries and causes allocation balance to be recalculated automatically.
+        """
         leave = self.with_user(SUPERUSER_ID).browse(leave_id)
         if not leave.exists():
             raise UserError(_('Leave request not found.'))
-        if leave.state == 'refuse':
-            pass  # already refused
-        elif leave.state in ('draft', 'confirm', 'validate1', 'validate'):
-            leave.with_user(SUPERUSER_ID).action_refuse()
-        else:
-            raise UserError(_('Cannot cancel a leave in state: %s') % leave.state)
+        if leave.state in ('validate1', 'validate'):
+            raise UserError(_(
+                'Approved leave requests cannot be deleted. '
+                'Please contact HR to reverse the approval.'
+            ))
+        leave.with_user(SUPERUSER_ID).unlink()
         return True
 
     @api.model
@@ -261,12 +360,9 @@ class HrLeaveExt(models.Model):
         leave = self.with_user(SUPERUSER_ID).browse(leave_id)
         if not leave.exists():
             raise UserError(_('Leave request not found.'))
-        # Try the standard Odoo method first; fall back to direct write
-        try:
-            leave.with_user(SUPERUSER_ID).action_draft()
-            leave.with_user(SUPERUSER_ID).action_confirm()
-        except Exception:
-            leave.with_user(SUPERUSER_ID).write({'state': 'confirm'})
+        # In Odoo 19 there is no 'draft' state. Resetting means writing 'confirm'
+        # (To Approve) directly — that's the earliest state in the Odoo 19 workflow.
+        leave.with_user(SUPERUSER_ID).write({'state': 'confirm'})
         return self._format_leave_record(leave)
 
     @api.model
@@ -389,8 +485,7 @@ class HrLeaveExt(models.Model):
 
     def _format_leave_record(self, leave):
         """Format an hr.leave record into a plain dict matching the mobile LeaveRequest type."""
-        state = leave.state or 'draft'
-        status = _STATE_TO_STATUS.get(state, state)
+        status = leave.state if leave.state in _ODOO_STATES else 'cancel'
         emp = leave.employee_id
         lt = leave.holiday_status_id
         return {
@@ -411,14 +506,3 @@ class HrLeaveExt(models.Model):
             'created_at': leave.create_date.strftime('%Y-%m-%d') if leave.create_date else '',
         }
 
-    def _validate_leave_dates(self, date_from, date_to):
-        """Raise ValidationError if leave dates are invalid."""
-        if not date_from or not date_to:
-            raise ValidationError(_('Leave start and end dates are required.'))
-        try:
-            d_from = datetime.strptime(date_from, '%Y-%m-%d').date()
-            d_to = datetime.strptime(date_to, '%Y-%m-%d').date()
-        except ValueError:
-            raise ValidationError(_('Invalid date format. Use YYYY-MM-DD.'))
-        if d_from > d_to:
-            raise ValidationError(_('Leave start date must be before or equal to end date.'))

@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity, TextInput} from 'react-native';
 import {useTranslation} from 'react-i18next';
-import {useRoute} from '@react-navigation/native';
+import {useRoute, useNavigation} from '@react-navigation/native';
 import type {RouteProp} from '@react-navigation/stack';
 import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query';
 
@@ -13,6 +13,7 @@ import LoadingSkeleton from '../../components/common/LoadingSkeleton';
 import {useTheme} from '../../hooks/useTheme';
 import {useAppSelector} from '../../hooks/useAppSelector';
 import {useRBAC} from '../../hooks/useRBAC';
+import {useApiError} from '../../hooks/useApiError';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
 import type {LeaveRequest} from '../../api/mocks/leave.mock';
@@ -30,8 +31,8 @@ function InfoRow({label, value, theme}: {label: string; value: string; theme: an
 }
 
 function stepDotColor(status: string): string {
-  if (status === 'approved' || status === 'validated') {return colors.success;}
-  if (status === 'refused') {return colors.error;}
+  if (status === 'approved' || status === 'validate' || status === 'validate1') {return colors.success;}
+  if (status === 'refused' || status === 'refuse') {return colors.error;}
   return colors.warning;
 }
 
@@ -39,11 +40,13 @@ export default function LeaveDetailScreen() {
   const {t, i18n} = useTranslation();
   const theme = useTheme();
   const route = useRoute<Route>();
+  const navigation = useNavigation();
   const queryClient = useQueryClient();
   const user = useAppSelector(state => state.auth.user);
   const isAr = i18n.language === 'ar';
   const {id} = route.params;
-  const {canApproveLeave, canRefuseLeave, canResetLeave, canDeleteDraftLeave, canValidateLeave} = useRBAC();
+  const {canApproveLeave, canRefuseLeave, canResetLeave, canValidateLeave} = useRBAC();
+  const {showError} = useApiError();
 
   const [comment, setComment] = useState('');
 
@@ -65,35 +68,39 @@ export default function LeaveDetailScreen() {
     mutationFn: async () =>
       apiClient.post(API_MAP.leave.approve, {leave_id: id}),
     onSuccess: invalidate,
-    onError: () => Alert.alert(t('common.error')),
+    onError: (err) => showError(err),
   });
 
   const refuseMutation = useMutation({
     mutationFn: async () =>
       apiClient.post(API_MAP.leave.refuse, {leave_id: id, reason: comment}),
     onSuccess: () => { setComment(''); invalidate(); },
-    onError: () => Alert.alert(t('common.error')),
+    onError: (err) => showError(err),
   });
 
   const validateMutation = useMutation({
     mutationFn: async () =>
       apiClient.post(API_MAP.leave.validate, {leave_id: id}),
     onSuccess: invalidate,
-    onError: () => Alert.alert(t('common.error')),
+    onError: (err) => showError(err),
   });
 
   const resetMutation = useMutation({
     mutationFn: async () =>
       apiClient.post(API_MAP.leave.reset, {leave_id: id}),
     onSuccess: invalidate,
-    onError: () => Alert.alert(t('common.error')),
+    onError: (err) => showError(err),
   });
 
   const deleteMutation = useMutation({
     mutationFn: async () =>
       apiClient.delete(API_MAP.leave.requestById(id)),
-    onSuccess: invalidate,
-    onError: () => Alert.alert(t('common.error')),
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: ['leave-requests']});
+      queryClient.invalidateQueries({queryKey: ['leave-balances']});
+      navigation.goBack();
+    },
+    onError: (err) => showError(err),
   });
 
   const anyPending =
@@ -137,14 +144,19 @@ export default function LeaveDetailScreen() {
   const isOwnRequest = request.employee_id === user?.id;
 
   // Action visibility based on status + RBAC
-  const canApprove = canApproveLeave && request.status === 'pending';
-  const canValidate = canValidateLeave && request.status === 'approved';
+  // Odoo 19 state keys: confirm=To Approve, validate1=Second Approval,
+  //                       validate=Approved, refuse=Refused, cancel=Cancelled
+  const canApprove = canApproveLeave && request.status === 'confirm';
+  const canValidate = canValidateLeave && request.status === 'validate1';
   const canRefuse = canRefuseLeave && (
-    request.status === 'pending' ||
-    (request.status === 'approved' && canValidateLeave)
+    request.status === 'confirm' ||
+    (request.status === 'validate1' && canValidateLeave)
   );
-  const canReset = canResetLeave && request.status === 'refused';
-  const canDelete = canDeleteDraftLeave && request.status === 'draft' && isOwnRequest;
+  const canReset = canResetLeave && request.status === 'refuse';
+  // Employee can delete their own leave only when it hasn't been approved yet
+  // (confirm=To Approve, refuse=Refused, cancel=Cancelled are all deletable)
+  // Approved leaves (validate1/validate) are blocked — HR must reverse them.
+  const canDelete = isOwnRequest && ['confirm', 'refuse', 'cancel'].includes(request.status);
 
   return (
     <View style={[styles.container, {backgroundColor: theme.background}]}>

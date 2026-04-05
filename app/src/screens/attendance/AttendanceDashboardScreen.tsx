@@ -18,6 +18,7 @@ import apiClient from '../../api/client';
 import {isApiSuccess} from '../../types/api';
 import {useTheme} from '../../hooks/useTheme';
 import {useRBAC} from '../../hooks/useRBAC';
+import {useApiError} from '../../hooks/useApiError';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {AttendanceStackParamList} from '../../navigation/types';
 import type {AttendanceSummary} from '../../api/mocks/attendance.mock';
@@ -41,6 +42,8 @@ export default function AttendanceDashboardScreen() {
   const queryClient = useQueryClient();
   const insets = useSafeAreaInsets();
   const isAr = i18n.language === 'ar';
+
+  const {showError} = useApiError();
 
   const [selectedTask, setSelectedTask] = useState<number | null>(null);
   const [selectedMood, setSelectedMood] = useState<number | null>(null);
@@ -78,10 +81,7 @@ export default function AttendanceDashboardScreen() {
         Alert.alert(t('common.done'), t('attendance.checkIn') + ' ✓');
       }
     },
-    onError: (err: any) => {
-      const msg = err?.response?.data?.error?.message ?? t('common.error');
-      Alert.alert(t('common.error'), msg);
-    },
+    onError: (err) => showError(err),
   });
 
   const checkOutMutation = useMutation({
@@ -96,10 +96,7 @@ export default function AttendanceDashboardScreen() {
       queryClient.invalidateQueries({queryKey: ['attendance-summary']});
       Alert.alert(t('common.done'), t('attendance.checkOut') + ' ✓');
     },
-    onError: (err: any) => {
-      const msg = err?.response?.data?.error?.message ?? t('common.error');
-      Alert.alert(t('common.error'), msg);
-    },
+    onError: (err) => showError(err),
   });
 
   const isPending = checkInMutation.isPending || checkOutMutation.isPending;

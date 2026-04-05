@@ -22,6 +22,7 @@ import DatePickerField from '../../components/common/DatePickerField';
 import SelectField from '../../components/common/SelectField';
 import {useTheme} from '../../hooks/useTheme';
 import {useAppSelector} from '../../hooks/useAppSelector';
+import {useApiError} from '../../hooks/useApiError';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {DocumentType, DocumentRequest} from '../../api/mocks/document-requests.mock';
 import {API_MAP} from '../../api/apiMap';
@@ -33,6 +34,8 @@ export default function DocumentRequestCreateScreen() {
   const queryClient = useQueryClient();
   const isAr = i18n.language === 'ar';
   const user = useAppSelector(state => state.auth.user);
+
+  const {showError, showValidationError} = useApiError();
 
   const [requestTitle, setRequestTitle] = useState('');
   const [selectedTypeId, setSelectedTypeId] = useState<number | null>(null);
@@ -71,12 +74,12 @@ export default function DocumentRequestCreateScreen() {
       Alert.alert(t('common.done'), t('documentRequest.request') + ' ✓');
       navigation.goBack();
     },
-    onError: () => Alert.alert(t('common.error')),
+    onError: (err) => showError(err),
   });
 
   function handleSubmit(isDraft: boolean) {
     if (!requestTitle.trim() || !selectedTypeId) {
-      Alert.alert(t('common.error'), 'Please fill all required fields');
+      showValidationError('Please fill all required fields');
       return;
     }
     mutation.mutate(isDraft);

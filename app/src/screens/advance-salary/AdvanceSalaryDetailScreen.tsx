@@ -11,6 +11,7 @@ import ScreenHeader from '../../components/common/ScreenHeader';
 import StatusChip from '../../components/common/StatusChip';
 import {useTheme} from '../../hooks/useTheme';
 import {useRBAC} from '../../hooks/useRBAC';
+import {useApiError} from '../../hooks/useApiError';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
 import type {AdvanceSalary} from '../../api/mocks/advance-salary.mock';
@@ -41,6 +42,8 @@ export default function AdvanceSalaryDetailScreen() {
   const {canApproveAdvanceSalary, canRefuseAdvanceSalary, canResetLeave, canDeleteDraftLeave} = useRBAC();
   const {id} = route.params;
 
+  const {showError} = useApiError();
+
   const {data: items} = useQuery({
     queryKey: ['advance-salary'],
     queryFn: async () => {
@@ -63,7 +66,7 @@ export default function AdvanceSalaryDetailScreen() {
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['advance-salary']});
     },
-    onError: () => Alert.alert(t('common.error')),
+    onError: (err) => showError(err),
   });
 
   function confirmAction(action: string, label: string) {

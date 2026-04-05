@@ -23,6 +23,7 @@ import TextInput from '../../components/common/TextInput';
 import DatePickerField from '../../components/common/DatePickerField';
 import {useTheme} from '../../hooks/useTheme';
 import {useAppSelector} from '../../hooks/useAppSelector';
+import {useApiError} from '../../hooks/useApiError';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {TasksStackParamList} from '../../navigation/types';
 import type {Task} from '../../api/mocks/tasks.mock';
@@ -51,6 +52,8 @@ export default function LogTimeScreen() {
   const paramTaskId = route.params?.taskId ?? 0;
   const paramTaskName = route.params?.taskName ?? '';
   const isStandalone = !paramTaskId;
+
+  const {showError, showValidationError} = useApiError();
 
   const [date, setDate] = useState(getTodayString());
   const [hoursNum, setHoursNum] = useState<number>(1.0);
@@ -117,16 +120,16 @@ export default function LogTimeScreen() {
       Alert.alert(t('common.done'), t('tasks.timeLogged') + ' ✓');
       navigation.goBack();
     },
-    onError: () => Alert.alert(t('common.error')),
+    onError: (err) => showError(err),
   });
 
   function handleSubmit() {
     if (!date) {
-      Alert.alert(t('common.error'), 'Please select a date');
+      showValidationError('Please select a date');
       return;
     }
     if (isStandalone && !selectedTask) {
-      Alert.alert(t('common.error'), t('tasks.task'));
+      showValidationError(t('tasks.task'));
       return;
     }
     mutation.mutate();

@@ -12,6 +12,7 @@ import Card from '../../components/common/Card';
 import StatusChip from '../../components/common/StatusChip';
 import {useTheme} from '../../hooks/useTheme';
 import {useRBAC} from '../../hooks/useRBAC';
+import {useApiError} from '../../hooks/useApiError';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
 import type {Loan} from '../../api/mocks/loan.mock';
@@ -26,6 +27,8 @@ export default function LoanDetailScreen() {
   const queryClient = useQueryClient();
   const {canApproveManagerLoan, canApproveHRLoan, canApproveCEOLoan, canRefuseLoan} = useRBAC();
   const {id} = route.params;
+
+  const {showError} = useApiError();
 
   const {data: loans} = useQuery({
     queryKey: ['loans'],
@@ -51,7 +54,7 @@ export default function LoanDetailScreen() {
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['loans']});
     },
-    onError: () => Alert.alert(t('common.error')),
+    onError: (err) => showError(err),
   });
 
   function confirmAction(action: string, label: string) {

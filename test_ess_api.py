@@ -23,10 +23,17 @@ Requirements:
     pip install requests
 """
 import sys
+import io
 import json
 import time
 import argparse
 import requests
+
+# Force UTF-8 output on Windows so Unicode chars (arrows, em-dashes) don't crash
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+elif sys.stdout.encoding and sys.stdout.encoding.lower() != 'utf-8':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 
 # ── Colour helpers ─────────────────────────────────────────────────────────────
 
@@ -106,7 +113,7 @@ def call(method, path, body=None, no_auth=False, label=None):
         h.update(HEADERS)
     try:
         if method == 'GET':
-            resp = SESSION.get(url, headers=h, timeout=15)
+            resp = SESSION.get(url, headers=h, params=body or {}, timeout=15)
         elif method == 'POST':
             resp = SESSION.post(url, headers=h,
                                 data=json.dumps(body or {}), timeout=15)
@@ -251,10 +258,13 @@ def test_attendance(emp_id):
               'POST', '/ess/api/attendance/check-out',
               {'latitude': 0.0, 'longitude': 0.0})
 
+    # Use a date ~90 days ago so it won't conflict with recent check-in/out
+    import datetime
+    manual_date = (datetime.date.today() - datetime.timedelta(days=90)).strftime('%Y-%m-%d')
     check('POST manual attendance',
           'POST', '/ess/api/attendance/manual',
-          {'check_in':  '2026-03-01 08:00:00',
-           'check_out': '2026-03-01 17:00:00',
+          {'check_in':  f'{manual_date} 08:00:00',
+           'check_out': f'{manual_date} 17:00:00',
            'latitude': 0.0, 'longitude': 0.0})
 
 
@@ -271,12 +281,17 @@ def test_leave():
     ok_types, types_data, _, _ = call('GET', '/ess/api/leave/types')
     leave_type_id = types_data[0]['id'] if ok_types and types_data else 1
 
+    # Use a far-future date window to avoid conflicts on repeated runs
+    import datetime
+    leave_from = (datetime.date.today() + datetime.timedelta(days=365)).strftime('%Y-%m-%d')
+    leave_to   = (datetime.date.today() + datetime.timedelta(days=366)).strftime('%Y-%m-%d')
+
     # Create → get → approve → refuse → reset → (cancel via delete)
     created = check('POST leave/requests (create)',
                     'POST', '/ess/api/leave/requests',
                     {'leave_type_id': leave_type_id,
-                     'date_from': '2026-05-10',
-                     'date_to':   '2026-05-11',
+                     'date_from': leave_from,
+                     'date_to':   leave_to,
                      'description': 'API test leave'})
     leave_id = created.get('id') if created else None
 
@@ -334,7 +349,9 @@ def test_expense():
     prod_id = cats[0]['id'] if ok2 and cats else None
 
     ok3, currs, _, _ = call('GET', '/ess/api/expenses/currencies')
-    curr_id = currs[0]['id'] if ok3 and currs else 1
+    # Use company currency (rate=1.0) to avoid cross-currency precompute issues
+    comp_curr = next((c for c in (currs or []) if c.get('rate', 0) == 1.0), None)
+    curr_id = comp_curr['id'] if comp_curr else (currs[0]['id'] if ok3 and currs else 1)
 
     if prod_id:
         created = check('POST expenses (create)',

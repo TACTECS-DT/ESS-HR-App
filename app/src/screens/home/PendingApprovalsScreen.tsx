@@ -19,6 +19,7 @@ import LoadingSkeleton from '../../components/common/LoadingSkeleton';
 import {useTheme} from '../../hooks/useTheme';
 import {useRBAC} from '../../hooks/useRBAC';
 import AccessDenied from '../../components/common/AccessDenied';
+import {useApiError} from '../../hooks/useApiError';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {PendingApproval, ApprovalType} from '../../api/mocks/pending-approvals.mock';
 import {API_MAP} from '../../api/apiMap';
@@ -83,6 +84,7 @@ export default function PendingApprovalsScreen() {
   const queryClient = useQueryClient();
   const isAr = i18n.language === 'ar';
   const {canAccessPendingApprovals, canApproveHRRequests, canApproveBusinessService} = useRBAC();
+  const {showError} = useApiError();
   const [filter, setFilter] = useState<Filter>('all');
 
   // Hook must be called unconditionally — disabled when no access
@@ -103,7 +105,7 @@ export default function PendingApprovalsScreen() {
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['pending-approvals']});
     },
-    onError: () => Alert.alert(t('common.error')),
+    onError: (err) => showError(err),
   });
 
   if (!canAccessPendingApprovals) {

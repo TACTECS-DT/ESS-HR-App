@@ -12,6 +12,7 @@ import StatusChip from '../../components/common/StatusChip';
 import {useTheme} from '../../hooks/useTheme';
 import {useAppSelector} from '../../hooks/useAppSelector';
 import {useRBAC} from '../../hooks/useRBAC';
+import {useApiError} from '../../hooks/useApiError';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
 import type {ExperienceCertificate} from '../../api/mocks/experience-certificates.mock';
@@ -44,6 +45,8 @@ export default function ExperienceCertDetailScreen() {
   const isAr = i18n.language === 'ar';
   const {id} = route.params;
 
+  const {showError} = useApiError();
+
   const {data: certs} = useQuery({
     queryKey: ['experience-certs'],
     queryFn: async () => {
@@ -66,7 +69,7 @@ export default function ExperienceCertDetailScreen() {
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['experience-certs']});
     },
-    onError: () => Alert.alert(t('common.error')),
+    onError: (err) => showError(err),
   });
 
   function confirmAction(action: string, label: string) {
