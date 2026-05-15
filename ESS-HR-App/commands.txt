@@ -1,0 +1,101 @@
+
+Test credentials to use:
+
+Any license key except "INVALID" → goes to login
+PIN: anything except 0000 → logs in successfully
+Password: anything except "wrong" → logs in successfully
+
+npx react-native start --reset-cache                                    
+---run emulator  vs code terminal:
+
+     emulator -list-avds
+     emulator -avd Pixel_9a
+emulator -avd Pixel_9a -no-snapshot-load
+
+--Run app vs code another terminal terminal::
+
+     npx react-native run-android
+
+
+
+
+--clean build :
+
+cd android
+./gradlew clean
+cd ..
+
+--to fix and detect :
+npx react-native doctor
+
+
+
+************Create Project (VS Code / Terminal)***********************
+npm uninstall -g react-native-cli @react-native-community/cli 
+npx @react-native-community/cli init App   # Create new project
+cd App                                     # Enter project folder
+npm install                                # Install dependencies
+
+
+
+
+no need for android studio now 
+************Start Android Emulator (Android Studio)***********************
+
+Open Android Studio → Tools → AVD Manager
+
+Start emulator (e.g., Pixel 6)
+
+Wait until fully loaded
+If device not found:
+     adb devices
+
+
+
+
+************Run App First Time (VS Code / Terminal)**********************
+
+# Build & launch app on emulator
+npx react-native run-android  
+
+# Start Metro manually for hot reload (in other terminal inside vs code)
+npx react-native start        
+
+
+
+to fix and detect :
+npx react-native doctor
+
+clean build :
+
+cd android
+./gradlew clean
+cd ..
+
+
+run emulator :
+emulator -list-avds
+
+
+emulator -avd Pixel_9a
+
+Run app:
+
+npx react-native run-android
+
+
+
+Two commands — run them from the app/ folder:
+
+1. Bundle the JS:
+
+
+npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
+2. Build the APK:
+
+
+cd android && ./gradlew assembleRelease
+Output APK will be at:
+
+
+android/app/build/outputs/apk/release/app-release.apk

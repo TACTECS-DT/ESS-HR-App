@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ── Search view ──────────────────────────────────────────────────────── -->
+    <!-- <record id="view_ess_api_log_search" model="ir.ui.view">
+        <field name="name">ess.api.log.search</field>
+        <field name="model">ess.api.log</field>
+        <field name="arch" type="xml">
+            <search string="Search API Logs">
+                <field name="employee_id"/>
+                <field name="module"/>
+                <field name="endpoint"/>
+                <field name="ip_address"/>
+
+                <filter string="Today" name="today"
+                        domain="[('timestamp','&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0)).strftime('%Y-%m-%d %H:%M:%S'))]"/>
+                <filter string="This Week" name="this_week"
+                        domain="[('timestamp','&gt;=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d 00:00:00'))]"/>
+                <filter string="This Month" name="this_month"
+                        domain="[('timestamp','&gt;=', context_today().strftime('%Y-%m-01 00:00:00'))]"/>
+
+                <separator/>
+                <filter string="Errors Only" name="errors_only" domain="[('status','=','error')]"/>
+                <filter string="Success Only" name="success_only" domain="[('status','=','success')]"/>
+
+                <group expand="0" string="Group By">
+                    <filter string="Module"   name="group_module"   context="{'group_by':'module'}"/>
+                    <filter string="Employee" name="group_employee" context="{'group_by':'employee_id'}"/>
+                    <filter string="Status"   name="group_status"   context="{'group_by':'status'}"/>
+                    <filter string="Date"     name="group_date"     context="{'group_by':'timestamp:day'}"/>
+                    <filter string="Company"  name="group_company"  context="{'group_by':'company_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record> -->
+
+    <!-- ── List view ───────────────────────────────────────────────────────── -->
+    <record id="view_ess_api_log_list" model="ir.ui.view">
+        <field name="name">ess.api.log.list</field>
+        <field name="model">ess.api.log</field>
+        <field name="arch" type="xml">
+            <list string="API Logs" create="false" edit="false" delete="false"
+                  decoration-danger="status == 'error'"
+                  decoration-success="status == 'success'">
+                <field name="timestamp" string="Time" optional="show"/>
+                <field name="employee_id" optional="show"/>
+                <field name="company_id" optional="hide"/>
+                <field name="module" optional="show"/>
+                <field name="action" optional="show"/>
+                <field name="endpoint" optional="hide"/>
+                <field name="status" optional="show" widget="badge"
+                       decoration-success="status == 'success'"
+                       decoration-danger="status == 'error'"/>
+                <field name="duration_ms" string="Duration (ms)" optional="show"/>
+                <field name="ip_address" optional="hide"/>
+                <field name="error_message" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ── Form view (read-only detail) ────────────────────────────────────── -->
+    <record id="view_ess_api_log_form" model="ir.ui.view">
+        <field name="name">ess.api.log.form</field>
+        <field name="model">ess.api.log</field>
+        <field name="arch" type="xml">
+            <form string="API Log Entry" create="false" edit="false" delete="false">
+                <sheet>
+                    <group>
+                        <group string="Request">
+                            <field name="timestamp"/>
+                            <field name="endpoint"/>
+                            <field name="module"/>
+                            <field name="action"/>
+                            <field name="ip_address"/>
+                        </group>
+                        <group string="Actor">
+                            <field name="employee_id"/>
+                            <field name="company_id"/>
+                            <field name="odoo_uid" string="Odoo User ID"/>
+                        </group>
+                    </group>
+                    <group string="Result">
+                        <field name="status" widget="badge"
+                               decoration-success="status == 'success'"
+                               decoration-danger="status == 'error'"/>
+                        <field name="duration_ms" string="Duration (ms)"/>
+                    </group>
+                    <group string="Error Details" invisible="status != 'error'">
+                        <field name="error_message" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ── Pivot view ───────────────────────────────────────────────────────── -->
+    <record id="view_ess_api_log_pivot" model="ir.ui.view">
+        <field name="name">ess.api.log.pivot</field>
+        <field name="model">ess.api.log</field>
+        <field name="arch" type="xml">
+            <pivot string="API Log Analysis" display_quantity="true">
+                <field name="module"      type="row"/>
+                <field name="status"      type="col"/>
+                <field name="duration_ms" type="measure" string="Avg Duration (ms)" widget="float" avg="1"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- ── Graph view ───────────────────────────────────────────────────────── -->
+    <record id="view_ess_api_log_graph" model="ir.ui.view">
+        <field name="name">ess.api.log.graph</field>
+        <field name="model">ess.api.log</field>
+        <field name="arch" type="xml">
+            <graph string="API Requests by Module" type="bar" stacked="True">
+                <field name="module"  type="row"/>
+                <field name="status"  type="col"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- ── Action window ────────────────────────────────────────────────────── -->
+    <record id="action_ess_api_log" model="ir.actions.act_window">
+        <field name="name">API Logs</field>
+        <field name="res_model">ess.api.log</field>
+        <field name="view_mode">list,pivot,graph,form</field>
+        <!-- <field name="search_view_id" ref="view_ess_api_log_search"/> -->
+        <field name="context">{'search_default_this_week': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No API requests logged yet.
+            </p>
+            <p>
+                Every call to an ESS Mobile API endpoint is automatically
+                recorded here for monitoring and analysis.
+            </p>
+        </field>
+    </record>
+
+    <!-- ── Employee activity action ─────────────────────────────────────────── -->
+    <record id="action_ess_api_log_employee" model="ir.actions.act_window">
+        <field name="name">Employee Activity</field>
+        <field name="res_model">ess.api.log</field>
+        <field name="view_mode">pivot,graph,list</field>
+        <!-- <field name="search_view_id" ref="view_ess_api_log_search"/> -->
+        <field name="context">{'search_default_group_employee': 1, 'search_default_this_week': 1}</field>
+    </record>
+
+    <!-- ── Error monitor action ─────────────────────────────────────────────── -->
+    <record id="action_ess_api_log_errors" model="ir.actions.act_window">
+        <field name="name">Error Monitor</field>
+        <field name="res_model">ess.api.log</field>
+        <field name="view_mode">list,graph,pivot</field>
+        <!-- <field name="search_view_id" ref="view_ess_api_log_search"/> -->
+        <field name="context">{'search_default_errors_only': 1}</field>
+        <field name="domain">[('status', '=', 'error')]</field>
+    </record>
+
+</odoo>

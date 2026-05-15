@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ess_server_list" model="ir.ui.view">
+        <field name="name">ess.server.list</field>
+        <field name="model">ess.server</field>
+        <field name="arch" type="xml">
+            <list string="ESS Client Servers"
+                  decoration-danger="server_status == 'deactivated'"
+                  decoration-warning="server_status == 'unreachable'">
+                <field name="name"/>
+                <field name="url"/>
+                <field name="license_id"/>
+                <field name="employee_count"/>
+                <field name="active_user_count" string="Active Users (30d)"/>
+                <field name="last_sync_date"/>
+                <field name="last_sync_status" widget="badge"
+                       decoration-success="last_sync_status == 'success'"
+                       decoration-danger="last_sync_status == 'unreachable'"
+                       decoration-warning="last_sync_status == 'failed'"/>
+                <field name="server_status" widget="badge"
+                       decoration-success="server_status == 'active'"
+                       decoration-danger="server_status == 'deactivated'"
+                       decoration-warning="server_status == 'unreachable'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_ess_server_form" model="ir.ui.view">
+        <field name="name">ess.server.form</field>
+        <field name="model">ess.server</field>
+        <field name="arch" type="xml">
+            <form string="ESS Client Server">
+                <header>
+                    <button
+                        name="action_sync_stats"
+                        string="Sync Stats Now"
+                        type="object"
+                        class="btn-primary"
+                        help="Immediately pull employee and user stats from this server."/>
+                    <button
+                        name="action_open_status_wizard"
+                        string="Change Status"
+                        type="object"
+                        class="btn-secondary"/>
+                    <field name="server_status" widget="statusbar"
+                           statusbar_visible="active,unreachable,deactivated"
+                           readonly="1"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group string="Server">
+                            <field name="name"/>
+                            <field name="url" placeholder="https://company.odoo.com"/>
+                            <field name="license_id"/>
+                        </group>
+                        <group string="Settings">
+                            <field name="auto_logout_duration"
+                                   help="Hours of inactivity before mobile app auto-logs out. Sent to mobile on each Step 1 validation."/>
+                        </group>
+                    </group>
+                    <group string="Admin Connection Key">
+                        <group>
+                            <field name="connection_key"
+                                   widget="password"
+                                   placeholder="Click Generate Key to create a new key"/>
+                        </group>
+                        <group>
+                            <div>
+                                <button name="action_generate_key"
+                                        string="Generate Key"
+                                        type="object"
+                                        class="btn-warning"
+                                        confirm="This will replace the current key. The client server must be updated with the new key or sync will fail. Continue?"/>
+                                <p class="text-muted mt-2">
+                                    After generating: copy the key → open Odoo Settings → ESS Client → paste into Admin Connection Key → Save.
+                                </p>
+                            </div>
+                        </group>
+                    </group>
+                    <group string="Live Stats (last sync)">
+                        <group>
+                            <field name="employee_count" readonly="1"/>
+                            <field name="active_user_count" string="Active Users (30d)" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="last_sync_date" readonly="1"/>
+                            <field name="last_sync_status" readonly="1" widget="badge"
+                                   decoration-success="last_sync_status == 'success'"
+                                   decoration-danger="last_sync_status == 'unreachable'"
+                                   decoration-warning="last_sync_status == 'failed'"/>
+                        </group>
+                    </group>
+                    <group string="Sync Error" invisible="not last_sync_error">
+                        <field name="last_sync_error" nolabel="1" readonly="1"/>
+                    </group>
+                    <notebook>
+                        <page string="Status History" name="status_history">
+                            <field name="history_ids" readonly="1">
+                                <list string="Status History" create="0" edit="0" delete="0">
+                                    <field name="date"/>
+                                    <field name="old_status" widget="badge"
+                                           decoration-success="old_status == 'active'"
+                                           decoration-danger="old_status == 'deactivated'"
+                                           decoration-warning="old_status == 'unreachable'"/>
+                                    <field name="new_status" widget="badge"
+                                           decoration-success="new_status == 'active'"
+                                           decoration-danger="new_status == 'deactivated'"
+                                           decoration-warning="new_status == 'unreachable'"/>
+                                    <field name="source"/>
+                                    <field name="reason"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_ess_server" model="ir.actions.act_window">
+        <field name="name">Client Servers</field>
+        <field name="res_model">ess.server</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

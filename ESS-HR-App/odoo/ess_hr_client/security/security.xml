@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record model="ir.module.category" id="ess_client_group_category">
+            <field name="name">ESS Client</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <record model="res.groups.privilege" id="ess_client_privilege">
+            <field name="name">ESS Client Privilege</field>
+            <field name="category_id" ref="ess_client_group_category"/>
+            <field name="sequence">1</field>
+        </record>
+
+        <record id="ess_mobile_group" model="res.groups">
+            <field name="name">ESS Client Group</field>
+            <field name="privilege_id" ref="ess_client_privilege"/>
+        </record>
+    </data>
+</odoo>

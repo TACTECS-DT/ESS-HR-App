@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"d:\\\\ESS-HR-App\")",
+      "Bash(Select-Object Name, PSIsContainer)",
+      "Bash(grep -v \"\\\\\\\\.cxx\")",
+      "Bash(Get-ChildItem -Path \"d:\\\\ESS-HR-App\\\\app\\\\src\\\\config\\\\\" -File | Select-Object Name)",
+      "Bash(Get-ChildItem -Path \"d:\\\\ESS-HR-App\\\\app\\\\src\\\\store\" -File)",
+      "Bash(Select-Object Name)",
+      "Bash(Get-ChildItem -Path \"d:\\\\ESS-HR-App\\\\odoo\\\\ess_hr_admin\\\\models\\\\\" -File | Select-Object Name)",
+      "Bash(Get-ChildItem -Path \"d:\\\\ESS-HR-App\\\\odoo\\\\ess_hr_admin\\\\models\" -File)",
+      "Bash(Remove-Item \"d:\\\\ESS-HR-App\\\\odoo\\\\ess_hr_client\\\\models\\\\ess_client_settings.py\")"
+    ]
+  }
+}

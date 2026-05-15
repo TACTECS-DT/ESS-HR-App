@@ -1,0 +1,3022 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تطبيق الخدمة الذاتية - الإطارات السلكية (عربي)</title>
+<style>
+:root {
+  --primary: #1a73e8;
+  --primary-dark: #1557b0;
+  --success: #34a853;
+  --warning: #f9ab00;
+  --danger: #ea4335;
+  --bg: #f5f7fa;
+  --card: #ffffff;
+  --text: #202124;
+  --text-secondary: #5f6368;
+  --border: #e0e0e0;
+  --nav-bg: #ffffff;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', 'Tahoma', 'Arial', system-ui, sans-serif; background: #1a1a2e; display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; padding: 30px; direction: rtl; }
+h1.page-title { width: 100%; text-align: center; color: #fff; font-size: 28px; margin-bottom: 10px; }
+p.page-subtitle { width: 100%; text-align: center; color: #aaa; font-size: 14px; margin-bottom: 20px; }
+.phone {
+  width: 375px; height: 812px; background: var(--bg); border-radius: 40px;
+  box-shadow: 0 0 0 4px #333, 0 0 0 6px #555, 0 20px 60px rgba(0,0,0,0.5);
+  overflow: hidden; position: relative; display: flex; flex-direction: column; direction: rtl;
+}
+.phone .status-bar {
+  height: 44px; background: var(--primary); display: flex; align-items: center;
+  justify-content: space-between; padding: 0 20px; color: #fff; font-size: 12px; flex-shrink: 0;
+}
+.phone .header {
+  height: 56px; background: var(--primary); display: flex; align-items: center;
+  padding: 0 16px; color: #fff; flex-shrink: 0;
+}
+.phone .header .title { font-size: 18px; font-weight: 600; flex: 1; }
+.phone .header .icon { width: 24px; height: 24px; margin-right: 12px; opacity: 0.9; cursor: pointer; }
+.phone .content { flex: 1; overflow-y: auto; padding: 16px; }
+.phone .bottom-nav {
+  height: 60px; background: var(--nav-bg); display: flex; border-top: 1px solid var(--border); flex-shrink: 0;
+}
+.phone .bottom-nav .nav-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; font-size: 10px; color: var(--text-secondary);
+}
+.phone .bottom-nav .nav-item.active { color: var(--primary); }
+.phone .bottom-nav .nav-item .nav-icon { font-size: 20px; margin-bottom: 2px; }
+.card {
+  background: var(--card); border-radius: 12px; padding: 16px; margin-bottom: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.card-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; padding: 10px 20px;
+  border-radius: 8px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; width: 100%;
+}
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-success { background: var(--success); color: #fff; }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+.input-group { margin-bottom: 12px; }
+.input-group label { display: block; font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
+.input-group input, .input-group select, .input-group textarea {
+  width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px;
+  font-size: 14px; background: #fff; outline: none; direction: rtl; text-align: right;
+}
+.badge {
+  display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 500;
+}
+.badge-draft { background: #e8eaed; color: #5f6368; }
+.badge-pending { background: #fef7e0; color: #b06000; }
+.badge-approved { background: #e6f4ea; color: #137333; }
+.badge-refused { background: #fce8e6; color: #c5221f; }
+.list-item {
+  display: flex; align-items: center; padding: 12px; border-bottom: 1px solid var(--border);
+  background: #fff; margin-bottom: 4px; border-radius: 8px;
+}
+.list-item .item-icon { font-size: 24px; margin-left: 12px; }
+.list-item .item-content { flex: 1; }
+.list-item .item-title { font-size: 14px; font-weight: 500; color: var(--text); }
+.list-item .item-sub { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+.grid-menu { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.grid-item {
+  display: flex; flex-direction: column; align-items: center; padding: 16px 8px;
+  background: var(--card); border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.grid-item .grid-icon { font-size: 28px; margin-bottom: 8px; }
+.grid-item .grid-label { font-size: 11px; color: var(--text); text-align: center; font-weight: 500; }
+.progress-bar { height: 6px; background: #e8eaed; border-radius: 3px; overflow: hidden; margin-top: 6px; }
+.progress-bar .fill { height: 100%; border-radius: 3px; }
+.avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 600; }
+.fab { position: absolute; bottom: 76px; left: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 12px rgba(26,115,232,0.4); }
+.section-title { font-size: 16px; font-weight: 600; color: var(--text); margin: 16px 0 8px; }
+.filter-tabs { display: flex; gap: 8px; margin-bottom: 12px; overflow-x: auto; }
+.filter-tab { padding: 6px 14px; border-radius: 20px; font-size: 12px; white-space: nowrap; background: #e8eaed; color: var(--text-secondary); }
+.filter-tab.active { background: var(--primary); color: #fff; }
+.screen-label { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.7); color: #fff; padding: 4px 12px; border-radius: 12px; font-size: 10px; z-index: 10; white-space: nowrap; }
+.separator { height: 1px; background: var(--border); margin: 12px 0; }
+.stat-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; }
+.stat-label { font-size: 13px; color: var(--text-secondary); }
+.stat-value { font-size: 13px; font-weight: 600; color: var(--text); }
+.checkin-btn { width: 120px; height: 120px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0 auto; border: 4px solid; font-weight: 600; cursor: pointer; }
+.approval-actions { display: flex; gap: 8px; margin-top: 8px; }
+.approval-actions .btn { flex: 1; padding: 8px; font-size: 12px; }
+.timeline { padding-right: 20px; border-right: 2px solid var(--border); }
+.timeline-item { position: relative; padding: 0 16px 16px 0; }
+.timeline-item::before { content: ''; position: absolute; right: -7px; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: var(--primary); }
+.timeline-item.done::before { background: var(--success); }
+.back-btn { margin-left: 12px; font-size: 20px; cursor: pointer; }
+/* أنماط المهام وجدول الأوقات */
+.timer-display { font-size: 36px; font-weight: 700; font-family: 'Courier New', monospace; text-align: center; color: #fff; }
+.timer-card { background: linear-gradient(135deg, var(--primary), #1a3a8a); color: #fff; border-radius: 16px; padding: 24px; text-align: center; margin-bottom: 12px; }
+.timer-controls { display: flex; gap: 16px; justify-content: center; margin-top: 16px; }
+.timer-btn { width: 56px; height: 56px; border-radius: 50%; border: none; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.priority-stars { display: flex; gap: 4px; }
+.priority-star { font-size: 18px; cursor: pointer; color: #d1d5db; }
+.priority-star.active { color: #f59e0b; }
+.mini-timer { background: var(--primary); color: #fff; padding: 8px 16px; display: flex; align-items: center; justify-content: space-between; font-size: 13px; border-radius: 8px; margin-bottom: 12px; }
+.attachment-item { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.attachment-icon { width: 40px; height: 40px; border-radius: 8px; background: #e8f0fe; display: flex; align-items: center; justify-content: center; margin-left: 12px; font-size: 18px; }
+.upload-area { border: 2px dashed var(--border); border-radius: 12px; padding: 32px; text-align: center; margin-bottom: 16px; cursor: pointer; }
+.day-header { display: flex; justify-content: space-between; padding: 8px 0; font-weight: 600; border-bottom: 2px solid var(--primary); margin-top: 12px; }
+.time-entry { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.project-dot { width: 10px; height: 10px; border-radius: 50%; margin-left: 10px; flex-shrink: 0; }
+.weekly-bars { display: flex; gap: 4px; align-items: flex-end; height: 40px; margin-top: 8px; }
+.weekly-bar { flex: 1; background: rgba(255,255,255,0.3); border-radius: 3px; min-height: 4px; }
+.stage-select { padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border); font-size: 13px; background: #fff; direction: rtl; }
+</style>
+</head>
+<body>
+
+<h1 class="page-title">تطبيق الخدمة الذاتية للموظفين - الإطارات السلكية</h1>
+<p class="page-subtitle">الخدمة الذاتية للموظفين | ٣٠ شاشة | واجهة عربية RTL</p>
+
+<!-- ==================== شاشة 1: تفعيل الرخصة ==================== -->
+<div class="phone">
+  <div class="screen-label">1. تفعيل الرخصة</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="content" style="display:flex; flex-direction:column; justify-content:center; align-items:center;">
+    <div style="font-size:48px; margin-bottom:16px;">🏢</div>
+    <div style="font-size:22px; font-weight:700; color:var(--primary); margin-bottom:4px;">ESS Pro</div>
+    <div style="font-size:13px; color:var(--text-secondary); margin-bottom:32px;">الخدمة الذاتية للموظفين</div>
+    <div style="width:100%;">
+      <div class="input-group">
+        <label>مفتاح الرخصة</label>
+        <input type="text" placeholder="XXXX-XXXX-XXXX-XXXX" style="text-align:center; letter-spacing:2px; direction:ltr;">
+      </div>
+      <div class="input-group">
+        <label>رابط الشركة</label>
+        <input type="text" placeholder="https://your-company.odoo.com" style="direction:ltr; text-align:left;">
+      </div>
+      <div class="input-group">
+        <label>قاعدة البيانات</label>
+        <input type="text" placeholder="company_database" style="direction:ltr; text-align:left;">
+      </div>
+      <button class="btn btn-primary" style="margin-top:8px;">تفعيل الرخصة</button>
+      <div style="text-align:center; margin-top:16px; font-size:12px; color:var(--text-secondary);">
+        تواصل مع مسؤول الموارد البشرية للحصول على مفتاح الرخصة
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== شاشة 2: تسجيل الدخول ==================== -->
+<div class="phone">
+  <div class="screen-label">2. تسجيل الدخول</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="content" style="display:flex; flex-direction:column; justify-content:center; align-items:center;">
+    <div style="font-size:48px; margin-bottom:16px;">🏢</div>
+    <div style="font-size:22px; font-weight:700; color:var(--primary); margin-bottom:4px;">ESS Pro</div>
+    <div style="font-size:11px; color:var(--text-secondary); margin-bottom:24px;">شركة ABC</div>
+
+    <div style="display:flex; gap:0; margin-bottom:20px; background:#e8eaed; border-radius:8px; overflow:hidden; width:100%;">
+      <div style="flex:1; padding:8px; text-align:center; background:var(--primary); color:#fff; font-size:13px; font-weight:500;">رقم البطاقة</div>
+      <div style="flex:1; padding:8px; text-align:center; font-size:13px; color:var(--text-secondary);">اسم المستخدم</div>
+    </div>
+
+    <div style="width:100%;">
+      <div class="input-group">
+        <label>رقم البطاقة</label>
+        <input type="text" placeholder="أدخل رقم البطاقة">
+      </div>
+      <div class="input-group">
+        <label>الرقم السري</label>
+        <input type="password" placeholder="أدخل الرقم السري (٤-٦ أرقام)">
+      </div>
+      <button class="btn btn-primary" style="margin-top:8px;">تسجيل الدخول</button>
+      <div style="text-align:center; margin-top:16px;">
+        <span style="font-size:12px; color:var(--primary);">نسيت الرقم السري؟</span>
+      </div>
+      <div class="separator"></div>
+      <div style="text-align:center;">
+        <div style="font-size:13px; color:var(--text-secondary); margin-bottom:12px;">أو سجل الدخول عبر</div>
+        <div style="display:flex; gap:12px; justify-content:center;">
+          <div style="width:48px; height:48px; border-radius:12px; background:#f0f0f0; display:flex; align-items:center; justify-content:center; font-size:24px;">👆</div>
+          <div style="width:48px; height:48px; border-radius:12px; background:#f0f0f0; display:flex; align-items:center; justify-content:center; font-size:24px;">😀</div>
+        </div>
+        <div style="font-size:10px; color:var(--text-secondary); margin-top:8px;">البصمة / التعرف على الوجه</div>
+      </div>
+    </div>
+    <div style="position:absolute; bottom:20px; display:flex; gap:4px; font-size:12px;">
+      <span style="color:var(--primary); font-weight:600;">العربية</span>
+      <span style="color:var(--text-secondary);">|</span>
+      <span style="color:var(--text-secondary);">English</span>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== شاشة 3: الصفحة الرئيسية ==================== -->
+<div class="phone">
+  <div class="screen-label">3. الصفحة الرئيسية</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <div class="title">الرئيسية</div>
+    <span class="icon">🔔</span>
+    <span class="icon">📝</span>
+  </div>
+  <div class="content">
+    <div class="card" style="display:flex; align-items:center; gap:12px;">
+      <div class="avatar">أح</div>
+      <div style="flex:1;">
+        <div style="font-size:16px; font-weight:600;">أحمد حسن</div>
+        <div style="font-size:12px; color:var(--text-secondary);">مهندس برمجيات - قسم تقنية المعلومات</div>
+        <div style="font-size:11px; color:var(--text-secondary);">البطاقة: EMP-045 | شركة ABC ▾</div>
+      </div>
+    </div>
+
+    <div class="card" style="text-align:center;">
+      <div class="checkin-btn" style="background:#e6f4ea; border-color:var(--success); color:var(--success);">
+        <span style="font-size:28px;">⏰</span>
+        <span style="font-size:12px;">تسجيل حضور</span>
+      </div>
+      <div style="font-size:12px; color:var(--text-secondary); margin-top:8px;">لم يتم تسجيل الحضور اليوم</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">رصيد الإجازات</div>
+      <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+        <div style="text-align:center; flex:1;">
+          <div style="font-size:20px; font-weight:700; color:var(--primary);">١٢</div>
+          <div style="font-size:10px; color:var(--text-secondary);">سنوية</div>
+          <div class="progress-bar"><div class="fill" style="width:60%; background:var(--primary);"></div></div>
+        </div>
+        <div style="text-align:center; flex:1;">
+          <div style="font-size:20px; font-weight:700; color:var(--warning);">٥</div>
+          <div style="font-size:10px; color:var(--text-secondary);">مرضية</div>
+          <div class="progress-bar"><div class="fill" style="width:83%; background:var(--warning);"></div></div>
+        </div>
+        <div style="text-align:center; flex:1;">
+          <div style="font-size:20px; font-weight:700; color:var(--success);">٣</div>
+          <div style="font-size:10px; color:var(--text-secondary);">شخصية</div>
+          <div class="progress-bar"><div class="fill" style="width:100%; background:var(--success);"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">الخدمات</div>
+    <div class="grid-menu">
+      <div class="grid-item"><span class="grid-icon">📋</span><span class="grid-label">الحضور</span></div>
+      <div class="grid-item"><span class="grid-icon">🏖️</span><span class="grid-label">الإجازات</span></div>
+      <div class="grid-item"><span class="grid-icon">💰</span><span class="grid-label">كشف الراتب</span></div>
+      <div class="grid-item"><span class="grid-icon">🧾</span><span class="grid-label">المصروفات</span></div>
+      <div class="grid-item"><span class="grid-icon">🏦</span><span class="grid-label">القروض</span></div>
+      <div class="grid-item"><span class="grid-icon">💵</span><span class="grid-label">سلفة راتب</span></div>
+      <div class="grid-item"><span class="grid-icon">✉️</span><span class="grid-label">خطابات HR</span></div>
+      <div class="grid-item"><span class="grid-icon">📄</span><span class="grid-label">طلب مستندات</span></div>
+      <div class="grid-item"><span class="grid-icon">📜</span><span class="grid-label">شهادات خبرة</span></div>
+      <div class="grid-item"><span class="grid-icon">🔧</span><span class="grid-label">خدمات أعمال</span></div>
+      <div class="grid-item"><span class="grid-icon">✅</span><span class="grid-label">المهام</span></div>
+      <div class="grid-item"><span class="grid-icon">⏱️</span><span class="grid-label">جدول الأوقات</span></div>
+      <div class="grid-item"><span class="grid-icon">👥</span><span class="grid-label">فريقي</span></div>
+      <div class="grid-item"><span class="grid-icon">⚙️</span><span class="grid-label">الإعدادات</span></div>
+      <div class="grid-item"><span class="grid-icon">☰</span><span class="grid-label">المزيد</span></div>
+    </div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item active"><span class="nav-icon">🏠</span>الرئيسية</div>
+    <div class="nav-item"><span class="nav-icon">📋</span>الحضور</div>
+    <div class="nav-item"><span class="nav-icon">🏖️</span>الإجازات</div>
+    <div class="nav-item"><span class="nav-icon">💰</span>الراتب</div>
+    <div class="nav-item"><span class="nav-icon">☰</span>المزيد</div>
+  </div>
+</div>
+
+<!-- ==================== شاشة 4: تسجيل الحضور ==================== -->
+<div class="phone">
+  <div class="screen-label">4. تسجيل الحضور</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">تسجيل الحضور</div>
+  </div>
+  <div class="content" style="text-align:center;">
+    <div style="margin-top:20px;">
+      <div class="checkin-btn" style="width:160px; height:160px; background:#e6f4ea; border-color:var(--success); color:var(--success);">
+        <span style="font-size:40px;">👆</span>
+        <span style="font-size:16px; font-weight:700;">تسجيل حضور</span>
+      </div>
+    </div>
+    <div style="margin-top:16px; font-size:32px; font-weight:700; color:var(--text);">٠٩:٠٠ ص</div>
+    <div style="font-size:13px; color:var(--text-secondary);">الثلاثاء، ١٠ مارس ٢٠٢٦</div>
+
+    <div class="card" style="margin-top:24px; text-align:right;">
+      <div class="card-title">📍 الموقع</div>
+      <div style="background:#e8eaed; height:120px; border-radius:8px; display:flex; align-items:center; justify-content:center; color:var(--text-secondary);">
+        [معاينة الخريطة - الموقع الحالي]
+      </div>
+      <div style="font-size:12px; color:var(--success); margin-top:8px;">✓ داخل النطاق المسموح (المكتب - ٥٠م)</div>
+    </div>
+
+    <div class="card" style="text-align:right;">
+      <div class="input-group" style="margin-bottom:0;">
+        <label>ربط بمهمة (اختياري)</label>
+        <select>
+          <option>-- اختر مهمة --</option>
+          <option>PRJ-001: تطوير تطبيق الموبايل</option>
+          <option>PRJ-002: ربط الـ API</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card" style="text-align:right;">
+      <div class="card-title">😊 كيف حالك اليوم؟</div>
+      <div style="display:flex; justify-content:space-around; font-size:28px;">
+        <span>😄</span><span>🙂</span><span>😐</span><span>😔</span><span>😟</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== شاشة 5: سجل الحضور ==================== -->
+<div class="phone">
+  <div class="screen-label">5. سجل الحضور</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">سجل الحضور</div>
+    <span class="icon">📅</span>
+  </div>
+  <div class="content">
+    <div class="filter-tabs">
+      <div class="filter-tab active">هذا الشهر</div>
+      <div class="filter-tab">الشهر السابق</div>
+      <div class="filter-tab">فترة مخصصة</div>
+    </div>
+
+    <div class="card" style="text-align:center; display:flex; justify-content:space-around;">
+      <div><div style="font-size:20px; font-weight:700; color:var(--success);">٢٢</div><div style="font-size:10px; color:var(--text-secondary);">حاضر</div></div>
+      <div><div style="font-size:20px; font-weight:700; color:var(--danger);">١</div><div style="font-size:10px; color:var(--text-secondary);">غائب</div></div>
+      <div><div style="font-size:20px; font-weight:700; color:var(--warning);">٣</div><div style="font-size:10px; color:var(--text-secondary);">متأخر</div></div>
+      <div><div style="font-size:20px; font-weight:700; color:var(--primary);">١٧٦س</div><div style="font-size:10px; color:var(--text-secondary);">المجموع</div></div>
+    </div>
+
+    <div class="list-item">
+      <div class="item-content">
+        <div class="item-title">الإثنين، ١٠ مارس</div>
+        <div class="item-sub">٠٨:٥٥ ص - ٠٥:١٠ م</div>
+      </div>
+      <div style="text-align:left;">
+        <div style="font-size:14px; font-weight:600; color:var(--success);">٨ س ١٥ د</div>
+        <span class="badge badge-approved">في الوقت</span>
+      </div>
+    </div>
+    <div class="list-item">
+      <div class="item-content">
+        <div class="item-title">الأحد، ٩ مارس</div>
+        <div class="item-sub">٠٩:٢٠ ص - ٠٥:٣٠ م</div>
+      </div>
+      <div style="text-align:left;">
+        <div style="font-size:14px; font-weight:600; color:var(--warning);">٨ س ١٠ د</div>
+        <span class="badge badge-pending">متأخر ٢٠ د</span>
+      </div>
+    </div>
+    <div class="list-item">
+      <div class="item-content">
+        <div class="item-title">السبت، ٨ مارس</div>
+        <div class="item-sub">عطلة نهاية الأسبوع</div>
+      </div>
+      <div><span class="badge badge-draft">عطلة</span></div>
+    </div>
+    <div class="list-item">
+      <div class="item-content">
+        <div class="item-title">الخميس، ٦ مارس</div>
+        <div class="item-sub">٠٩:٠٠ ص - ٠٥:٠٥ م</div>
+      </div>
+      <div style="text-align:left;">
+        <div style="font-size:14px; font-weight:600; color:var(--success);">٨ س ٠٥ د</div>
+        <span class="badge badge-approved">في الوقت</span>
+      </div>
+    </div>
+    <div class="list-item">
+      <div class="item-content">
+        <div class="item-title">الأربعاء، ٥ مارس</div>
+        <div class="item-sub">إجازة سنوية</div>
+      </div>
+      <div><span class="badge" style="background:#e8f0fe; color:var(--primary);">إجازة</span></div>
+    </div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item"><span class="nav-icon">🏠</span>الرئيسية</div>
+    <div class="nav-item active"><span class="nav-icon">📋</span>الحضور</div>
+    <div class="nav-item"><span class="nav-icon">🏖️</span>الإجازات</div>
+    <div class="nav-item"><span class="nav-icon">💰</span>الراتب</div>
+    <div class="nav-item"><span class="nav-icon">☰</span>المزيد</div>
+  </div>
+</div>
+
+<!-- ==================== شاشة 6: رصيد الإجازات ==================== -->
+<div class="phone">
+  <div class="screen-label">6. الإجازات</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">الإجازات</div>
+    <span class="icon">➕</span>
+  </div>
+  <div class="content">
+    <div class="filter-tabs">
+      <div class="filter-tab active">إجازاتي</div>
+      <div class="filter-tab">بانتظار الموافقة</div>
+      <div class="filter-tab">الكل</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">رصيد الإجازات</div>
+      <div style="margin-bottom:12px;">
+        <div style="display:flex; justify-content:space-between; font-size:13px;"><span>إجازة سنوية</span><span style="font-weight:600;">١٢ / ٢١ يوم</span></div>
+        <div class="progress-bar"><div class="fill" style="width:57%; background:var(--primary);"></div></div>
+      </div>
+      <div style="margin-bottom:12px;">
+        <div style="display:flex; justify-content:space-between; font-size:13px;"><span>إجازة مرضية</span><span style="font-weight:600;">٥ / ٦ أيام</span></div>
+        <div class="progress-bar"><div class="fill" style="width:83%; background:var(--warning);"></div></div>
+      </div>
+      <div style="margin-bottom:12px;">
+        <div style="display:flex; justify-content:space-between; font-size:13px;"><span>إجازة شخصية</span><span style="font-weight:600;">٣ / ٣ أيام</span></div>
+        <div class="progress-bar"><div class="fill" style="width:100%; background:var(--success);"></div></div>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; font-size:13px;"><span>إجازة بدون راتب</span><span style="font-weight:600;">بدون حد</span></div>
+        <div class="progress-bar"><div class="fill" style="width:100%; background:#9c27b0;"></div></div>
+      </div>
+    </div>
+
+    <div class="section-title">الطلبات الأخيرة</div>
+    <div class="list-item">
+      <div class="item-content">
+        <div class="item-title">إجازة سنوية</div>
+        <div class="item-sub">٥ مارس - ٥ مارس (يوم واحد)</div>
+      </div>
+      <span class="badge badge-approved">موافق عليها</span>
+    </div>
+    <div class="list-item">
+      <div class="item-content">
+        <div class="item-title">إجازة مرضية</div>
+        <div class="item-sub">٢٠ فبراير (نصف يوم - صباحاً)</div>
+      </div>
+      <span class="badge badge-approved">موافق عليها</span>
+    </div>
+    <div class="list-item">
+      <div class="item-content">
+        <div class="item-title">إجازة سنوية</div>
+        <div class="item-sub">١٥ - ١٧ مارس (٣ أيام)</div>
+      </div>
+      <span class="badge badge-pending">بانتظار الموافقة</span>
+    </div>
+  </div>
+  <div class="fab">+</div>
+  <div class="bottom-nav">
+    <div class="nav-item"><span class="nav-icon">🏠</span>الرئيسية</div>
+    <div class="nav-item"><span class="nav-icon">📋</span>الحضور</div>
+    <div class="nav-item active"><span class="nav-icon">🏖️</span>الإجازات</div>
+    <div class="nav-item"><span class="nav-icon">💰</span>الراتب</div>
+    <div class="nav-item"><span class="nav-icon">☰</span>المزيد</div>
+  </div>
+</div>
+
+<!-- ==================== شاشة 7: طلب إجازة جديد ==================== -->
+<div class="phone">
+  <div class="screen-label">7. طلب إجازة جديد</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">طلب إجازة جديد</div>
+  </div>
+  <div class="content">
+    <div class="input-group">
+      <label>نوع الإجازة *</label>
+      <select>
+        <option>-- اختر نوع الإجازة --</option>
+        <option>إجازة سنوية (١٢ يوم متبقي)</option>
+        <option>إجازة مرضية (٥ أيام متبقية)</option>
+        <option>إجازة شخصية (٣ أيام متبقية)</option>
+        <option>إجازة بدون راتب (بدون حد)</option>
+      </select>
+    </div>
+
+    <div class="input-group">
+      <label>نوع المدة</label>
+      <div style="display:flex; gap:0; background:#e8eaed; border-radius:8px; overflow:hidden;">
+        <div style="flex:1; padding:8px; text-align:center; background:var(--primary); color:#fff; font-size:12px;">يوم كامل</div>
+        <div style="flex:1; padding:8px; text-align:center; font-size:12px; color:var(--text-secondary);">نصف يوم</div>
+        <div style="flex:1; padding:8px; text-align:center; font-size:12px; color:var(--text-secondary);">ساعات</div>
+      </div>
+    </div>
+
+    <div class="input-group">
+      <label>من تاريخ *</label>
+      <input type="date" value="2026-03-15">
+    </div>
+    <div class="input-group">
+      <label>إلى تاريخ *</label>
+      <input type="date" value="2026-03-17">
+    </div>
+
+    <div class="card" style="background:#e8f0fe;">
+      <div style="font-size:13px; color:var(--primary);">📅 سيتم خصم ٣ أيام عمل</div>
+      <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">المتبقي بعد الخصم: ٩ أيام</div>
+    </div>
+
+    <div class="input-group">
+      <label>الوصف *</label>
+      <textarea rows="3" placeholder="سبب الإجازة..."></textarea>
+    </div>
+    <div class="input-group">
+      <label>المرفقات 📎 (مطلوب للإجازة المرضية)</label>
+      <div style="border:2px dashed var(--border); border-radius:8px; padding:20px; text-align:center;">
+        <div style="font-size:24px;">📁</div>
+        <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">اضغط لرفع ملف</div>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:8px; margin-top:16px;">
+      <button class="btn btn-outline" style="flex:1;">حفظ كمسودة</button>
+      <button class="btn btn-primary" style="flex:1;">إرسال الطلب</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== شاشة 8: كشف الراتب ==================== -->
+<div class="phone">
+  <div class="screen-label">8. تفاصيل كشف الراتب</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">فبراير ٢٠٢٦</div>
+    <span class="icon">📤</span>
+    <span class="icon">📥</span>
+  </div>
+  <div class="content">
+    <div class="card">
+      <div style="text-align:center; margin-bottom:12px;">
+        <div style="font-size:28px; font-weight:700; color:var(--success);">٥,٤٥٠.٠٠ ريال</div>
+        <div style="font-size:12px; color:var(--text-secondary);">صافي الراتب</div>
+      </div>
+      <div class="stat-row"><span class="stat-label">الفترة</span><span class="stat-value">١ - ٢٨ فبراير ٢٠٢٦</span></div>
+      <div class="stat-row"><span class="stat-label">الحالة</span><span class="stat-value"><span class="badge badge-approved">مدفوع</span></span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title" style="color:var(--success);">المستحقات</div>
+      <div class="stat-row"><span class="stat-label">الراتب الأساسي</span><span class="stat-value">٤,٠٠٠.٠٠</span></div>
+      <div class="stat-row"><span class="stat-label">بدل سكن</span><span class="stat-value">١,٠٠٠.٠٠</span></div>
+      <div class="stat-row"><span class="stat-label">بدل مواصلات</span><span class="stat-value">٥٠٠.٠٠</span></div>
+      <div class="stat-row"><span class="stat-label">بدل هاتف</span><span class="stat-value">٢٠٠.٠٠</span></div>
+      <div class="separator"></div>
+      <div class="stat-row"><span class="stat-label" style="font-weight:600;">إجمالي المستحقات</span><span class="stat-value" style="color:var(--success);">٥,٧٠٠.٠٠</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title" style="color:var(--danger);">الاستقطاعات</div>
+      <div class="stat-row"><span class="stat-label">التأمينات (٩.٧٥٪)</span><span class="stat-value">-١٩٥.٠٠</span></div>
+      <div class="stat-row"><span class="stat-label">قسط القرض</span><span class="stat-value">-٥٥.٠٠</span></div>
+      <div class="separator"></div>
+      <div class="stat-row"><span class="stat-label" style="font-weight:600;">إجمالي الاستقطاعات</span><span class="stat-value" style="color:var(--danger);">-٢٥٠.٠٠</span></div>
+    </div>
+
+    <div style="display:flex; gap:8px; margin-top:8px;">
+      <button class="btn btn-primary" style="flex:1;">📥 تحميل PDF</button>
+      <button class="btn btn-outline" style="flex:1;">📤 مشاركة</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== شاشة 9: القروض ==================== -->
+<div class="phone">
+  <div class="screen-label">9. طلب قرض جديد</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">طلب قرض جديد</div>
+  </div>
+  <div class="content">
+    <div class="card" style="background:#fef7e0;">
+      <div style="font-size:12px; color:#b06000;">
+        ⚠️ الحد الأقصى: ٢٤,٠٠٠ ريال | أقصى مدة: ٢٤ شهر
+      </div>
+    </div>
+
+    <div class="input-group">
+      <label>عنوان القرض *</label>
+      <input type="text" placeholder="مثال: قرض شخصي">
+    </div>
+    <div class="input-group">
+      <label>مبلغ القرض (ريال) *</label>
+      <input type="number" placeholder="٠.٠٠">
+    </div>
+    <div class="input-group">
+      <label>مبلغ القسط (ريال) *</label>
+      <input type="number" placeholder="يحسب تلقائياً">
+    </div>
+    <div class="input-group">
+      <label>تاريخ بدء السداد *</label>
+      <input type="date">
+    </div>
+    <div class="input-group">
+      <label>تاريخ انتهاء السداد *</label>
+      <input type="date">
+    </div>
+    <div class="input-group">
+      <label>طريقة التحويل *</label>
+      <select>
+        <option>-- اختر الطريقة --</option>
+        <option>تحويل بنكي</option>
+        <option>نقداً</option>
+        <option>شيك</option>
+      </select>
+    </div>
+    <div class="input-group">
+      <label>سبب القرض *</label>
+      <textarea rows="3" placeholder="اشرح سبب طلب القرض..."></textarea>
+    </div>
+
+    <div class="card" style="background:#e6f4ea;">
+      <div class="card-title">سلسلة الموافقات</div>
+      <div style="font-size:12px;">
+        <div>١. المدير ← سارة علي</div>
+        <div>٢. الموارد البشرية ← محمد أحمد</div>
+        <div>٣. المدير التنفيذي ← الموافقة النهائية</div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary">إرسال الطلب</button>
+  </div>
+</div>
+
+<!-- ==================== شاشة 10: سلفة راتب ==================== -->
+<div class="phone">
+  <div class="screen-label">10. سلفة راتب</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">سلفة راتب</div>
+  </div>
+  <div class="content">
+    <div class="card" style="background:#e8f0fe;">
+      <div style="font-size:13px; color:var(--primary);">
+        الحد الأقصى المسموح: <strong>٢,٠٠٠ ريال</strong> (٥٠٪ من الراتب الأساسي)
+      </div>
+    </div>
+
+    <div class="section-title">طلب جديد</div>
+    <div class="input-group">
+      <label>العنوان *</label>
+      <input type="text" placeholder="مثال: سلفة مارس ٢٠٢٦">
+    </div>
+    <div class="input-group">
+      <label>المبلغ (ريال) * (الحد: ٢,٠٠٠)</label>
+      <input type="number" placeholder="٠.٠٠">
+    </div>
+    <div class="input-group">
+      <label>السبب *</label>
+      <textarea rows="3" placeholder="سبب طلب السلفة..."></textarea>
+    </div>
+    <div style="display:flex; gap:8px;">
+      <button class="btn btn-outline" style="flex:1;">حفظ كمسودة</button>
+      <button class="btn btn-primary" style="flex:1;">إرسال</button>
+    </div>
+
+    <div class="separator"></div>
+    <div class="section-title">الطلبات السابقة</div>
+    <div class="list-item">
+      <div class="item-content">
+        <div class="item-title">سلفة - مارس</div>
+        <div class="item-sub">الطلب: ١ مارس | ١,٥٠٠ ريال</div>
+      </div>
+      <span class="badge badge-approved">موافق عليها</span>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== شاشة 11: خطاب HR ==================== -->
+<div class="phone">
+  <div class="screen-label">11. طلب خطاب HR</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">طلب خطاب HR</div>
+  </div>
+  <div class="content">
+    <div class="input-group">
+      <label>عنوان الخطاب *</label>
+      <input type="text" placeholder="مثال: شهادة راتب">
+    </div>
+    <div class="input-group">
+      <label>موجه إلى *</label>
+      <input type="text" placeholder="مثال: السفارة، البنك، إلخ">
+    </div>
+    <div class="input-group">
+      <label>التاريخ المطلوب *</label>
+      <input type="date">
+    </div>
+    <div class="input-group">
+      <label>الغرض *</label>
+      <textarea rows="2" placeholder="الغرض من الخطاب..."></textarea>
+    </div>
+    <div class="input-group">
+      <label>نوع الراتب *</label>
+      <div style="display:flex; gap:0; background:#e8eaed; border-radius:8px; overflow:hidden;">
+        <div style="flex:1; padding:10px; text-align:center; background:var(--primary); color:#fff; font-size:13px;">صافي الراتب</div>
+        <div style="flex:1; padding:10px; text-align:center; font-size:13px; color:var(--text-secondary);">إجمالي الراتب</div>
+      </div>
+    </div>
+    <div style="display:flex; gap:8px; margin-top:16px;">
+      <button class="btn btn-outline" style="flex:1;">حفظ كمسودة</button>
+      <button class="btn btn-primary" style="flex:1;">إرسال</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== شاشة 12: فريقي (المدير) ==================== -->
+<div class="phone">
+  <div class="screen-label">12. فريقي (عرض المدير)</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">فريقي</div>
+  </div>
+  <div class="content">
+    <div class="card" style="display:flex; justify-content:space-around; text-align:center;">
+      <div><div style="font-size:24px; font-weight:700; color:var(--success);">٨</div><div style="font-size:10px;">حاضر</div></div>
+      <div><div style="font-size:24px; font-weight:700; color:var(--danger);">١</div><div style="font-size:10px;">غائب</div></div>
+      <div><div style="font-size:24px; font-weight:700; color:var(--primary);">٢</div><div style="font-size:10px;">في إجازة</div></div>
+      <div><div style="font-size:24px; font-weight:700; color:var(--warning);">٣</div><div style="font-size:10px;">بانتظار</div></div>
+    </div>
+
+    <div class="section-title">أعضاء الفريق</div>
+    <div class="list-item">
+      <div class="avatar" style="width:40px; height:40px; font-size:14px; margin-left:12px; background:var(--success);">أح</div>
+      <div class="item-content">
+        <div class="item-title">أحمد حسن</div>
+        <div class="item-sub">سجل حضور ٠٨:٥٥ ص</div>
+      </div>
+      <span class="badge badge-approved">حاضر</span>
+    </div>
+    <div class="list-item">
+      <div class="avatar" style="width:40px; height:40px; font-size:14px; margin-left:12px; background:var(--success);">فخ</div>
+      <div class="item-content">
+        <div class="item-title">فاطمة خليل</div>
+        <div class="item-sub">سجلت حضور ٠٩:٠٠ ص</div>
+      </div>
+      <span class="badge badge-approved">حاضرة</span>
+    </div>
+    <div class="list-item">
+      <div class="avatar" style="width:40px; height:40px; font-size:14px; margin-left:12px; background:var(--primary);">عر</div>
+      <div class="item-content">
+        <div class="item-title">عمر الراشد</div>
+        <div class="item-sub">إجازة سنوية (١٠-١٢ مارس)</div>
+      </div>
+      <span class="badge" style="background:#e8f0fe; color:var(--primary);">إجازة</span>
+    </div>
+    <div class="list-item">
+      <div class="avatar" style="width:40px; height:40px; font-size:14px; margin-left:12px; background:var(--danger);">نم</div>
+      <div class="item-content">
+        <div class="item-title">نور محمد</div>
+        <div class="item-sub">لم يسجل حضور اليوم</div>
+      </div>
+      <span class="badge badge-refused">غائب</span>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== شاشة 13: الموافقات ==================== -->
+<div class="phone">
+  <div class="screen-label">13. طابور الموافقات (المدير)</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">الموافقات المعلقة</div>
+    <span style="background:#ea4335; color:#fff; border-radius:10px; padding:2px 8px; font-size:11px;">٥</span>
+  </div>
+  <div class="content">
+    <div class="filter-tabs">
+      <div class="filter-tab active">الكل (٥)</div>
+      <div class="filter-tab">إجازات (٢)</div>
+      <div class="filter-tab">مصروفات (١)</div>
+      <div class="filter-tab">قروض (١)</div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:start;">
+        <div>
+          <div style="font-size:10px; color:var(--primary); font-weight:600;">طلب إجازة</div>
+          <div style="font-size:14px; font-weight:600;">أحمد حسن</div>
+          <div style="font-size:12px; color:var(--text-secondary);">إجازة سنوية | ١٥-١٧ مارس (٣ أيام)</div>
+        </div>
+        <span class="badge badge-pending">معلق</span>
+      </div>
+      <div class="approval-actions">
+        <button class="btn btn-success" style="font-size:12px;">✓ موافقة</button>
+        <button class="btn btn-danger" style="font-size:12px;">✗ رفض</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:start;">
+        <div>
+          <div style="font-size:10px; color:var(--warning); font-weight:600;">مصروفات</div>
+          <div style="font-size:14px; font-weight:600;">فاطمة خليل</div>
+          <div style="font-size:12px; color:var(--text-secondary);">مصروف سفر | ٨٥٠ ريال</div>
+        </div>
+        <span class="badge badge-pending">معلق</span>
+      </div>
+      <div class="approval-actions">
+        <button class="btn btn-success" style="font-size:12px;">✓ موافقة</button>
+        <button class="btn btn-danger" style="font-size:12px;">✗ رفض</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:start;">
+        <div>
+          <div style="font-size:10px; color:var(--success); font-weight:600;">قرض (مستوى المدير)</div>
+          <div style="font-size:14px; font-weight:600;">عمر الراشد</div>
+          <div style="font-size:12px; color:var(--text-secondary);">قرض شخصي | ١٠,٠٠٠ ريال | ١٢ شهر</div>
+        </div>
+        <span class="badge badge-pending">معلق</span>
+      </div>
+      <div class="approval-actions">
+        <button class="btn btn-success" style="font-size:12px;">✓ موافقة</button>
+        <button class="btn btn-danger" style="font-size:12px;">✗ رفض</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== شاشة 14: الإعدادات ==================== -->
+<div class="phone">
+  <div class="screen-label">14. الإعدادات</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">الإعدادات</div>
+  </div>
+  <div class="content">
+    <div class="card">
+      <div class="card-title">المظهر</div>
+      <div class="list-item" style="border:none; padding:8px 0;">
+        <div class="item-content"><div class="item-title">🌙 الوضع الداكن</div></div>
+        <div style="width:48px; height:28px; background:#e8eaed; border-radius:14px; position:relative;">
+          <div style="width:24px; height:24px; background:#fff; border-radius:50%; position:absolute; top:2px; right:2px; box-shadow:0 1px 3px rgba(0,0,0,0.2);"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">اللغة / Language</div>
+      <div class="list-item" style="border:none; padding:8px 0;">
+        <div class="item-content">
+          <div class="item-title">🌐 لغة التطبيق</div>
+          <div class="item-sub">الحالية: العربية</div>
+        </div>
+        <span style="color:var(--primary); font-size:13px;">العربية ▾</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">الإشعارات</div>
+      <div class="list-item" style="border:none; padding:8px 0;">
+        <div class="item-content"><div class="item-title">🔔 الإشعارات الفورية</div></div>
+        <div style="width:48px; height:28px; background:var(--primary); border-radius:14px; position:relative;">
+          <div style="width:24px; height:24px; background:#fff; border-radius:50%; position:absolute; top:2px; left:2px;"></div>
+        </div>
+      </div>
+      <div class="list-item" style="border:none; padding:8px 0;">
+        <div class="item-content"><div class="item-title">⏰ تذكير تسجيل الحضور</div><div class="item-sub">٠٨:٥٠ ص يومياً</div></div>
+        <span style="color:var(--primary); font-size:13px;">تعديل ◂</span>
+      </div>
+      <div class="list-item" style="border:none; padding:8px 0;">
+        <div class="item-content"><div class="item-title">⏰ تذكير تسجيل الانصراف</div><div class="item-sub">٠٥:٠٠ م يومياً</div></div>
+        <span style="color:var(--primary); font-size:13px;">تعديل ◂</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">الأمان</div>
+      <div class="list-item" style="border:none; padding:8px 0;">
+        <div class="item-content"><div class="item-title">👆 تسجيل بالبصمة</div><div class="item-sub">البصمة / التعرف على الوجه</div></div>
+        <div style="width:48px; height:28px; background:var(--primary); border-radius:14px; position:relative;">
+          <div style="width:24px; height:24px; background:#fff; border-radius:50%; position:absolute; top:2px; left:2px;"></div>
+        </div>
+      </div>
+      <div class="list-item" style="border:none; padding:8px 0;">
+        <div class="item-content"><div class="item-title">📸 التعرف على الوجه</div><div class="item-sub">لتسجيل الحضور</div></div>
+        <span style="color:var(--primary); font-size:13px;">إعداد ◂</span>
+      </div>
+      <div class="list-item" style="border:none; padding:8px 0;">
+        <div class="item-content"><div class="item-title">🔒 تغيير الرقم السري</div></div>
+        <span style="color:var(--primary); font-size:13px;">◂</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">حول التطبيق</div>
+      <div class="stat-row"><span class="stat-label">إصدار التطبيق</span><span class="stat-value">١.٠.٠</span></div>
+      <div class="stat-row"><span class="stat-label">الشركة</span><span class="stat-value">شركة ABC</span></div>
+      <div class="stat-row"><span class="stat-label">الرخصة</span><span class="stat-value">بريميوم</span></div>
+      <div class="stat-row"><span class="stat-label">تنتهي في</span><span class="stat-value">١٠ مارس ٢٠٢٧</span></div>
+    </div>
+
+    <button class="btn btn-danger" style="margin-top:8px;">🚪 تسجيل الخروج</button>
+  </div>
+</div>
+
+<!-- ==================== شاشة 15: الإعلانات ==================== -->
+<div class="phone">
+  <div class="screen-label">15. الإعلانات</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">الإعلانات</div>
+  </div>
+  <div class="content">
+    <div class="card" style="border-right:4px solid var(--danger);">
+      <div style="font-size:10px; color:var(--danger); font-weight:600;">عاجل</div>
+      <div class="card-title">إغلاق المكتب - اليوم الوطني</div>
+      <div style="font-size:12px; color:var(--text-secondary); margin-bottom:8px;">
+        يرجى العلم أن المكتب سيكون مغلقاً يوم ٢٣ مارس بمناسبة اليوم الوطني. يرجى إنهاء المهام المعلقة قبل الإجازة.
+      </div>
+      <div style="font-size:11px; color:var(--text-secondary);">📅 ٩ مارس ٢٠٢٦ | قسم الموارد البشرية</div>
+    </div>
+
+    <div class="card" style="border-right:4px solid var(--primary);">
+      <div style="font-size:10px; color:var(--primary); font-weight:600;">معلومات</div>
+      <div class="card-title">مزود تأمين صحي جديد</div>
+      <div style="font-size:12px; color:var(--text-secondary); margin-bottom:8px;">
+        يسرنا الإعلان عن شراكتنا الجديدة للتأمين الصحي. سيتم توزيع البطاقات المحدثة الأسبوع القادم.
+      </div>
+      <div style="font-size:11px; color:var(--text-secondary);">📅 ٥ مارس ٢٠٢٦ | قسم الموارد البشرية</div>
+    </div>
+
+    <div class="card" style="border-right:4px solid var(--success);">
+      <div style="font-size:10px; color:var(--success); font-weight:600;">عام</div>
+      <div class="card-title">اجتماع الربع الأول</div>
+      <div style="font-size:12px; color:var(--text-secondary); margin-bottom:8px;">
+        انضموا إلينا في الاجتماع الربعي يوم ٢٠ مارس الساعة ١٠ صباحاً في قاعة المؤتمرات الرئيسية.
+      </div>
+      <div style="font-size:11px; color:var(--text-secondary);">📅 ١ مارس ٢٠٢٦ | مكتب المدير التنفيذي</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== شاشة 16: المحادثة مع HR ==================== -->
+<div class="phone">
+  <div class="screen-label">16. محادثة مع الموارد البشرية</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">تحدث مع HR</div>
+    <span style="font-size:12px; color:rgba(255,255,255,0.7);">متصل</span>
+  </div>
+  <div class="content" style="display:flex; flex-direction:column; padding:8px 16px;">
+    <div style="flex:1; overflow-y:auto;">
+      <div style="text-align:center; font-size:11px; color:var(--text-secondary); margin:8px 0;">اليوم، ٠٩:١٥ ص</div>
+
+      <div style="display:flex; justify-content:flex-start; margin-bottom:8px;">
+        <div style="background:var(--primary); color:#fff; padding:10px 14px; border-radius:16px 16px 16px 4px; max-width:70%; font-size:13px;">
+          مرحباً، أحتاج تحديث بيانات حسابي البنكي لتحويل الراتب. كيف يمكنني ذلك؟
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; margin-bottom:8px;">
+        <div style="background:#fff; padding:10px 14px; border-radius:16px 16px 4px 16px; max-width:70%; font-size:13px; box-shadow:0 1px 2px rgba(0,0,0,0.1);">
+          مرحباً أحمد! يرجى تقديم طلب مستند لـ "تحديث البيانات البنكية" مع إرفاق شهادة الحساب الجديد. سنقوم بالمعالجة خلال يومي عمل.
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:flex-start; margin-bottom:8px;">
+        <div style="background:var(--primary); color:#fff; padding:10px 14px; border-radius:16px 16px 16px 4px; max-width:70%; font-size:13px;">
+          شكراً! سأقوم بذلك الآن.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="padding:8px 16px; background:#fff; border-top:1px solid var(--border); display:flex; gap:8px;">
+    <div style="width:36px; height:36px; border-radius:50%; background:var(--primary); color:#fff; display:flex; align-items:center; justify-content:center;">➤</div>
+    <input type="text" placeholder="اكتب رسالة..." style="flex:1; border:1px solid var(--border); border-radius:20px; padding:8px 16px; font-size:13px; direction:rtl;">
+    <div style="width:36px; height:36px; border-radius:50%; background:#f0f0f0; display:flex; align-items:center; justify-content:center;">📎</div>
+  </div>
+</div>
+
+<!-- ==================== شاشة 17: كشف الحضور الشهري ==================== -->
+<div class="phone">
+  <div class="screen-label">17. كشف الحضور الشهري</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">كشف الحضور</div>
+    <span class="icon">◀</span>
+    <span class="icon">▶</span>
+  </div>
+  <div class="content">
+    <div class="card">
+      <div style="text-align:center; margin-bottom:12px;">
+        <div style="font-size:16px; font-weight:600;">مارس ٢٠٢٦</div>
+        <div style="font-size:12px; color:var(--text-secondary);">الحالة: <span class="badge badge-approved">مؤكد</span></div>
+      </div>
+
+      <div style="font-size:11px; overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse; font-size:11px;">
+          <tr style="background:#f5f7fa;">
+            <th style="padding:6px; text-align:right; border-bottom:1px solid var(--border);">اليوم</th>
+            <th style="padding:6px; text-align:center; border-bottom:1px solid var(--border);">دخول</th>
+            <th style="padding:6px; text-align:center; border-bottom:1px solid var(--border);">خروج</th>
+            <th style="padding:6px; text-align:center; border-bottom:1px solid var(--border);">ساعات</th>
+            <th style="padding:6px; text-align:center; border-bottom:1px solid var(--border);">الحالة</th>
+          </tr>
+          <tr><td style="padding:6px;">إثنين ١</td><td style="padding:6px; text-align:center;">٠٨:٥٥</td><td style="padding:6px; text-align:center;">١٧:١٠</td><td style="padding:6px; text-align:center;">٨:١٥</td><td style="padding:6px; text-align:center;"><span style="color:var(--success);">✓</span></td></tr>
+          <tr style="background:#f9f9f9;"><td style="padding:6px;">ثلاثاء ٢</td><td style="padding:6px; text-align:center;">٠٩:٠٥</td><td style="padding:6px; text-align:center;">١٧:٠٠</td><td style="padding:6px; text-align:center;">٧:٥٥</td><td style="padding:6px; text-align:center;"><span style="color:var(--success);">✓</span></td></tr>
+          <tr><td style="padding:6px;">أربعاء ٣</td><td style="padding:6px; text-align:center;">—</td><td style="padding:6px; text-align:center;">—</td><td style="padding:6px; text-align:center;">—</td><td style="padding:6px; text-align:center;"><span style="color:var(--primary);">إجازة</span></td></tr>
+          <tr style="background:#f9f9f9;"><td style="padding:6px;">خميس ٤</td><td style="padding:6px; text-align:center;">٠٨:٥٠</td><td style="padding:6px; text-align:center;">١٧:١٥</td><td style="padding:6px; text-align:center;">٨:٢٥</td><td style="padding:6px; text-align:center;"><span style="color:var(--success);">✓</span></td></tr>
+          <tr><td style="padding:6px;">جمعة ٥</td><td style="padding:6px; text-align:center;">—</td><td style="padding:6px; text-align:center;">—</td><td style="padding:6px; text-align:center;">—</td><td style="padding:6px; text-align:center;"><span style="color:#999;">ع.أ</span></td></tr>
+          <tr style="background:#f9f9f9;"><td style="padding:6px;">سبت ٦</td><td style="padding:6px; text-align:center;">—</td><td style="padding:6px; text-align:center;">—</td><td style="padding:6px; text-align:center;">—</td><td style="padding:6px; text-align:center;"><span style="color:#999;">ع.أ</span></td></tr>
+          <tr><td style="padding:6px;">أحد ٧</td><td style="padding:6px; text-align:center;">٠٩:٢٠</td><td style="padding:6px; text-align:center;">١٧:٣٠</td><td style="padding:6px; text-align:center;">٨:١٠</td><td style="padding:6px; text-align:center;"><span style="color:var(--warning);">متأخر</span></td></tr>
+          <tr style="background:#f9f9f9;"><td style="padding:6px;">إثنين ٨</td><td style="padding:6px; text-align:center;">—</td><td style="padding:6px; text-align:center;">—</td><td style="padding:6px; text-align:center;">—</td><td style="padding:6px; text-align:center;"><span style="color:var(--danger);">غياب</span></td></tr>
+          <tr><td style="padding:6px;">ثلاثاء ٩</td><td style="padding:6px; text-align:center;">—</td><td style="padding:6px; text-align:center;">—</td><td style="padding:6px; text-align:center;">—</td><td style="padding:6px; text-align:center;"><span style="color:#9c27b0;">ع.ر</span></td></tr>
+        </table>
+      </div>
+
+      <div class="separator"></div>
+      <div style="display:flex; justify-content:space-around; font-size:11px; text-align:center;">
+        <div><span style="color:var(--success);">✓</span> حاضر</div>
+        <div><span style="color:var(--danger);">غياب</span></div>
+        <div><span style="color:#999;">ع.أ</span> عطلة</div>
+        <div><span style="color:#9c27b0;">ع.ر</span> إجازة رسمية</div>
+        <div><span style="color:var(--primary);">إجازة</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">الملخص</div>
+      <div class="stat-row"><span class="stat-label">أيام العمل</span><span class="stat-value">٢٢</span></div>
+      <div class="stat-row"><span class="stat-label">حاضر</span><span class="stat-value" style="color:var(--success);">١٩</span></div>
+      <div class="stat-row"><span class="stat-label">غائب</span><span class="stat-value" style="color:var(--danger);">١</span></div>
+      <div class="stat-row"><span class="stat-label">إجازات</span><span class="stat-value" style="color:var(--primary);">١</span></div>
+      <div class="stat-row"><span class="stat-label">إجازات رسمية</span><span class="stat-value">١</span></div>
+      <div class="stat-row"><span class="stat-label">إجمالي الساعات</span><span class="stat-value">١٥٢ س ٣٠ د</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== شاشة 18: تفاصيل طلب إجازة (عرض المدير) ==================== -->
+<div class="phone">
+  <div class="screen-label">18. تفاصيل الإجازة (عرض المدير)</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">طلب إجازة</div>
+  </div>
+  <div class="content">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <div style="font-size:16px; font-weight:600;">إجازة سنوية</div>
+        <span class="badge badge-pending">بانتظار الموافقة</span>
+      </div>
+      <div class="stat-row"><span class="stat-label">الموظف</span><span class="stat-value">أحمد حسن</span></div>
+      <div class="stat-row"><span class="stat-label">القسم</span><span class="stat-value">قسم تقنية المعلومات</span></div>
+      <div class="stat-row"><span class="stat-label">من تاريخ</span><span class="stat-value">١٥ مارس ٢٠٢٦</span></div>
+      <div class="stat-row"><span class="stat-label">إلى تاريخ</span><span class="stat-value">١٧ مارس ٢٠٢٦</span></div>
+      <div class="stat-row"><span class="stat-label">المدة</span><span class="stat-value">٣ أيام</span></div>
+      <div class="stat-row"><span class="stat-label">النوع</span><span class="stat-value">يوم كامل</span></div>
+      <div class="separator"></div>
+      <div style="font-size:13px; color:var(--text-secondary);">
+        <strong>الوصف:</strong> إجازة عائلية - سفر مخطط مسبقاً
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">مسار الموافقة</div>
+      <div class="timeline">
+        <div class="timeline-item done">
+          <div style="font-size:13px; font-weight:500;">تم الإرسال</div>
+          <div style="font-size:11px; color:var(--text-secondary);">بواسطة أحمد حسن - ١٠ مارس، ٠٩:١٥ ص</div>
+        </div>
+        <div class="timeline-item" style="padding-bottom:0;">
+          <div style="font-size:13px; font-weight:500;">موافقة المدير</div>
+          <div style="font-size:11px; color:var(--text-secondary);">بانتظار - سارة علي</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="border:2px solid var(--primary);">
+      <div class="card-title">إجراءات المدير</div>
+      <div class="approval-actions">
+        <button class="btn btn-success">✓ موافقة</button>
+        <button class="btn btn-danger">✗ رفض</button>
+      </div>
+      <div class="input-group" style="margin-top:8px; margin-bottom:0;">
+        <textarea rows="2" placeholder="تعليق (اختياري)..."></textarea>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:8px; font-size:12px; justify-content:center; color:var(--text-secondary);">
+      <span>السابق ▶</span>
+      <span>|</span>
+      <span>◀ التالي</span>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== شاشة 19: قائمة كشوف الرواتب ==================== -->
+<div class="phone">
+  <div class="screen-label">19. قائمة كشوف الرواتب</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">كشوف الرواتب</div>
+  </div>
+  <div class="content">
+    <div class="filter-tabs">
+      <div class="filter-tab active">الكل</div>
+      <div class="filter-tab">هذه السنة</div>
+      <div class="filter-tab">السنة الماضية</div>
+    </div>
+
+    <div class="list-item" style="cursor:pointer;">
+      <div style="font-size:24px; margin-left:12px;">💰</div>
+      <div class="item-content">
+        <div class="item-title">فبراير ٢٠٢٦</div>
+        <div class="item-sub">١ - ٢٨ فبراير ٢٠٢٦</div>
+      </div>
+      <div style="text-align:left;">
+        <div style="font-size:14px; font-weight:700; color:var(--success);">٥,٤٥٠ ريال</div>
+        <span class="badge badge-approved">مدفوع</span>
+      </div>
+    </div>
+    <div class="list-item" style="cursor:pointer;">
+      <div style="font-size:24px; margin-left:12px;">💰</div>
+      <div class="item-content">
+        <div class="item-title">يناير ٢٠٢٦</div>
+        <div class="item-sub">١ - ٣١ يناير ٢٠٢٦</div>
+      </div>
+      <div style="text-align:left;">
+        <div style="font-size:14px; font-weight:700; color:var(--success);">٥,٤٥٠ ريال</div>
+        <span class="badge badge-approved">مدفوع</span>
+      </div>
+    </div>
+    <div class="list-item" style="cursor:pointer;">
+      <div style="font-size:24px; margin-left:12px;">💰</div>
+      <div class="item-content">
+        <div class="item-title">ديسمبر ٢٠٢٥</div>
+        <div class="item-sub">١ - ٣١ ديسمبر ٢٠٢٥</div>
+      </div>
+      <div style="text-align:left;">
+        <div style="font-size:14px; font-weight:700; color:var(--success);">٥,٤٥٠ ريال</div>
+        <span class="badge badge-approved">مدفوع</span>
+      </div>
+    </div>
+    <div class="list-item" style="cursor:pointer;">
+      <div style="font-size:24px; margin-left:12px;">💰</div>
+      <div class="item-content">
+        <div class="item-title">نوفمبر ٢٠٢٥</div>
+        <div class="item-sub">١ - ٣٠ نوفمبر ٢٠٢٥</div>
+      </div>
+      <div style="text-align:left;">
+        <div style="font-size:14px; font-weight:700; color:var(--success);">٥,٦٨٠ ريال</div>
+        <span class="badge badge-approved">مدفوع</span>
+      </div>
+    </div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item"><span class="nav-icon">🏠</span>الرئيسية</div>
+    <div class="nav-item"><span class="nav-icon">📋</span>الحضور</div>
+    <div class="nav-item"><span class="nav-icon">🏖️</span>الإجازات</div>
+    <div class="nav-item active"><span class="nav-icon">💰</span>الراتب</div>
+    <div class="nav-item"><span class="nav-icon">☰</span>المزيد</div>
+  </div>
+</div>
+
+<!-- ==================== شاشة 20: قائمة المصروفات ==================== -->
+<div class="phone">
+  <div class="screen-label">20. قائمة المصروفات</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">المصروفات</div>
+  </div>
+  <div class="content">
+    <div class="filter-tabs">
+      <div class="filter-tab active">مصروفاتي</div>
+      <div class="filter-tab">مسودات</div>
+      <div class="filter-tab">الكل</div>
+    </div>
+
+    <div class="list-item">
+      <div class="item-content">
+        <div class="item-title">اجتماع عميل - غداء</div>
+        <div class="item-sub">٨ مارس ٢٠٢٦ | وجبات</div>
+      </div>
+      <div style="text-align:left;">
+        <div style="font-size:14px; font-weight:600;">١٥٠ ريال</div>
+        <span class="badge badge-approved">موافق عليه</span>
+      </div>
+    </div>
+    <div class="list-item">
+      <div class="item-content">
+        <div class="item-title">تاكسي إلى المطار</div>
+        <div class="item-sub">٥ مارس ٢٠٢٦ | سفر</div>
+      </div>
+      <div style="text-align:left;">
+        <div style="font-size:14px; font-weight:600;">٨٥ ريال</div>
+        <span class="badge badge-pending">مرسل</span>
+      </div>
+    </div>
+    <div class="list-item">
+      <div class="item-content">
+        <div class="item-title">مستلزمات مكتبية</div>
+        <div class="item-sub">١ مارس ٢٠٢٦ | مستلزمات</div>
+      </div>
+      <div style="text-align:left;">
+        <div style="font-size:14px; font-weight:600;">٢٢٠ ريال</div>
+        <span class="badge badge-draft">مسودة</span>
+      </div>
+    </div>
+  </div>
+  <div class="fab">+</div>
+</div>
+
+<!-- ==================== شاشة 21: إنشاء مصروف جديد ==================== -->
+<div class="phone">
+  <div class="screen-label">21. إنشاء مصروف جديد</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">مصروف جديد</div>
+  </div>
+  <div class="content">
+    <div class="input-group">
+      <label>الوصف *</label>
+      <input type="text" placeholder="مثال: غداء اجتماع عميل">
+    </div>
+    <div class="input-group">
+      <label>الفئة *</label>
+      <select>
+        <option>-- اختر الفئة --</option>
+        <option>سفر</option>
+        <option>وجبات</option>
+        <option>وقود</option>
+        <option>مستلزمات مكتبية</option>
+        <option>اتصالات</option>
+      </select>
+    </div>
+    <div style="display:flex; gap:8px;">
+      <div class="input-group" style="flex:2;">
+        <label>المبلغ *</label>
+        <input type="number" placeholder="٠.٠٠">
+      </div>
+      <div class="input-group" style="flex:1;">
+        <label>العملة</label>
+        <select><option>ريال</option><option>دولار</option><option>يورو</option></select>
+      </div>
+    </div>
+    <div class="input-group">
+      <label>التاريخ *</label>
+      <input type="date" value="2026-03-10">
+    </div>
+    <div class="input-group">
+      <label>الكمية</label>
+      <input type="number" value="1" min="1">
+    </div>
+    <div class="input-group">
+      <label>الضريبة</label>
+      <select><option>بدون ضريبة</option><option>ضريبة القيمة المضافة ١٥٪</option><option>ضريبة القيمة المضافة ٥٪</option></select>
+    </div>
+    <div class="input-group">
+      <label>طريقة الدفع</label>
+      <select><option>الموظف (يسترد لاحقاً)</option><option>الشركة</option></select>
+    </div>
+    <div class="input-group">
+      <label>الإيصال 📎</label>
+      <div style="border:2px dashed var(--border); border-radius:8px; padding:16px; text-align:center;">
+        <div style="font-size:20px;">📷</div>
+        <div style="font-size:12px; color:var(--text-secondary);">التقط صورة أو ارفع ملف</div>
+      </div>
+    </div>
+    <div class="input-group">
+      <label>ملاحظات</label>
+      <textarea rows="2" placeholder="تفاصيل إضافية..."></textarea>
+    </div>
+    <div style="display:flex; gap:8px;">
+      <button class="btn btn-outline" style="flex:1;">حفظ كمسودة</button>
+      <button class="btn btn-primary" style="flex:1;">إرسال</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== شاشة 22: قائمة القروض ==================== -->
+<div class="phone">
+  <div class="screen-label">22. قائمة القروض</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">القروض</div>
+  </div>
+  <div class="content">
+    <div class="card" style="background:#e8f0fe;">
+      <div style="font-size:13px; color:var(--primary);">
+        💡 الحد الأقصى للقرض: <strong>٢٤,٠٠٠ ريال</strong> (حسب العقد)
+      </div>
+      <div style="font-size:11px; color:var(--text-secondary); margin-top:4px;">
+        مؤهل للتقديم | تم استيفاء الحد الأدنى لفترة التوظيف
+      </div>
+    </div>
+
+    <div class="list-item">
+      <div class="item-content">
+        <div class="item-title">قرض شخصي</div>
+        <div class="item-sub">التقديم: ١٥ فبراير ٢٠٢٦ | ١٠,٠٠٠ ريال</div>
+        <div class="item-sub">١٢ قسط بمبلغ ٨٣٣ ريال</div>
+      </div>
+      <span class="badge badge-approved">موافق عليه</span>
+    </div>
+    <div class="list-item">
+      <div class="item-content">
+        <div class="item-title">قرض طوارئ</div>
+        <div class="item-sub">التقديم: ٨ مارس ٢٠٢٦ | ٥,٠٠٠ ريال</div>
+        <div class="item-sub">٦ أقساط بمبلغ ٨٣٣ ريال</div>
+      </div>
+      <span class="badge badge-pending">مراجعة HR</span>
+    </div>
+  </div>
+  <div class="fab">+</div>
+</div>
+
+<!-- ==================== شاشة 23: طلب مستندات ==================== -->
+<div class="phone">
+  <div class="screen-label">23. طلب مستندات</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">طلب مستندات</div>
+  </div>
+  <div class="content">
+    <div class="section-title">طلب مستند جديد</div>
+    <div class="input-group">
+      <label>عنوان الطلب *</label>
+      <input type="text" placeholder="مثال: نسخة جواز السفر">
+    </div>
+    <div class="input-group">
+      <label>نوع المستند *</label>
+      <select>
+        <option>-- اختر النوع --</option>
+        <option>نسخة جواز السفر</option>
+        <option>نسخة الهوية</option>
+        <option>نسخة العقد</option>
+        <option>بطاقة التأمين</option>
+        <option>أخرى</option>
+      </select>
+    </div>
+    <div class="input-group">
+      <label>تاريخ الإرجاع</label>
+      <input type="date">
+    </div>
+    <div class="input-group">
+      <label>السبب *</label>
+      <textarea rows="3" placeholder="لماذا تحتاج هذا المستند..."></textarea>
+    </div>
+    <div style="display:flex; gap:8px;">
+      <button class="btn btn-outline" style="flex:1;">حفظ كمسودة</button>
+      <button class="btn btn-primary" style="flex:1;">إرسال</button>
+    </div>
+
+    <div class="separator"></div>
+    <div class="section-title">الطلبات السابقة</div>
+    <div class="list-item">
+      <div class="item-content">
+        <div class="item-title">استلام جواز السفر</div>
+        <div class="item-sub">١ مارس ٢٠٢٦ | نسخة جواز | الإرجاع: ١٥ مارس</div>
+      </div>
+      <span class="badge badge-pending">مرسل</span>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== شاشة 24: شهادة خبرة ==================== -->
+<div class="phone">
+  <div class="screen-label">24. طلب شهادة خبرة</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">شهادة خبرة</div>
+  </div>
+  <div class="content">
+    <div class="section-title">طلب شهادة جديد</div>
+    <div class="input-group">
+      <label>العنوان *</label>
+      <input type="text" placeholder="مثال: شهادة خبرة وظيفية">
+    </div>
+    <div class="input-group">
+      <label>موجهة إلى *</label>
+      <input type="text" placeholder="مثال: اسم جهة العمل الجديدة">
+    </div>
+    <div class="input-group">
+      <label>التاريخ المطلوب *</label>
+      <input type="date">
+    </div>
+    <div class="input-group">
+      <label>الغرض *</label>
+      <textarea rows="3" placeholder="الغرض من الشهادة..."></textarea>
+    </div>
+    <div style="display:flex; gap:8px;">
+      <button class="btn btn-outline" style="flex:1;">حفظ كمسودة</button>
+      <button class="btn btn-primary" style="flex:1;">إرسال</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== شاشة 25: طلب خدمة أعمال ==================== -->
+<div class="phone">
+  <div class="screen-label">25. طلب خدمة أعمال</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">خدمة أعمال</div>
+  </div>
+  <div class="content">
+    <div class="section-title">طلب خدمة جديد</div>
+    <div class="input-group">
+      <label>العنوان *</label>
+      <input type="text" placeholder="مثال: طلب بطاقات عمل">
+    </div>
+    <div class="input-group">
+      <label>نوع الخدمة *</label>
+      <select>
+        <option>-- اختر الخدمة --</option>
+        <option>بطاقات عمل</option>
+        <option>أجهزة تقنية</option>
+        <option>مستلزمات مكتبية</option>
+        <option>طلب مركبة</option>
+        <option>حجز قاعة اجتماعات</option>
+      </select>
+    </div>
+    <div class="input-group">
+      <label>التاريخ المطلوب *</label>
+      <input type="date">
+    </div>
+    <div class="input-group">
+      <label>السبب *</label>
+      <textarea rows="3" placeholder="اشرح ما تحتاجه..."></textarea>
+    </div>
+    <div style="display:flex; gap:8px;">
+      <button class="btn btn-outline" style="flex:1;">حفظ كمسودة</button>
+      <button class="btn btn-primary" style="flex:1;">إرسال</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== شاشة 26: الملف الشخصي ==================== -->
+<div class="phone">
+  <div class="screen-label">26. الملف الشخصي</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">ملفي الشخصي</div>
+  </div>
+  <div class="content">
+    <div style="text-align:center; margin-bottom:16px;">
+      <div class="avatar" style="width:80px; height:80px; font-size:32px; margin:0 auto 8px;">أح</div>
+      <div style="font-size:18px; font-weight:600;">أحمد حسن</div>
+      <div style="font-size:13px; color:var(--text-secondary);">مهندس برمجيات</div>
+      <div style="font-size:12px; color:var(--text-secondary);">البطاقة: EMP-045</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">معلومات العمل</div>
+      <div class="stat-row"><span class="stat-label">القسم</span><span class="stat-value">قسم تقنية المعلومات</span></div>
+      <div class="stat-row"><span class="stat-label">المدير</span><span class="stat-value">سارة علي</span></div>
+      <div class="stat-row"><span class="stat-label">الشركة</span><span class="stat-value">شركة ABC</span></div>
+      <div class="stat-row"><span class="stat-label">تاريخ الالتحاق</span><span class="stat-value">١٥ يناير ٢٠٢٣</span></div>
+      <div class="stat-row"><span class="stat-label">البريد الإلكتروني</span><span class="stat-value" style="direction:ltr;">ahmed@abc.com</span></div>
+      <div class="stat-row"><span class="stat-label">هاتف العمل</span><span class="stat-value" style="direction:ltr;">+966 5XX XXX XXX</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">المعلومات الشخصية</div>
+      <div class="stat-row"><span class="stat-label">الجنسية</span><span class="stat-value">سعودي</span></div>
+      <div class="stat-row"><span class="stat-label">الحالة الاجتماعية</span><span class="stat-value">متزوج</span></div>
+      <div class="stat-row"><span class="stat-label">المعالين</span><span class="stat-value">٢ أطفال</span></div>
+      <div class="stat-row"><span class="stat-label">رقم الهوية</span><span class="stat-value" style="direction:ltr;">1XXX XXX XXX</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">العقد</div>
+      <div class="stat-row"><span class="stat-label">نوع العقد</span><span class="stat-value">دوام كامل</span></div>
+      <div class="stat-row"><span class="stat-label">تاريخ البداية</span><span class="stat-value">١٥ يناير ٢٠٢٣</span></div>
+      <div class="stat-row"><span class="stat-label">الراتب الأساسي</span><span class="stat-value">٤,٠٠٠ ريال</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== شاشة 27: الإشعارات ==================== -->
+<div class="phone">
+  <div class="screen-label">27. مركز الإشعارات</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">الإشعارات</div>
+    <span style="font-size:12px; color:rgba(255,255,255,0.7);">تعيين الكل كمقروء</span>
+  </div>
+  <div class="content">
+    <div class="list-item" style="background:#e8f0fe;">
+      <div style="font-size:20px; margin-left:12px;">✅</div>
+      <div class="item-content">
+        <div class="item-title">تمت الموافقة على الإجازة</div>
+        <div class="item-sub">تمت الموافقة على إجازتك السنوية (٥ مارس) بواسطة سارة علي</div>
+        <div style="font-size:10px; color:var(--text-secondary); margin-top:4px;">منذ ساعتين</div>
+      </div>
+    </div>
+    <div class="list-item" style="background:#e8f0fe;">
+      <div style="font-size:20px; margin-left:12px;">📢</div>
+      <div class="item-content">
+        <div class="item-title">إعلان جديد</div>
+        <div class="item-sub">إغلاق المكتب - اليوم الوطني</div>
+        <div style="font-size:10px; color:var(--text-secondary); margin-top:4px;">منذ ٥ ساعات</div>
+      </div>
+    </div>
+    <div class="list-item">
+      <div style="font-size:20px; margin-left:12px;">💰</div>
+      <div class="item-content">
+        <div class="item-title">كشف الراتب متاح</div>
+        <div class="item-sub">كشف راتب فبراير ٢٠٢٦ متاح الآن</div>
+        <div style="font-size:10px; color:var(--text-secondary); margin-top:4px;">منذ يومين</div>
+      </div>
+    </div>
+    <div class="list-item">
+      <div style="font-size:20px; margin-left:12px;">🏦</div>
+      <div class="item-content">
+        <div class="item-title">القرض - موافقة المدير</div>
+        <div class="item-sub">تمت موافقة المدير على طلب القرض. بانتظار مراجعة الموارد البشرية.</div>
+        <div style="font-size:10px; color:var(--text-secondary); margin-top:4px;">منذ ٣ أيام</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== شاشة 28: التقويم ==================== -->
+<div class="phone">
+  <div class="screen-label">28. عرض التقويم</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">تقويمي</div>
+  </div>
+  <div class="content">
+    <div class="card">
+      <div style="text-align:center; margin-bottom:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span>▶</span>
+          <span style="font-size:16px; font-weight:600;">مارس ٢٠٢٦</span>
+          <span>◀</span>
+        </div>
+      </div>
+      <table style="width:100%; text-align:center; font-size:12px;">
+        <tr style="color:var(--text-secondary);"><td>أح</td><td>إث</td><td>ثل</td><td>أر</td><td>خم</td><td style="color:var(--danger);">جم</td><td style="color:var(--danger);">سب</td></tr>
+        <tr><td style="padding:8px;">١</td><td style="padding:8px; background:#e6f4ea; border-radius:50%;">٢</td><td style="padding:8px; background:#e6f4ea; border-radius:50%;">٣</td><td style="padding:8px; background:#e6f4ea; border-radius:50%;">٤</td><td style="padding:8px; background:#e8f0fe; border-radius:50%; color:var(--primary);">٥</td><td style="padding:8px; color:#ccc;">٦</td><td style="padding:8px; color:#ccc;">٧</td></tr>
+        <tr><td style="padding:8px; background:#e6f4ea; border-radius:50%;">٨</td><td style="padding:8px; background:#fce8e6; border-radius:50%; color:var(--danger);">٩</td><td style="padding:8px; background:var(--primary); color:#fff; border-radius:50%; font-weight:700;">١٠</td><td style="padding:8px;">١١</td><td style="padding:8px;">١٢</td><td style="padding:8px; color:#ccc;">١٣</td><td style="padding:8px; color:#ccc;">١٤</td></tr>
+        <tr><td style="padding:8px; background:#e8f0fe; border-radius:50%;">١٥</td><td style="padding:8px; background:#e8f0fe; border-radius:50%;">١٦</td><td style="padding:8px; background:#e8f0fe; border-radius:50%;">١٧</td><td style="padding:8px;">١٨</td><td style="padding:8px;">١٩</td><td style="padding:8px; color:#ccc;">٢٠</td><td style="padding:8px; color:#ccc;">٢١</td></tr>
+        <tr><td style="padding:8px;">٢٢</td><td style="padding:8px; background:#f3e5f5; border-radius:50%; color:#9c27b0;">٢٣</td><td style="padding:8px;">٢٤</td><td style="padding:8px;">٢٥</td><td style="padding:8px;">٢٦</td><td style="padding:8px; color:#ccc;">٢٧</td><td style="padding:8px; color:#ccc;">٢٨</td></tr>
+        <tr><td style="padding:8px;">٢٩</td><td style="padding:8px;">٣٠</td><td style="padding:8px;">٣١</td><td></td><td></td><td></td><td></td></tr>
+      </table>
+
+      <div class="separator"></div>
+      <div style="display:flex; flex-wrap:wrap; gap:8px; font-size:10px;">
+        <div><span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#e6f4ea;"></span> حاضر</div>
+        <div><span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#fce8e6;"></span> غائب</div>
+        <div><span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#e8f0fe;"></span> إجازة</div>
+        <div><span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#f3e5f5;"></span> عطلة رسمية</div>
+        <div><span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#ccc;"></span> عطلة أسبوعية</div>
+      </div>
+    </div>
+
+    <div class="section-title">١٠ مارس (اليوم)</div>
+    <div class="card">
+      <div class="stat-row"><span class="stat-label">الحالة</span><span class="stat-value" style="color:var(--success);">حاضر</span></div>
+      <div class="stat-row"><span class="stat-label">تسجيل الحضور</span><span class="stat-value">٠٨:٥٥ ص</span></div>
+      <div class="stat-row"><span class="stat-label">الساعات حتى الآن</span><span class="stat-value">٤ س ١٥ د</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== شاشة 29: رصيد إجازات الفريق ==================== -->
+<div class="phone">
+  <div class="screen-label">29. رصيد إجازات الفريق</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">رصيد إجازات الفريق</div>
+  </div>
+  <div class="content">
+    <div class="card">
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+        <div class="avatar" style="width:32px; height:32px; font-size:12px;">أح</div>
+        <div style="font-size:14px; font-weight:600;">أحمد حسن</div>
+      </div>
+      <div style="font-size:12px;">
+        <div style="display:flex; justify-content:space-between; padding:4px 0;"><span>سنوية</span><span style="font-weight:600;">١٢ / ٢١ يوم</span></div>
+        <div class="progress-bar" style="margin-bottom:6px;"><div class="fill" style="width:57%; background:var(--primary);"></div></div>
+        <div style="display:flex; justify-content:space-between; padding:4px 0;"><span>مرضية</span><span style="font-weight:600;">٥ / ٦ أيام</span></div>
+        <div class="progress-bar" style="margin-bottom:6px;"><div class="fill" style="width:83%; background:var(--warning);"></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+        <div class="avatar" style="width:32px; height:32px; font-size:12px; background:var(--warning);">فخ</div>
+        <div style="font-size:14px; font-weight:600;">فاطمة خليل</div>
+      </div>
+      <div style="font-size:12px;">
+        <div style="display:flex; justify-content:space-between; padding:4px 0;"><span>سنوية</span><span style="font-weight:600;">١٨ / ٢١ يوم</span></div>
+        <div class="progress-bar" style="margin-bottom:6px;"><div class="fill" style="width:86%; background:var(--primary);"></div></div>
+        <div style="display:flex; justify-content:space-between; padding:4px 0;"><span>مرضية</span><span style="font-weight:600;">٣ / ٦ أيام</span></div>
+        <div class="progress-bar" style="margin-bottom:6px;"><div class="fill" style="width:50%; background:var(--warning);"></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+        <div class="avatar" style="width:32px; height:32px; font-size:12px; background:var(--danger);">عر</div>
+        <div style="font-size:14px; font-weight:600;">عمر الراشد</div>
+      </div>
+      <div style="font-size:12px;">
+        <div style="display:flex; justify-content:space-between; padding:4px 0;"><span>سنوية</span><span style="font-weight:600; color:var(--danger);">٢ / ٢١ يوم</span></div>
+        <div class="progress-bar" style="margin-bottom:6px;"><div class="fill" style="width:10%; background:var(--danger);"></div></div>
+        <div style="display:flex; justify-content:space-between; padding:4px 0;"><span>مرضية</span><span style="font-weight:600;">٦ / ٦ أيام</span></div>
+        <div class="progress-bar" style="margin-bottom:6px;"><div class="fill" style="width:100%; background:var(--success);"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== شاشة 30: قائمة المزيد ==================== -->
+<div class="phone">
+  <div class="screen-label">30. قائمة المزيد</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <div class="title">المزيد</div>
+  </div>
+  <div class="content">
+    <div class="card">
+      <div class="card-title">المالية</div>
+      <div class="list-item" style="border-radius:8px;">
+        <span style="font-size:20px; margin-left:12px;">🧾</span>
+        <div class="item-content"><div class="item-title">المصروفات</div></div>
+        <span>◂</span>
+      </div>
+      <div class="list-item" style="border-radius:8px;">
+        <span style="font-size:20px; margin-left:12px;">🏦</span>
+        <div class="item-content"><div class="item-title">القروض</div></div>
+        <span>◂</span>
+      </div>
+      <div class="list-item" style="border-radius:8px;">
+        <span style="font-size:20px; margin-left:12px;">💵</span>
+        <div class="item-content"><div class="item-title">سلفة الراتب</div></div>
+        <span>◂</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">خدمات الموارد البشرية</div>
+      <div class="list-item" style="border-radius:8px;">
+        <span style="font-size:20px; margin-left:12px;">✉️</span>
+        <div class="item-content"><div class="item-title">خطابات HR</div></div>
+        <span>◂</span>
+      </div>
+      <div class="list-item" style="border-radius:8px;">
+        <span style="font-size:20px; margin-left:12px;">📄</span>
+        <div class="item-content"><div class="item-title">طلب مستندات</div></div>
+        <span>◂</span>
+      </div>
+      <div class="list-item" style="border-radius:8px;">
+        <span style="font-size:20px; margin-left:12px;">📜</span>
+        <div class="item-content"><div class="item-title">شهادات الخبرة</div></div>
+        <span>◂</span>
+      </div>
+      <div class="list-item" style="border-radius:8px;">
+        <span style="font-size:20px; margin-left:12px;">🔧</span>
+        <div class="item-content"><div class="item-title">خدمات الأعمال</div></div>
+        <span>◂</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">المهام وجدول الأوقات</div>
+      <div class="list-item" style="border-radius:8px;">
+        <span style="font-size:20px; margin-left:12px;">✅</span>
+        <div class="item-content"><div class="item-title">مهامي</div></div>
+        <span>◂</span>
+      </div>
+      <div class="list-item" style="border-radius:8px;">
+        <span style="font-size:20px; margin-left:12px;">⏱️</span>
+        <div class="item-content"><div class="item-title">جدول الأوقات</div></div>
+        <span>◂</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">أخرى</div>
+      <div class="list-item" style="border-radius:8px;">
+        <span style="font-size:20px; margin-left:12px;">📢</span>
+        <div class="item-content"><div class="item-title">الإعلانات</div></div>
+        <span>◂</span>
+      </div>
+      <div class="list-item" style="border-radius:8px;">
+        <span style="font-size:20px; margin-left:12px;">💬</span>
+        <div class="item-content"><div class="item-title">تحدث مع HR</div></div>
+        <span>◂</span>
+      </div>
+      <div class="list-item" style="border-radius:8px;">
+        <span style="font-size:20px; margin-left:12px;">📝</span>
+        <div class="item-content"><div class="item-title">ملاحظاتي الشخصية</div></div>
+        <span>◂</span>
+      </div>
+      <div class="list-item" style="border-radius:8px;">
+        <span style="font-size:20px; margin-left:12px;">👤</span>
+        <div class="item-content"><div class="item-title">ملفي الشخصي</div></div>
+        <span>◂</span>
+      </div>
+      <div class="list-item" style="border-radius:8px;">
+        <span style="font-size:20px; margin-left:12px;">⚙️</span>
+        <div class="item-content"><div class="item-title">الإعدادات</div></div>
+        <span>◂</span>
+      </div>
+    </div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item"><span class="nav-icon">🏠</span>الرئيسية</div>
+    <div class="nav-item"><span class="nav-icon">📋</span>الحضور</div>
+    <div class="nav-item"><span class="nav-icon">🏖️</span>الإجازات</div>
+    <div class="nav-item"><span class="nav-icon">💰</span>الراتب</div>
+    <div class="nav-item active"><span class="nav-icon">☰</span>المزيد</div>
+  </div>
+</div>
+
+<!-- ==================== شاشة 31: قائمة الإجازات ==================== -->
+<div class="phone">
+  <div class="screen-label">31. قائمة الإجازات</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">جميع طلبات الإجازات</div>
+    <span class="icon">🔍</span>
+  </div>
+  <div class="content">
+    <div class="filter-tabs">
+      <div class="filter-tab active">إجازاتي</div>
+      <div class="filter-tab">معلقة</div>
+      <div class="filter-tab">موافق عليها</div>
+      <div class="filter-tab">مرفوضة</div>
+    </div>
+    <div class="list-item"><div class="item-content"><div class="item-title">إجازة سنوية</div><div class="item-sub">١٥ - ١٧ مارس ٢٠٢٦ | ٣ أيام (يوم كامل)</div></div><span class="badge badge-pending">معلقة</span></div>
+    <div class="list-item"><div class="item-content"><div class="item-title">إجازة سنوية</div><div class="item-sub">٥ مارس ٢٠٢٦ | يوم واحد (يوم كامل)</div></div><span class="badge badge-approved">موافق عليها</span></div>
+    <div class="list-item"><div class="item-content"><div class="item-title">إجازة مرضية</div><div class="item-sub">٢٠ فبراير ٢٠٢٦ | نصف يوم (صباحاً)</div></div><span class="badge badge-approved">موافق عليها</span></div>
+    <div class="list-item"><div class="item-content"><div class="item-title">إجازة شخصية</div><div class="item-sub">١٠ يناير ٢٠٢٦ | ساعتين (١٠:٠٠-١٢:٠٠)</div></div><span class="badge badge-approved">موافق عليها</span></div>
+    <div class="list-item"><div class="item-content"><div class="item-title">إجازة سنوية</div><div class="item-sub">٢٥ - ٢٧ ديسمبر ٢٠٢٥ | ٣ أيام</div></div><span class="badge badge-refused">مرفوضة</span></div>
+  </div>
+  <div class="fab">+</div>
+</div>
+
+<!-- ==================== شاشة 32: قائمة سلف الراتب ==================== -->
+<div class="phone">
+  <div class="screen-label">32. قائمة سلف الراتب</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">سلف الراتب</div>
+  </div>
+  <div class="content">
+    <div class="card" style="background:#e8f0fe;">
+      <div style="font-size:13px; color:var(--primary);">الحد الأقصى: <strong>٢,٠٠٠ ريال</strong> (٥٠٪ من الراتب الأساسي)</div>
+    </div>
+    <div class="filter-tabs">
+      <div class="filter-tab active">الكل</div>
+      <div class="filter-tab">مسودات</div>
+      <div class="filter-tab">طلباتي</div>
+    </div>
+    <div class="list-item"><div class="item-content"><div class="item-title">سلفة - مارس ٢٠٢٦</div><div class="item-sub">١ مارس ٢٠٢٦ | ١,٥٠٠ ريال</div></div><span class="badge badge-approved">موافق عليها</span></div>
+    <div class="list-item"><div class="item-content"><div class="item-title">سلفة - فبراير ٢٠٢٦</div><div class="item-sub">٣ فبراير ٢٠٢٦ | ٢,٠٠٠ ريال</div></div><span class="badge badge-approved">موافق عليها</span></div>
+    <div class="list-item"><div class="item-content"><div class="item-title">سلفة - يناير ٢٠٢٦</div><div class="item-sub">٥ يناير ٢٠٢٦ | ١,٠٠٠ ريال</div></div><span class="badge badge-refused">مرفوضة</span></div>
+  </div>
+  <div class="fab">+</div>
+</div>
+
+<!-- ==================== شاشة 33: تفاصيل سلفة الراتب ==================== -->
+<div class="phone">
+  <div class="screen-label">33. تفاصيل سلفة الراتب</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">تفاصيل السلفة</div>
+  </div>
+  <div class="content">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <div style="font-size:16px; font-weight:600;">سلفة - مارس ٢٠٢٦</div>
+        <span class="badge badge-approved">موافق عليها</span>
+      </div>
+      <div class="stat-row"><span class="stat-label">الموظف</span><span class="stat-value">أحمد حسن</span></div>
+      <div class="stat-row"><span class="stat-label">تاريخ الطلب</span><span class="stat-value">١ مارس ٢٠٢٦</span></div>
+      <div class="stat-row"><span class="stat-label">المبلغ</span><span class="stat-value" style="font-size:18px; color:var(--primary);">١,٥٠٠ ريال</span></div>
+      <div class="stat-row"><span class="stat-label">الحد المسموح</span><span class="stat-value">٢,٠٠٠ ريال</span></div>
+      <div class="separator"></div>
+      <div style="font-size:13px; color:var(--text-secondary);"><strong>السبب:</strong> مصاريف شخصية عاجلة.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">مسار الموافقة</div>
+      <div class="timeline">
+        <div class="timeline-item done"><div style="font-size:13px; font-weight:500;">تم الإرسال</div><div style="font-size:11px; color:var(--text-secondary);">أحمد حسن - ١ مارس، ٠٩:٠٠ ص</div></div>
+        <div class="timeline-item done"><div style="font-size:13px; font-weight:500;">تمت الموافقة</div><div style="font-size:11px; color:var(--text-secondary);">سارة علي - ٢ مارس، ١٠:٣٠ ص</div></div>
+      </div>
+    </div>
+    <div style="display:flex; gap:8px; font-size:12px; justify-content:center; color:var(--text-secondary);"><span>السابق ▶</span><span>|</span><span>◀ التالي</span></div>
+  </div>
+</div>
+
+<!-- ==================== شاشة 34: قائمة خطابات HR ==================== -->
+<div class="phone">
+  <div class="screen-label">34. قائمة خطابات HR</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">خطابات HR</div>
+  </div>
+  <div class="content">
+    <div class="filter-tabs">
+      <div class="filter-tab active">الكل</div>
+      <div class="filter-tab">مسودات</div>
+      <div class="filter-tab">طلباتي</div>
+    </div>
+    <div class="list-item"><div class="item-content"><div class="item-title">شهادة راتب - البنك</div><div class="item-sub">٢٠ فبراير ٢٠٢٦ | صافي الراتب | إلى: بنك الراجحي</div></div><span class="badge badge-approved">موافق عليها</span></div>
+    <div class="list-item"><div class="item-content"><div class="item-title">تعريف وظيفي</div><div class="item-sub">١٥ يناير ٢٠٢٦ | إجمالي الراتب | إلى: السفارة</div></div><span class="badge badge-approved">موافق عليها</span></div>
+    <div class="list-item"><div class="item-content"><div class="item-title">شهادة راتب - تأشيرة</div><div class="item-sub">٨ مارس ٢٠٢٦ | صافي الراتب | إلى: السفارة البريطانية</div></div><span class="badge badge-pending">مرسل</span></div>
+  </div>
+  <div class="fab">+</div>
+</div>
+
+<!-- ==================== شاشة 35: تفاصيل خطاب HR ==================== -->
+<div class="phone">
+  <div class="screen-label">35. تفاصيل خطاب HR</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">تفاصيل الخطاب</div>
+  </div>
+  <div class="content">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <div style="font-size:16px; font-weight:600;">شهادة راتب - البنك</div>
+        <span class="badge badge-approved">موافق عليها</span>
+      </div>
+      <div class="stat-row"><span class="stat-label">الموظف</span><span class="stat-value">أحمد حسن</span></div>
+      <div class="stat-row"><span class="stat-label">موجه إلى</span><span class="stat-value">بنك الراجحي</span></div>
+      <div class="stat-row"><span class="stat-label">التاريخ المطلوب</span><span class="stat-value">٢٥ فبراير ٢٠٢٦</span></div>
+      <div class="stat-row"><span class="stat-label">نوع الراتب</span><span class="stat-value"><span class="badge" style="background:#e8f0fe; color:var(--primary);">صافي الراتب</span></span></div>
+      <div class="separator"></div>
+      <div style="font-size:13px; color:var(--text-secondary);"><strong>الغرض:</strong> مطلوب لطلب قرض شخصي من بنك الراجحي.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">مسار الموافقة</div>
+      <div class="timeline">
+        <div class="timeline-item done"><div style="font-size:13px; font-weight:500;">تم الإرسال</div><div style="font-size:11px; color:var(--text-secondary);">٢٠ فبراير، ٠٨:٣٠ ص</div></div>
+        <div class="timeline-item done"><div style="font-size:13px; font-weight:500;">تمت الموافقة</div><div style="font-size:11px; color:var(--text-secondary);">مسؤول HR - ٢١ فبراير، ١١:٠٠ ص</div></div>
+      </div>
+    </div>
+    <div style="display:flex; gap:8px;">
+      <button class="btn btn-outline" style="flex:1;">🔄 إعادة إرسال</button>
+      <button class="btn btn-primary" style="flex:1;">📥 تحميل</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== شاشة 36: قائمة طلبات المستندات ==================== -->
+<div class="phone">
+  <div class="screen-label">36. قائمة طلبات المستندات</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">طلبات المستندات</div>
+  </div>
+  <div class="content">
+    <div class="filter-tabs">
+      <div class="filter-tab active">الكل</div>
+      <div class="filter-tab">مسودات</div>
+      <div class="filter-tab">طلباتي</div>
+    </div>
+    <div class="list-item"><div class="item-content"><div class="item-title">استلام جواز السفر</div><div class="item-sub">١ مارس ٢٠٢٦ | نسخة جواز | الإرجاع: ١٥ مارس</div></div><span class="badge badge-pending">مرسل</span></div>
+    <div class="list-item"><div class="item-content"><div class="item-title">بطاقة التأمين</div><div class="item-sub">١٠ فبراير ٢٠٢٦ | بطاقة تأمين | الإرجاع: ٢٠ فبراير</div></div><span class="badge badge-approved">موافق عليها</span></div>
+    <div class="list-item"><div class="item-content"><div class="item-title">نسخة العقد</div><div class="item-sub">٥ يناير ٢٠٢٦ | نسخة عقد | بدون إرجاع</div></div><span class="badge badge-approved">موافق عليها</span></div>
+  </div>
+  <div class="fab">+</div>
+</div>
+
+<!-- ==================== شاشة 37: تفاصيل طلب مستند ==================== -->
+<div class="phone">
+  <div class="screen-label">37. تفاصيل طلب المستند</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">تفاصيل المستند</div>
+  </div>
+  <div class="content">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <div style="font-size:16px; font-weight:600;">استلام جواز السفر</div>
+        <span class="badge badge-pending">مرسل</span>
+      </div>
+      <div class="stat-row"><span class="stat-label">الموظف</span><span class="stat-value">أحمد حسن</span></div>
+      <div class="stat-row"><span class="stat-label">نوع المستند</span><span class="stat-value">نسخة جواز السفر</span></div>
+      <div class="stat-row"><span class="stat-label">تاريخ الطلب</span><span class="stat-value">١ مارس ٢٠٢٦</span></div>
+      <div class="stat-row"><span class="stat-label">تاريخ الإرجاع</span><span class="stat-value">١٥ مارس ٢٠٢٦</span></div>
+      <div class="separator"></div>
+      <div style="font-size:13px; color:var(--text-secondary);"><strong>السبب:</strong> الحاجة للجواز لطلب تأشيرة لحضور مؤتمر دولي.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">مسار الموافقة</div>
+      <div class="timeline">
+        <div class="timeline-item done"><div style="font-size:13px; font-weight:500;">تم الإرسال</div><div style="font-size:11px; color:var(--text-secondary);">١ مارس، ٠٩:١٥ ص</div></div>
+        <div class="timeline-item pending" style="padding-bottom:0;"><div style="font-size:13px; font-weight:500;">موافقة المدير</div><div style="font-size:11px; color:var(--text-secondary);">بانتظار - سارة علي</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== شاشة 38: قائمة شهادات الخبرة ==================== -->
+<div class="phone">
+  <div class="screen-label">38. قائمة شهادات الخبرة</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">شهادات الخبرة</div>
+  </div>
+  <div class="content">
+    <div class="filter-tabs">
+      <div class="filter-tab active">الكل</div>
+      <div class="filter-tab">مسودات</div>
+      <div class="filter-tab">طلباتي</div>
+    </div>
+    <div class="list-item"><div class="item-content"><div class="item-title">شهادة توظيف</div><div class="item-sub">٥ مارس ٢٠٢٦ | إلى: شركة XYZ</div></div><span class="badge badge-pending">مرسل</span></div>
+    <div class="list-item"><div class="item-content"><div class="item-title">خطاب خبرة</div><div class="item-sub">٢٠ يناير ٢٠٢٦ | إلى: وزارة العمل</div></div><span class="badge badge-approved">موافق عليها</span></div>
+  </div>
+  <div class="fab">+</div>
+</div>
+
+<!-- ==================== شاشة 39: تفاصيل شهادة الخبرة ==================== -->
+<div class="phone">
+  <div class="screen-label">39. تفاصيل شهادة الخبرة</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">تفاصيل الشهادة</div>
+  </div>
+  <div class="content">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <div style="font-size:16px; font-weight:600;">شهادة توظيف</div>
+        <span class="badge badge-pending">مرسل</span>
+      </div>
+      <div class="stat-row"><span class="stat-label">الموظف</span><span class="stat-value">أحمد حسن</span></div>
+      <div class="stat-row"><span class="stat-label">موجهة إلى</span><span class="stat-value">شركة XYZ</span></div>
+      <div class="stat-row"><span class="stat-label">التاريخ المطلوب</span><span class="stat-value">١٠ مارس ٢٠٢٦</span></div>
+      <div class="separator"></div>
+      <div style="font-size:13px; color:var(--text-secondary);"><strong>الغرض:</strong> التحقق من التوظيف لغرض خارجي.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">مسار الموافقة</div>
+      <div class="timeline">
+        <div class="timeline-item done"><div style="font-size:13px; font-weight:500;">تم الإرسال</div><div style="font-size:11px; color:var(--text-secondary);">٥ مارس، ٠٩:٠٠ ص</div></div>
+        <div class="timeline-item pending" style="padding-bottom:0;"><div style="font-size:13px; font-weight:500;">موافقة HR</div><div style="font-size:11px; color:var(--text-secondary);">بانتظار</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== شاشة 40: قائمة خدمات الأعمال ==================== -->
+<div class="phone">
+  <div class="screen-label">40. قائمة خدمات الأعمال</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">خدمات الأعمال</div>
+  </div>
+  <div class="content">
+    <div class="filter-tabs">
+      <div class="filter-tab active">الكل</div>
+      <div class="filter-tab">مسودات</div>
+      <div class="filter-tab">طلباتي</div>
+    </div>
+    <div class="list-item"><div class="item-content"><div class="item-title">طلب بطاقات عمل</div><div class="item-sub">٣ مارس ٢٠٢٦ | بطاقات عمل | المطلوب: ١٥ مارس</div></div><span class="badge badge-approved">موافق عليها</span></div>
+    <div class="list-item"><div class="item-content"><div class="item-title">استبدال لابتوب</div><div class="item-sub">٢٠ فبراير ٢٠٢٦ | أجهزة تقنية | المطلوب: ١ مارس</div></div><span class="badge badge-pending">مرسل</span></div>
+    <div class="list-item"><div class="item-content"><div class="item-title">طلب مركبة</div><div class="item-sub">١٠ يناير ٢٠٢٦ | طلب مركبة | المطلوب: ١٥ يناير</div></div><span class="badge badge-refused">مرفوض</span></div>
+  </div>
+  <div class="fab">+</div>
+</div>
+
+<!-- ==================== شاشة 41: تفاصيل خدمة أعمال ==================== -->
+<div class="phone">
+  <div class="screen-label">41. تفاصيل خدمة الأعمال</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">تفاصيل الخدمة</div>
+  </div>
+  <div class="content">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <div style="font-size:16px; font-weight:600;">طلب بطاقات عمل</div>
+        <span class="badge badge-approved">موافق عليها</span>
+      </div>
+      <div class="stat-row"><span class="stat-label">الموظف</span><span class="stat-value">أحمد حسن</span></div>
+      <div class="stat-row"><span class="stat-label">نوع الخدمة</span><span class="stat-value">بطاقات عمل</span></div>
+      <div class="stat-row"><span class="stat-label">التاريخ المطلوب</span><span class="stat-value">١٥ مارس ٢٠٢٦</span></div>
+      <div class="separator"></div>
+      <div style="font-size:13px; color:var(--text-secondary);"><strong>السبب:</strong> الحاجة لبطاقات عمل محدثة بالمسمى الوظيفي الجديد لمؤتمر قادم.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">مسار الموافقة</div>
+      <div class="timeline">
+        <div class="timeline-item done"><div style="font-size:13px; font-weight:500;">تم الإرسال</div><div style="font-size:11px; color:var(--text-secondary);">٣ مارس، ٠٨:٤٥ ص</div></div>
+        <div class="timeline-item done"><div style="font-size:13px; font-weight:500;">تمت الموافقة</div><div style="font-size:11px; color:var(--text-secondary);">٤ مارس، ٠٢:٠٠ م</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== شاشة 42: تفاصيل القرض مع الأقساط ==================== -->
+<div class="phone">
+  <div class="screen-label">42. تفاصيل القرض (الأقساط)</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">تفاصيل القرض</div>
+  </div>
+  <div class="content">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <div style="font-size:16px; font-weight:600;">قرض شخصي</div>
+        <span class="badge badge-approved">موافق عليه</span>
+      </div>
+      <div class="stat-row"><span class="stat-label">مبلغ القرض</span><span class="stat-value" style="font-size:18px; color:var(--primary);">١٠,٠٠٠ ريال</span></div>
+      <div class="stat-row"><span class="stat-label">القسط</span><span class="stat-value">٨٣٣ ريال / شهر</span></div>
+      <div class="stat-row"><span class="stat-label">المدة</span><span class="stat-value">١٢ شهر</span></div>
+      <div class="stat-row"><span class="stat-label">بداية السداد</span><span class="stat-value">١ مارس ٢٠٢٦</span></div>
+      <div class="stat-row"><span class="stat-label">نهاية السداد</span><span class="stat-value">٢٨ فبراير ٢٠٢٧</span></div>
+      <div class="stat-row"><span class="stat-label">طريقة التحويل</span><span class="stat-value">تحويل بنكي</span></div>
+      <div class="separator"></div>
+      <div style="font-size:13px; color:var(--text-secondary);"><strong>السبب:</strong> قرض شخصي لتجديد المنزل.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">سلسلة الموافقات</div>
+      <div class="timeline">
+        <div class="timeline-item done"><div style="font-size:13px; font-weight:500;">تم الإرسال</div><div style="font-size:11px; color:var(--text-secondary);">١٥ فبراير، ٠٩:٠٠ ص</div></div>
+        <div class="timeline-item done"><div style="font-size:13px; font-weight:500;">موافقة المدير</div><div style="font-size:11px; color:var(--text-secondary);">سارة علي - ١٦ فبراير</div></div>
+        <div class="timeline-item done"><div style="font-size:13px; font-weight:500;">موافقة HR</div><div style="font-size:11px; color:var(--text-secondary);">محمد - ١٧ فبراير</div></div>
+        <div class="timeline-item done"><div style="font-size:13px; font-weight:500;">موافقة المدير التنفيذي</div><div style="font-size:11px; color:var(--text-secondary);">١٨ فبراير</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">جدول الأقساط</div>
+      <div style="font-size:12px;">
+        <div class="stat-row" style="background:#e6f4ea; padding:4px 8px; border-radius:4px; margin-bottom:2px;"><span>مارس ٢٠٢٦</span><span style="color:var(--success);">٨٣٣ ريال ✓ مدفوع</span></div>
+        <div class="stat-row" style="background:#fef7e0; padding:4px 8px; border-radius:4px; margin-bottom:2px;"><span>أبريل ٢٠٢٦</span><span style="color:var(--warning);">٨٣٣ ريال ◯ قادم</span></div>
+        <div class="stat-row" style="padding:4px 8px; margin-bottom:2px;"><span>مايو ٢٠٢٦</span><span>٨٣٣ ريال</span></div>
+        <div class="stat-row" style="padding:4px 8px; margin-bottom:2px;"><span>يونيو ٢٠٢٦</span><span>٨٣٣ ريال</span></div>
+        <div class="stat-row" style="padding:4px 8px; margin-bottom:2px;"><span>...</span><span>...</span></div>
+        <div class="stat-row" style="padding:4px 8px;"><span>فبراير ٢٠٢٧</span><span>٨٣٧ ريال (أخير)</span></div>
+      </div>
+      <div class="separator"></div>
+      <div class="stat-row"><span class="stat-label" style="font-weight:600;">المدفوع</span><span class="stat-value" style="color:var(--success);">٨٣٣ ريال</span></div>
+      <div class="stat-row"><span class="stat-label" style="font-weight:600;">المتبقي</span><span class="stat-value" style="color:var(--danger);">٩,١٦٧ ريال</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== شاشة 43: تفاصيل المصروف ==================== -->
+<div class="phone">
+  <div class="screen-label">43. تفاصيل المصروف</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">تفاصيل المصروف</div>
+  </div>
+  <div class="content">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <div style="font-size:16px; font-weight:600;">اجتماع عميل - غداء</div>
+        <span class="badge badge-approved">موافق عليه</span>
+      </div>
+      <div class="stat-row"><span class="stat-label">الموظف</span><span class="stat-value">أحمد حسن</span></div>
+      <div class="stat-row"><span class="stat-label">التاريخ</span><span class="stat-value">٨ مارس ٢٠٢٦</span></div>
+      <div class="stat-row"><span class="stat-label">الفئة</span><span class="stat-value">وجبات</span></div>
+      <div class="stat-row"><span class="stat-label">المبلغ</span><span class="stat-value" style="font-size:18px; color:var(--primary);">١٥٠.٠٠ ريال</span></div>
+      <div class="stat-row"><span class="stat-label">الضريبة</span><span class="stat-value">ضريبة ١٥٪ (٢٢.٥٠ ريال)</span></div>
+      <div class="stat-row"><span class="stat-label">الإجمالي</span><span class="stat-value" style="font-weight:700;">١٧٢.٥٠ ريال</span></div>
+      <div class="stat-row"><span class="stat-label">طريقة الدفع</span><span class="stat-value">الموظف (يسترد)</span></div>
+      <div class="stat-row"><span class="stat-label">العملة</span><span class="stat-value">ريال سعودي</span></div>
+      <div class="separator"></div>
+      <div style="font-size:13px; color:var(--text-secondary);"><strong>ملاحظات:</strong> غداء مع العميل خلال اجتماع بدء المشروع.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">الإيصال 📎</div>
+      <div style="background:#f5f7fa; border-radius:8px; padding:16px; text-align:center;">
+        <div style="font-size:32px;">🧾</div>
+        <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">receipt_lunch_mar8.jpg</div>
+        <div style="font-size:11px; color:var(--primary); margin-top:4px;">اضغط لعرض بالحجم الكامل</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">مسار الموافقة</div>
+      <div class="timeline">
+        <div class="timeline-item done"><div style="font-size:13px; font-weight:500;">تم الإرسال</div><div style="font-size:11px; color:var(--text-secondary);">٨ مارس، ٠٥:٣٠ م</div></div>
+        <div class="timeline-item done"><div style="font-size:13px; font-weight:500;">تم إنشاء التقرير</div><div style="font-size:11px; color:var(--text-secondary);">تلقائي</div></div>
+        <div class="timeline-item done"><div style="font-size:13px; font-weight:500;">تمت الموافقة</div><div style="font-size:11px; color:var(--text-secondary);">سارة علي - ٩ مارس، ١٠:٠٠ ص</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== شاشة 44: الملاحظات الشخصية ==================== -->
+<div class="phone">
+  <div class="screen-label">44. الملاحظات الشخصية</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">ملاحظاتي الشخصية</div>
+  </div>
+  <div class="content">
+    <div class="filter-tabs">
+      <div class="filter-tab active">الكل</div>
+      <div class="filter-tab">مارس</div>
+      <div class="filter-tab">فبراير</div>
+      <div class="filter-tab">يناير</div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:start;">
+        <div class="card-title" style="margin-bottom:4px;">تقديم مستندات التأمين</div>
+        <span style="font-size:12px; color:var(--text-secondary);">١٠ مارس</span>
+      </div>
+      <div style="font-size:13px; color:var(--text-secondary);">تذكير بتقديم مستندات التأمين المحدثة لـ HR قبل نهاية الشهر.</div>
+    </div>
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:start;">
+        <div class="card-title" style="margin-bottom:4px;">أجندة اجتماع الفريق</div>
+        <span style="font-size:12px; color:var(--text-secondary);">٨ مارس</span>
+      </div>
+      <div style="font-size:13px; color:var(--text-secondary);">مناقشة الجدول الزمني لمشاريع الربع الثاني وتوزيع الموارد.</div>
+    </div>
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:start;">
+        <div class="card-title" style="margin-bottom:4px;">تخطيط الإجازة</div>
+        <span style="font-size:12px; color:var(--text-secondary);">١ مارس</span>
+      </div>
+      <div style="font-size:13px; color:var(--text-secondary);">حجز رحلات الطيران للإجازة العائلية ١٥-١٧ مارس. الفندق مؤكد.</div>
+    </div>
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:start;">
+        <div class="card-title" style="margin-bottom:4px;">شهادة تدريب</div>
+        <span style="font-size:12px; color:var(--text-secondary);">٢٥ فبراير</span>
+      </div>
+      <div style="font-size:13px; color:var(--text-secondary);">اختبار شهادة AWS مجدول ليوم ٢٠ مارس. المواد جاهزة.</div>
+    </div>
+  </div>
+  <div class="fab">+</div>
+</div>
+
+<!-- ==================== شاشة 45: لوحة التحليلات (المدير) ==================== -->
+<div class="phone">
+  <div class="screen-label">45. لوحة التحليلات (المدير)</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">التحليلات</div>
+    <span class="icon">📊</span>
+  </div>
+  <div class="content">
+    <div class="filter-tabs">
+      <div class="filter-tab active">هذا الشهر</div>
+      <div class="filter-tab">الشهر السابق</div>
+      <div class="filter-tab">الربع</div>
+      <div class="filter-tab">السنة</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📋 نظرة عامة على الحضور</div>
+      <div style="display:flex; justify-content:space-around; text-align:center; margin-bottom:8px;">
+        <div><div style="font-size:24px; font-weight:700; color:var(--success);">٩٤٪</div><div style="font-size:10px;">نسبة الحضور</div></div>
+        <div><div style="font-size:24px; font-weight:700; color:var(--warning);">١٢٪</div><div style="font-size:10px;">نسبة التأخير</div></div>
+        <div><div style="font-size:24px; font-weight:700; color:var(--danger);">٢٪</div><div style="font-size:10px;">نسبة الغياب</div></div>
+      </div>
+      <div style="background:#f5f7fa; border-radius:8px; padding:12px; text-align:center; font-size:11px; color:var(--text-secondary);">
+        [مخطط اتجاه الحضور]<br>
+        ██████████░░ ٩٤٪<br>
+        يناير ▪ فبراير ▪ مارس
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🏖️ مسؤولية الإجازات</div>
+      <div class="stat-row"><span class="stat-label">إجمالي الأيام غير المستخدمة (الفريق)</span><span class="stat-value" style="color:var(--danger);">٨٧ يوم</span></div>
+      <div class="stat-row"><span class="stat-label">المسؤولية المالية</span><span class="stat-value" style="color:var(--danger);">٢٨,٥٠٠ ريال</span></div>
+      <div class="stat-row"><span class="stat-label">موظفين معرضين للخطر</span><span class="stat-value">٣ (أكثر من ١٥ يوم)</span></div>
+      <div style="background:#f5f7fa; border-radius:8px; padding:8px; margin-top:8px;">
+        <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:4px;"><span>عمر الراشد</span><span style="color:var(--danger);">١٩ يوم غير مستخدم</span></div>
+        <div class="progress-bar"><div class="fill" style="width:90%; background:var(--danger);"></div></div>
+        <div style="display:flex; justify-content:space-between; font-size:11px; margin:8px 0 4px;"><span>فاطمة خليل</span><span style="color:var(--warning);">١٦ يوم غير مستخدم</span></div>
+        <div class="progress-bar"><div class="fill" style="width:76%; background:var(--warning);"></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">⏰ تحليل الوقت الإضافي</div>
+      <div class="stat-row"><span class="stat-label">إجمالي ساعات العمل الإضافي</span><span class="stat-value">٤٥ ساعة</span></div>
+      <div class="stat-row"><span class="stat-label">أعضاء الفريق بعمل إضافي</span><span class="stat-value">٦ / ١١</span></div>
+      <div class="stat-row"><span class="stat-label">متوسط الساعات الإضافية/موظف</span><span class="stat-value">٧.٥ ساعة</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🧾 ملخص المصروفات</div>
+      <div class="stat-row"><span class="stat-label">إجمالي مصروفات الفريق</span><span class="stat-value">١٢,٥٠٠ ريال</span></div>
+      <div class="stat-row"><span class="stat-label">بانتظار الموافقة</span><span class="stat-value" style="color:var(--warning);">٢,٣٠٠ ريال</span></div>
+      <div class="stat-row"><span class="stat-label">أعلى فئة</span><span class="stat-value">سفر (٤٥٪)</span></div>
+    </div>
+
+    <button class="btn btn-outline" style="margin-top:4px;">📥 تصدير إلى PDF / Excel</button>
+  </div>
+</div>
+
+<!-- ==================== شاشة 46: مهامي - القائمة ==================== -->
+<div class="phone">
+  <div class="screen-label">46. مهامي</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">مهامي</div>
+    <span class="icon">🔍</span>
+  </div>
+  <div class="content">
+    <!-- شريط المؤقت المصغر (يظهر عند تشغيل المؤقت) -->
+    <div class="mini-timer">
+      <span>⏱️ إعادة تصميم الموقع - مراجعة الواجهة</span>
+      <span style="font-weight:700;">٠١:٢٣:٤٥</span>
+      <span style="font-size:16px;">⏹</span>
+    </div>
+
+    <!-- ملخص الإحصائيات -->
+    <div class="card" style="display:flex; justify-content:space-around; text-align:center;">
+      <div>
+        <div style="font-size:22px; font-weight:700; color:var(--primary);">١٢</div>
+        <div style="font-size:10px; color:var(--text-secondary);">الإجمالي</div>
+      </div>
+      <div>
+        <div style="font-size:22px; font-weight:700; color:var(--warning);">٥</div>
+        <div style="font-size:10px; color:var(--text-secondary);">قيد التنفيذ</div>
+      </div>
+      <div>
+        <div style="font-size:22px; font-weight:700; color:var(--danger);">٢</div>
+        <div style="font-size:10px; color:var(--text-secondary);">متأخرة</div>
+      </div>
+      <div>
+        <div style="font-size:22px; font-weight:700; color:var(--success);">٥</div>
+        <div style="font-size:10px; color:var(--text-secondary);">مكتملة</div>
+      </div>
+    </div>
+
+    <!-- تبويبات الفلترة -->
+    <div class="filter-tabs">
+      <div class="filter-tab active">الكل</div>
+      <div class="filter-tab">جديدة</div>
+      <div class="filter-tab">قيد التنفيذ</div>
+      <div class="filter-tab">مكتملة</div>
+      <div class="filter-tab">متأخرة</div>
+    </div>
+
+    <!-- عناصر المهام -->
+    <div class="list-item">
+      <div style="width:4px; height:40px; border-radius:2px; background:#f59e0b; margin-left:12px;"></div>
+      <div class="item-content">
+        <div class="item-title">مراجعة الواجهة - الصفحة الرئيسية</div>
+        <div class="item-sub">إعادة تصميم الموقع | الموعد: ١٥ مارس</div>
+      </div>
+      <span class="badge badge-pending">قيد التنفيذ</span>
+    </div>
+    <div class="list-item">
+      <div style="width:4px; height:40px; border-radius:2px; background:#ef4444; margin-left:12px;"></div>
+      <div class="item-content">
+        <div class="item-title">ربط API - بوابة الدفع</div>
+        <div class="item-sub">تطبيق التجارة الإلكترونية | الموعد: ٨ مارس</div>
+      </div>
+      <span class="badge badge-refused" style="font-size:10px;">متأخرة</span>
+    </div>
+    <div class="list-item">
+      <div style="width:4px; height:40px; border-radius:2px; background:#3b82f6; margin-left:12px;"></div>
+      <div class="item-content">
+        <div class="item-title">سكربت ترحيل قاعدة البيانات</div>
+        <div class="item-sub">البنية التحتية | الموعد: ٢٠ مارس</div>
+      </div>
+      <span class="badge badge-draft">جديدة</span>
+    </div>
+    <div class="list-item">
+      <div style="width:4px; height:40px; border-radius:2px; background:#22c55e; margin-left:12px;"></div>
+      <div class="item-content">
+        <div class="item-title">كتابة حالات الاختبار - المصادقة</div>
+        <div class="item-sub">تطبيق التجارة الإلكترونية | مكتملة</div>
+      </div>
+      <span class="badge badge-approved">مكتملة</span>
+    </div>
+    <div class="list-item">
+      <div style="width:4px; height:40px; border-radius:2px; background:#f59e0b; margin-left:12px;"></div>
+      <div class="item-content">
+        <div class="item-title">مكونات نظام التصميم</div>
+        <div class="item-sub">إعادة تصميم الموقع | الموعد: ١٨ مارس</div>
+      </div>
+      <span class="badge badge-pending">قيد التنفيذ</span>
+    </div>
+    <div class="list-item">
+      <div style="width:4px; height:40px; border-radius:2px; background:#3b82f6; margin-left:12px;"></div>
+      <div class="item-content">
+        <div class="item-title">إعداد خط CI/CD</div>
+        <div class="item-sub">البنية التحتية | الموعد: ٢٥ مارس</div>
+      </div>
+      <span class="badge badge-draft">جديدة</span>
+    </div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item"><span class="nav-icon">🏠</span>الرئيسية</div>
+    <div class="nav-item"><span class="nav-icon">📋</span>الحضور</div>
+    <div class="nav-item"><span class="nav-icon">🏖️</span>الإجازات</div>
+    <div class="nav-item"><span class="nav-icon">💰</span>الراتب</div>
+    <div class="nav-item"><span class="nav-icon">☰</span>المزيد</div>
+  </div>
+</div>
+
+<!-- ==================== شاشة 47: تفاصيل المهمة ==================== -->
+<div class="phone">
+  <div class="screen-label">47. تفاصيل المهمة</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">تفاصيل المهمة</div>
+    <span class="icon">✏️</span>
+  </div>
+  <div class="content">
+    <!-- اسم المهمة والمشروع -->
+    <div class="card">
+      <div style="font-size:17px; font-weight:700; margin-bottom:6px;">مراجعة الواجهة - الصفحة الرئيسية</div>
+      <div style="font-size:13px; color:var(--text-secondary);">📁 إعادة تصميم الموقع</div>
+    </div>
+
+    <!-- الحالة والأولوية -->
+    <div class="card">
+      <div class="stat-row">
+        <span class="stat-label">المرحلة</span>
+        <select class="stage-select">
+          <option>جديدة</option>
+          <option selected>قيد التنفيذ</option>
+          <option>مراجعة</option>
+          <option>مكتملة</option>
+        </select>
+      </div>
+      <div class="separator"></div>
+      <div class="stat-row">
+        <span class="stat-label">الأولوية</span>
+        <div class="priority-stars">
+          <span class="priority-star active">★</span>
+          <span class="priority-star active">★</span>
+          <span class="priority-star">★</span>
+        </div>
+      </div>
+      <div class="separator"></div>
+      <div class="stat-row">
+        <span class="stat-label">الموعد النهائي</span>
+        <span class="stat-value">📅 ١٥ مارس ٢٠٢٦</span>
+      </div>
+      <div class="separator"></div>
+      <div class="stat-row">
+        <span class="stat-label">مسند إلى</span>
+        <span class="stat-value">أحمد حسن</span>
+      </div>
+    </div>
+
+    <!-- قسم المؤقت -->
+    <div class="card">
+      <div class="card-title">⏱️ متتبع الوقت</div>
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+        <div>
+          <div style="font-size:13px; color:var(--text-secondary);">اليوم</div>
+          <div style="font-size:20px; font-weight:700;">٠٢:١٥:٣٠</div>
+        </div>
+        <div>
+          <div style="font-size:13px; color:var(--text-secondary);">الإجمالي</div>
+          <div style="font-size:20px; font-weight:700;">٨.٥ ساعة</div>
+        </div>
+      </div>
+      <button class="btn btn-primary" style="padding:12px;">▶ بدء المؤقت</button>
+    </div>
+
+    <!-- الوصف -->
+    <div class="card">
+      <div class="card-title">الوصف</div>
+      <div style="font-size:13px; color:var(--text-secondary); line-height:1.5;">
+        مراجعة تصميم واجهة الصفحة الرئيسية وتقديم ملاحظات حول التخطيط والألوان والخطوط. التأكد من التصميم المتجاوب للهاتف والجهاز اللوحي.
+      </div>
+    </div>
+
+    <!-- المرفقات -->
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <div class="card-title" style="margin:0;">📎 المرفقات (٣)</div>
+        <span style="color:var(--primary); font-size:13px; font-weight:500;">+ إضافة</span>
+      </div>
+      <div class="attachment-item">
+        <div class="attachment-icon">📄</div>
+        <div style="flex:1;">
+          <div style="font-size:13px; font-weight:500;">نموذج_الصفحة_v2.pdf</div>
+          <div style="font-size:11px; color:var(--text-secondary);">٢.٤ ميغا - ١٠ مارس ٢٠٢٦</div>
+        </div>
+        <span style="color:var(--text-secondary);">⤓</span>
+      </div>
+      <div class="attachment-item">
+        <div class="attachment-icon">🖼️</div>
+        <div style="flex:1;">
+          <div style="font-size:13px; font-weight:500;">مرجع_التصميم.png</div>
+          <div style="font-size:11px; color:var(--text-secondary);">١.١ ميغا - ٩ مارس ٢٠٢٦</div>
+        </div>
+        <span style="color:var(--text-secondary);">⤓</span>
+      </div>
+      <div class="attachment-item" style="border:none;">
+        <div class="attachment-icon">📊</div>
+        <div style="flex:1;">
+          <div style="font-size:13px; font-weight:500;">قائمة_المراجعة.xlsx</div>
+          <div style="font-size:11px; color:var(--text-secondary);">٣٤٠ كيلو - ٨ مارس ٢٠٢٦</div>
+        </div>
+        <span style="color:var(--text-secondary);">⤓</span>
+      </div>
+    </div>
+
+    <!-- سجل الوقت الأخير -->
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <div class="card-title" style="margin:0;">🕐 سجل الوقت</div>
+        <span style="color:var(--primary); font-size:13px; font-weight:500;">+ تسجيل وقت</span>
+      </div>
+      <div class="time-entry">
+        <div style="flex:1;">
+          <div style="font-size:13px; font-weight:500;">١٠ مارس - مراجعة التخطيط</div>
+        </div>
+        <span style="font-size:14px; font-weight:600;">٢.٥ س</span>
+      </div>
+      <div class="time-entry">
+        <div style="flex:1;">
+          <div style="font-size:13px; font-weight:500;">٩ مارس - التقييم الأولي</div>
+        </div>
+        <span style="font-size:14px; font-weight:600;">٣.٠ س</span>
+      </div>
+      <div class="time-entry" style="border:none;">
+        <div style="flex:1;">
+          <div style="font-size:13px; font-weight:500;">٨ مارس - جمع المتطلبات</div>
+        </div>
+        <span style="font-size:14px; font-weight:600;">٣.٠ س</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== شاشة 48: إضافة مرفق ==================== -->
+<div class="phone">
+  <div class="screen-label">48. إضافة مرفق</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">إضافة مرفق</div>
+  </div>
+  <div class="content">
+    <div class="card">
+      <div style="font-size:13px; color:var(--text-secondary); margin-bottom:4px;">المهمة</div>
+      <div style="font-size:15px; font-weight:600;">مراجعة الواجهة - الصفحة الرئيسية</div>
+      <div style="font-size:12px; color:var(--text-secondary);">إعادة تصميم الموقع</div>
+    </div>
+
+    <!-- منطقة الرفع -->
+    <div class="upload-area">
+      <div style="font-size:40px; margin-bottom:8px;">📤</div>
+      <div style="font-size:14px; font-weight:500; color:var(--text);">اضغط لاختيار ملف</div>
+      <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">أو اسحب وأفلت هنا</div>
+    </div>
+
+    <!-- خيارات سريعة -->
+    <div style="display:flex; gap:12px; margin-bottom:16px;">
+      <div class="card" style="flex:1; text-align:center; padding:16px 8px; margin:0;">
+        <div style="font-size:24px;">📷</div>
+        <div style="font-size:11px; margin-top:4px;">الكاميرا</div>
+      </div>
+      <div class="card" style="flex:1; text-align:center; padding:16px 8px; margin:0;">
+        <div style="font-size:24px;">🖼️</div>
+        <div style="font-size:11px; margin-top:4px;">المعرض</div>
+      </div>
+      <div class="card" style="flex:1; text-align:center; padding:16px 8px; margin:0;">
+        <div style="font-size:24px;">📁</div>
+        <div style="font-size:11px; margin-top:4px;">المستندات</div>
+      </div>
+    </div>
+
+    <!-- معاينة الملف المحدد -->
+    <div class="card" style="background:#e8f0fe;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <span style="font-size:28px;">📄</span>
+        <div style="flex:1;">
+          <div style="font-size:13px; font-weight:500;">ملاحظات_المراجعة.pdf</div>
+          <div style="font-size:11px; color:var(--text-secondary);">١.٢ ميغا - جاهز للرفع</div>
+        </div>
+        <span style="color:var(--danger); font-size:16px;">✕</span>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" style="margin-top:12px;">📤 رفع المرفق</button>
+
+    <!-- المرفقات الحالية -->
+    <div class="section-title">المرفقات الحالية (٣)</div>
+    <div class="card">
+      <div class="attachment-item">
+        <div class="attachment-icon">📄</div>
+        <div style="flex:1;">
+          <div style="font-size:13px; font-weight:500;">نموذج_الصفحة_v2.pdf</div>
+          <div style="font-size:11px; color:var(--text-secondary);">٢.٤ ميغا - ١٠ مارس</div>
+        </div>
+      </div>
+      <div class="attachment-item">
+        <div class="attachment-icon">🖼️</div>
+        <div style="flex:1;">
+          <div style="font-size:13px; font-weight:500;">مرجع_التصميم.png</div>
+          <div style="font-size:11px; color:var(--text-secondary);">١.١ ميغا - ٩ مارس</div>
+        </div>
+      </div>
+      <div class="attachment-item" style="border:none;">
+        <div class="attachment-icon">📊</div>
+        <div style="flex:1;">
+          <div style="font-size:13px; font-weight:500;">قائمة_المراجعة.xlsx</div>
+          <div style="font-size:11px; color:var(--text-secondary);">٣٤٠ كيلو - ٨ مارس</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== شاشة 49: تسجيل وقت ==================== -->
+<div class="phone">
+  <div class="screen-label">49. تسجيل وقت</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">تسجيل وقت</div>
+  </div>
+  <div class="content">
+    <div class="input-group">
+      <label>المشروع</label>
+      <select style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:14px; background:#fff; direction:rtl;">
+        <option selected>إعادة تصميم الموقع</option>
+        <option>تطبيق التجارة الإلكترونية</option>
+        <option>البنية التحتية</option>
+      </select>
+    </div>
+    <div class="input-group">
+      <label>المهمة</label>
+      <select style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:14px; background:#fff; direction:rtl;">
+        <option selected>مراجعة الواجهة - الصفحة الرئيسية</option>
+        <option>مكونات نظام التصميم</option>
+        <option>ربط API - بوابة الدفع</option>
+      </select>
+    </div>
+    <div class="input-group">
+      <label>التاريخ</label>
+      <input type="text" value="١٠ مارس ٢٠٢٦" placeholder="اختر التاريخ" style="text-align:right;">
+    </div>
+    <div class="input-group">
+      <label>الساعات المنجزة</label>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="btn btn-outline" style="width:44px; height:44px; padding:0; font-size:18px;">−</button>
+        <input type="text" value="٢.٥٠" style="text-align:center; font-size:20px; font-weight:700; flex:1;">
+        <button class="btn btn-outline" style="width:44px; height:44px; padding:0; font-size:18px;">+</button>
+      </div>
+      <div style="font-size:11px; color:var(--text-secondary); text-align:center; margin-top:4px;">بزيادات ٠.٢٥ ساعة (١٥ دقيقة)</div>
+    </div>
+    <div class="input-group">
+      <label>الوصف</label>
+      <textarea style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:14px; height:80px; resize:none; direction:rtl; text-align:right;" placeholder="ما الذي عملت عليه؟">مراجعة تخطيط الصفحة الرئيسية وتقديم ملاحظات على نقاط التوقف للتصميم المتجاوب.</textarea>
+    </div>
+
+    <div class="separator"></div>
+
+    <!-- الملخص -->
+    <div class="card" style="background:#e8f0fe;">
+      <div class="stat-row">
+        <span class="stat-label">إجمالي المهمة</span>
+        <span class="stat-value">٨.٥ س + ٢.٥ س = ١١.٠ س</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">إجمالي اليوم</span>
+        <span class="stat-value">٤.٥ س + ٢.٥ س = ٧.٠ س</span>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" style="margin-top:8px;">💾 حفظ تسجيل الوقت</button>
+    <button class="btn btn-outline" style="margin-top:8px;">إلغاء</button>
+  </div>
+</div>
+
+<!-- ==================== شاشة 50: المؤقت النشط ==================== -->
+<div class="phone">
+  <div class="screen-label">50. المؤقت النشط</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">المؤقت</div>
+  </div>
+  <div class="content">
+    <!-- بطاقة المؤقت -->
+    <div class="timer-card">
+      <div style="font-size:13px; opacity:0.8; margin-bottom:4px;">📁 إعادة تصميم الموقع</div>
+      <div style="font-size:16px; font-weight:600; margin-bottom:16px;">مراجعة الواجهة - الصفحة الرئيسية</div>
+      <div style="width:10px; height:10px; border-radius:50%; background:#4ade80; margin:0 auto 12px; box-shadow:0 0 8px #4ade80;"></div>
+      <div class="timer-display">٠٢:٣٤:١٥</div>
+      <div style="font-size:12px; opacity:0.7; margin-top:4px;">بدأ الساعة ٠٩:١٥ صباحاً</div>
+      <div class="timer-controls">
+        <div class="timer-btn" style="background:rgba(255,255,255,0.2); color:#fff;">⏸</div>
+        <div class="timer-btn" style="background:#ef4444; color:#fff;">⏹</div>
+      </div>
+    </div>
+
+    <!-- ملخص اليوم -->
+    <div class="card">
+      <div class="card-title">عمل اليوم</div>
+      <div class="stat-row">
+        <span class="stat-label">الجلسة الحالية</span>
+        <span class="stat-value" style="color:var(--primary);">٢ س ٣٤ د (قيد التشغيل)</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">الجلسات السابقة</span>
+        <span class="stat-value">١ س ٣٠ د</span>
+      </div>
+      <div class="separator"></div>
+      <div class="stat-row">
+        <span class="stat-label" style="font-weight:600;">إجمالي اليوم</span>
+        <span class="stat-value" style="font-size:16px; font-weight:700;">٤ س ٠٤ د</span>
+      </div>
+    </div>
+
+    <!-- سجل الجلسات الأخيرة -->
+    <div class="card">
+      <div class="card-title">الجلسات الأخيرة</div>
+      <div class="time-entry">
+        <div style="flex:1;">
+          <div style="font-size:13px; font-weight:500;">اليوم، ٠٨:٠٠ - ٠٩:٣٠</div>
+          <div style="font-size:11px; color:var(--text-secondary);">مراجعة الواجهة - الصفحة الرئيسية</div>
+        </div>
+        <span style="font-size:14px; font-weight:600;">١.٥ س</span>
+      </div>
+      <div class="time-entry">
+        <div style="flex:1;">
+          <div style="font-size:13px; font-weight:500;">أمس، ١٤:٠٠ - ١٧:٠٠</div>
+          <div style="font-size:11px; color:var(--text-secondary);">ربط API - بوابة الدفع</div>
+        </div>
+        <span style="font-size:14px; font-weight:600;">٣.٠ س</span>
+      </div>
+      <div class="time-entry" style="border:none;">
+        <div style="flex:1;">
+          <div style="font-size:13px; font-weight:500;">أمس، ٠٩:٠٠ - ١٢:٣٠</div>
+          <div style="font-size:11px; color:var(--text-secondary);">مكونات نظام التصميم</div>
+        </div>
+        <span style="font-size:14px; font-weight:600;">٣.٥ س</span>
+      </div>
+    </div>
+
+    <!-- نصيحة -->
+    <div class="card" style="background:#fef7e0; border-right:3px solid var(--warning);">
+      <div style="font-size:12px; color:#92400e;">💡 نصيحة: سيستمر المؤقت في العمل حتى عند الانتقال إلى شاشات أخرى. ابحث عن شريط المؤقت المصغر في الأعلى.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== شاشة 51: جدول أوقاتي ==================== -->
+<div class="phone">
+  <div class="screen-label">51. جدول أوقاتي</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">جدول أوقاتي</div>
+    <span class="icon">📊</span>
+  </div>
+  <div class="content">
+    <!-- بطاقة ملخص الأسبوع -->
+    <div class="timer-card" style="padding:20px;">
+      <div style="font-size:13px; opacity:0.8;">هذا الأسبوع (٨ - ١٤ مارس)</div>
+      <div style="font-size:32px; font-weight:700; margin:8px 0;">٣٢.٥ س</div>
+      <div class="progress-bar" style="background:rgba(255,255,255,0.2); height:8px; margin:8px 0;">
+        <div class="fill" style="width:81%; background:#fff;"></div>
+      </div>
+      <div style="font-size:11px; opacity:0.7;">٨١٪ من هدف ٤٠ ساعة</div>
+      <div class="weekly-bars">
+        <div>
+          <div class="weekly-bar" style="height:85%; background:rgba(255,255,255,0.7);"></div>
+          <div style="font-size:9px; text-align:center; margin-top:4px; opacity:0.7;">إث</div>
+        </div>
+        <div>
+          <div class="weekly-bar" style="height:70%; background:rgba(255,255,255,0.7);"></div>
+          <div style="font-size:9px; text-align:center; margin-top:4px; opacity:0.7;">ثل</div>
+        </div>
+        <div>
+          <div class="weekly-bar" style="height:100%; background:rgba(255,255,255,0.9);"></div>
+          <div style="font-size:9px; text-align:center; margin-top:4px; opacity:0.7;">أر</div>
+        </div>
+        <div>
+          <div class="weekly-bar" style="height:50%; background:rgba(255,255,255,0.7);"></div>
+          <div style="font-size:9px; text-align:center; margin-top:4px; opacity:0.7;">خم</div>
+        </div>
+        <div>
+          <div class="weekly-bar" style="height:20%; background:rgba(255,255,255,0.4);"></div>
+          <div style="font-size:9px; text-align:center; margin-top:4px; opacity:0.7;">جم</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- تبويبات الفلترة -->
+    <div class="filter-tabs">
+      <div class="filter-tab active">هذا الأسبوع</div>
+      <div class="filter-tab">الأسبوع الماضي</div>
+      <div class="filter-tab">هذا الشهر</div>
+      <div class="filter-tab">مخصص</div>
+    </div>
+
+    <!-- مجموعات الأيام -->
+    <div class="day-header">
+      <span>الأربعاء، ١٠ مارس</span>
+      <span style="color:var(--primary);">٨.٠ س</span>
+    </div>
+    <div class="time-entry">
+      <div class="project-dot" style="background:#3b82f6;"></div>
+      <div style="flex:1;">
+        <div style="font-size:13px; font-weight:500;">مراجعة الواجهة - الصفحة الرئيسية</div>
+        <div style="font-size:11px; color:var(--text-secondary);">إعادة تصميم الموقع</div>
+      </div>
+      <span style="font-size:14px; font-weight:600;">٥.٠ س</span>
+    </div>
+    <div class="time-entry">
+      <div class="project-dot" style="background:#f59e0b;"></div>
+      <div style="flex:1;">
+        <div style="font-size:13px; font-weight:500;">ربط API</div>
+        <div style="font-size:11px; color:var(--text-secondary);">تطبيق التجارة الإلكترونية</div>
+      </div>
+      <span style="font-size:14px; font-weight:600;">٣.٠ س</span>
+    </div>
+
+    <div class="day-header">
+      <span>الثلاثاء، ٩ مارس</span>
+      <span style="color:var(--primary);">٧.٠ س</span>
+    </div>
+    <div class="time-entry">
+      <div class="project-dot" style="background:#3b82f6;"></div>
+      <div style="flex:1;">
+        <div style="font-size:13px; font-weight:500;">التقييم الأولي</div>
+        <div style="font-size:11px; color:var(--text-secondary);">إعادة تصميم الموقع</div>
+      </div>
+      <span style="font-size:14px; font-weight:600;">٤.٠ س</span>
+    </div>
+    <div class="time-entry">
+      <div class="project-dot" style="background:#22c55e;"></div>
+      <div style="flex:1;">
+        <div style="font-size:13px; font-weight:500;">تصميم مخطط قاعدة البيانات</div>
+        <div style="font-size:11px; color:var(--text-secondary);">البنية التحتية</div>
+      </div>
+      <span style="font-size:14px; font-weight:600;">٣.٠ س</span>
+    </div>
+
+    <div class="day-header">
+      <span>الإثنين، ٨ مارس</span>
+      <span style="color:var(--primary);">٨.٥ س</span>
+    </div>
+    <div class="time-entry">
+      <div class="project-dot" style="background:#f59e0b;"></div>
+      <div style="flex:1;">
+        <div style="font-size:13px; font-weight:500;">إعداد بوابة الدفع</div>
+        <div style="font-size:11px; color:var(--text-secondary);">تطبيق التجارة الإلكترونية</div>
+      </div>
+      <span style="font-size:14px; font-weight:600;">٥.٥ س</span>
+    </div>
+    <div class="time-entry">
+      <div class="project-dot" style="background:#3b82f6;"></div>
+      <div style="flex:1;">
+        <div style="font-size:13px; font-weight:500;">جمع المتطلبات</div>
+        <div style="font-size:11px; color:var(--text-secondary);">إعادة تصميم الموقع</div>
+      </div>
+      <span style="font-size:14px; font-weight:600;">٣.٠ س</span>
+    </div>
+  </div>
+  <div class="fab">+</div>
+</div>
+
+<!-- ==================== شاشة 52: تفاصيل اليوم ==================== -->
+<div class="phone">
+  <div class="screen-label">52. تفاصيل اليوم</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">الأربعاء، ١٠ مارس</div>
+    <span class="icon">✏️</span>
+  </div>
+  <div class="content">
+    <!-- إجمالي اليوم -->
+    <div class="card" style="text-align:center; background:#e8f0fe;">
+      <div style="font-size:13px; color:var(--text-secondary);">إجمالي الساعات</div>
+      <div style="font-size:32px; font-weight:700; color:var(--primary);">٨.٠ س</div>
+      <div style="font-size:11px; color:var(--text-secondary);">٣ إدخالات</div>
+    </div>
+
+    <!-- إدخالات الوقت -->
+    <div class="card">
+      <div style="display:flex; align-items:center; padding:12px 0; border-bottom:1px solid var(--border);">
+        <div class="project-dot" style="background:#3b82f6;"></div>
+        <div style="flex:1;">
+          <div style="font-size:14px; font-weight:500;">مراجعة الواجهة - الصفحة الرئيسية</div>
+          <div style="font-size:12px; color:var(--text-secondary);">إعادة تصميم الموقع</div>
+          <div style="font-size:12px; color:var(--text-secondary); margin-top:2px;">مراجعة التخطيط واختيارات الخطوط</div>
+        </div>
+        <div style="text-align:left;">
+          <div style="font-size:16px; font-weight:700;">٢.٥ س</div>
+          <div style="font-size:10px; color:var(--text-secondary);">٠٩:٠٠-١١:٣٠</div>
+        </div>
+      </div>
+
+      <div style="display:flex; align-items:center; padding:12px 0; border-bottom:1px solid var(--border);">
+        <div class="project-dot" style="background:#3b82f6;"></div>
+        <div style="flex:1;">
+          <div style="font-size:14px; font-weight:500;">مراجعة الواجهة - الصفحة الرئيسية</div>
+          <div style="font-size:12px; color:var(--text-secondary);">إعادة تصميم الموقع</div>
+          <div style="font-size:12px; color:var(--text-secondary); margin-top:2px;">نقاط التوقف للتصميم المتجاوب</div>
+        </div>
+        <div style="text-align:left;">
+          <div style="font-size:16px; font-weight:700;">٢.٥ س</div>
+          <div style="font-size:10px; color:var(--text-secondary);">١٣:٠٠-١٥:٣٠</div>
+        </div>
+      </div>
+
+      <div style="display:flex; align-items:center; padding:12px 0;">
+        <div class="project-dot" style="background:#f59e0b;"></div>
+        <div style="flex:1;">
+          <div style="font-size:14px; font-weight:500;">ربط API</div>
+          <div style="font-size:12px; color:var(--text-secondary);">تطبيق التجارة الإلكترونية</div>
+          <div style="font-size:12px; color:var(--text-secondary); margin-top:2px;">تنفيذ نقطة نهاية الدفع</div>
+        </div>
+        <div style="text-align:left;">
+          <div style="font-size:16px; font-weight:700;">٣.٠ س</div>
+          <div style="font-size:10px; color:var(--text-secondary);">١٥:٣٠-١٨:٣٠</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- تفصيل حسب المشروع -->
+    <div class="card">
+      <div class="card-title">حسب المشروع</div>
+      <div class="stat-row">
+        <span style="display:flex; align-items:center; gap:8px;">
+          <div class="project-dot" style="background:#3b82f6; margin:0;"></div>
+          <span class="stat-label">إعادة تصميم الموقع</span>
+        </span>
+        <span class="stat-value">٥.٠ س</span>
+      </div>
+      <div class="stat-row">
+        <span style="display:flex; align-items:center; gap:8px;">
+          <div class="project-dot" style="background:#f59e0b; margin:0;"></div>
+          <span class="stat-label">تطبيق التجارة الإلكترونية</span>
+        </span>
+        <span class="stat-value">٣.٠ س</span>
+      </div>
+    </div>
+
+    <button class="btn btn-primary">+ إضافة إدخال وقت</button>
+  </div>
+</div>
+
+<!-- ==================== شاشة 53: أوقات الفريق (المدير) ==================== -->
+<div class="phone">
+  <div class="screen-label">53. أوقات الفريق (المدير)</div>
+  <div class="status-bar"><span>٩:٤١</span><span>١٠٠٪</span></div>
+  <div class="header">
+    <span class="back-btn">→</span>
+    <div class="title">أوقات الفريق</div>
+    <span class="icon">📊</span>
+  </div>
+  <div class="content">
+    <!-- محدد الأسبوع -->
+    <div class="card" style="display:flex; align-items:center; justify-content:space-between;">
+      <span style="font-size:18px; cursor:pointer;">▶</span>
+      <div style="text-align:center;">
+        <div style="font-size:15px; font-weight:600;">٨ - ١٤ مارس ٢٠٢٦</div>
+        <div style="font-size:12px; color:var(--text-secondary);">الأسبوع ١١</div>
+      </div>
+      <span style="font-size:18px; cursor:pointer;">◀</span>
+    </div>
+
+    <!-- ملخص الفريق -->
+    <div class="card" style="background:#e8f0fe;">
+      <div style="display:flex; justify-content:space-around; text-align:center;">
+        <div>
+          <div style="font-size:20px; font-weight:700; color:var(--primary);">٢٨٥ س</div>
+          <div style="font-size:10px; color:var(--text-secondary);">إجمالي الفريق</div>
+        </div>
+        <div>
+          <div style="font-size:20px; font-weight:700; color:var(--success);">٣٦ س</div>
+          <div style="font-size:10px; color:var(--text-secondary);">المتوسط / فرد</div>
+        </div>
+        <div>
+          <div style="font-size:20px; font-weight:700; color:var(--danger);">٢</div>
+          <div style="font-size:10px; color:var(--text-secondary);">أقل من الهدف</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- أعضاء الفريق -->
+    <div class="section-title">أعضاء الفريق (٨)</div>
+
+    <div class="card" style="padding:12px;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div class="avatar" style="width:40px; height:40px; font-size:14px;">مخ</div>
+        <div style="flex:1;">
+          <div style="font-size:14px; font-weight:500;">محمد خليل</div>
+          <div style="font-size:11px; color:var(--text-secondary);">مطور أول</div>
+        </div>
+        <div style="text-align:left;">
+          <div style="font-size:16px; font-weight:700; color:var(--success);">٤٢.٠ س</div>
+          <div style="font-size:10px; color:var(--text-secondary);">١٠٥٪</div>
+        </div>
+      </div>
+      <div class="progress-bar" style="margin-top:8px;"><div class="fill" style="width:100%; background:var(--success);"></div></div>
+    </div>
+
+    <div class="card" style="padding:12px;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div class="avatar" style="width:40px; height:40px; font-size:14px;">سأ</div>
+        <div style="flex:1;">
+          <div style="font-size:14px; font-weight:500;">سارة أحمد</div>
+          <div style="font-size:11px; color:var(--text-secondary);">مصممة UI/UX</div>
+        </div>
+        <div style="text-align:left;">
+          <div style="font-size:16px; font-weight:700; color:var(--success);">٣٨.٥ س</div>
+          <div style="font-size:10px; color:var(--text-secondary);">٩٦٪</div>
+        </div>
+      </div>
+      <div class="progress-bar" style="margin-top:8px;"><div class="fill" style="width:96%; background:var(--success);"></div></div>
+    </div>
+
+    <div class="card" style="padding:12px;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div class="avatar" style="width:40px; height:40px; font-size:14px;">عط</div>
+        <div style="flex:1;">
+          <div style="font-size:14px; font-weight:500;">عمر طارق</div>
+          <div style="font-size:11px; color:var(--text-secondary);">مطور خلفي</div>
+        </div>
+        <div style="text-align:left;">
+          <div style="font-size:16px; font-weight:700; color:var(--primary);">٣٦.٠ س</div>
+          <div style="font-size:10px; color:var(--text-secondary);">٩٠٪</div>
+        </div>
+      </div>
+      <div class="progress-bar" style="margin-top:8px;"><div class="fill" style="width:90%; background:var(--primary);"></div></div>
+    </div>
+
+    <div class="card" style="padding:12px;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div class="avatar" style="width:40px; height:40px; font-size:14px;">نر</div>
+        <div style="flex:1;">
+          <div style="font-size:14px; font-weight:500;">نور رامي</div>
+          <div style="font-size:11px; color:var(--text-secondary);">مهندسة ضمان الجودة</div>
+        </div>
+        <div style="text-align:left;">
+          <div style="font-size:16px; font-weight:700; color:var(--danger);">٢٤.٠ س</div>
+          <div style="font-size:10px; color:var(--text-secondary);">٦٠٪</div>
+        </div>
+      </div>
+      <div class="progress-bar" style="margin-top:8px;"><div class="fill" style="width:60%; background:var(--danger);"></div></div>
+    </div>
+
+    <div class="card" style="padding:12px;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div class="avatar" style="width:40px; height:40px; font-size:14px;">لح</div>
+        <div style="flex:1;">
+          <div style="font-size:14px; font-weight:500;">ليلى حسن</div>
+          <div style="font-size:11px; color:var(--text-secondary);">مهندسة DevOps</div>
+        </div>
+        <div style="text-align:left;">
+          <div style="font-size:16px; font-weight:700; color:var(--warning);">٣٠.٠ س</div>
+          <div style="font-size:10px; color:var(--text-secondary);">٧٥٪</div>
+        </div>
+      </div>
+      <div class="progress-bar" style="margin-top:8px;"><div class="fill" style="width:75%; background:var(--warning);"></div></div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
