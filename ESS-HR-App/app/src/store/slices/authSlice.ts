@@ -10,7 +10,7 @@ interface AuthState {
   // Step 1 — Admin validation result
   serverUrl: string | null;
   allowedModules: AllowedModule[];
-  autoLogoutDuration: number;         // hours; default 72 (3 days)
+  autoLogoutDuration: number;         // minutes; default 4320 (3 days)
   knownServerUrls: string[];          // cached valid client server URLs for quick re-login
   // Step 2 — Login (identifier used, never password/pin)
   loginIdentifier: string | null;     // badge_id or username entered
@@ -23,12 +23,13 @@ interface AuthState {
   companyName: string | null;
   isAuthenticated: boolean;
   lastActivityTime: number | null;    // ms timestamp; updated on user activity
+  forceLogoutGen: number;             // generation counter received at login; sent with every request
 }
 
 const initialState: AuthState = {
   serverUrl: null,
   allowedModules: [],
-  autoLogoutDuration: 72,
+  autoLogoutDuration: 4320,
   knownServerUrls: [],
   loginIdentifier: null,
   loginMode: null,
@@ -39,6 +40,7 @@ const initialState: AuthState = {
   companyName: null,
   isAuthenticated: false,
   lastActivityTime: null,
+  forceLogoutGen: 0,
 };
 
 const authSlice = createSlice({
@@ -75,6 +77,7 @@ const authSlice = createSlice({
         companyName: string;
         loginIdentifier: string;
         loginMode: 'badge' | 'username';
+        forceLogoutGen: number;
       }>,
     ) => {
       state.accessToken = action.payload.accessToken;
@@ -84,6 +87,7 @@ const authSlice = createSlice({
       state.companyName = action.payload.companyName;
       state.loginIdentifier = action.payload.loginIdentifier;
       state.loginMode = action.payload.loginMode;
+      state.forceLogoutGen = action.payload.forceLogoutGen;
       state.isAuthenticated = true;
       state.lastActivityTime = Date.now();
     },
@@ -98,6 +102,9 @@ const authSlice = createSlice({
       state.lastActivityTime = Date.now();
     },
     clearAuth: state => {
+      state.serverUrl = null;
+      state.allowedModules = [];
+      state.autoLogoutDuration = 4320;
       state.accessToken = null;
       state.refreshToken = null;
       state.user = null;
@@ -105,8 +112,40 @@ const authSlice = createSlice({
       state.loginMode = null;
       state.isAuthenticated = false;
       state.lastActivityTime = null;
-      // serverUrl, allowedModules, autoLogoutDuration, knownServerUrls kept —
-      // user stays on same server context and sees cached URLs after logout.
+      state.forceLogoutGen = 0;
+      // knownServerUrls kept — visible in the welcome screen URL history dropdown.
+      // User must actively choose a server; nothing is auto-selected.
+    },
+    // Auto-logout due to inactivity: clear everything including server context
+    // so the user must re-enter the server URL. knownServerUrls kept for the
+    // history dropdown on the welcome screen.
+    autoLogout: state => {
+      state.serverUrl = null;
+      state.allowedModules = [];
+      state.autoLogoutDuration = 4320;
+      state.accessToken = null;
+      state.refreshToken = null;
+      state.user = null;
+      state.loginIdentifier = null;
+      state.loginMode = null;
+      state.isAuthenticated = false;
+      state.lastActivityTime = null;
+      state.forceLogoutGen = 0;
+      // knownServerUrls kept — visible in the welcome screen URL history
+    },
+    // Used only for admin force-logout: clears session and allowedModules so the
+    // user must re-validate the server license before logging in again.
+    forceLogout: state => {
+      state.accessToken = null;
+      state.refreshToken = null;
+      state.user = null;
+      state.loginIdentifier = null;
+      state.loginMode = null;
+      state.isAuthenticated = false;
+      state.lastActivityTime = null;
+      state.allowedModules = [];
+      state.autoLogoutDuration = 4320;
+      state.forceLogoutGen = 0;
     },
   },
 });
@@ -117,5 +156,7 @@ export const {
   updateTokens,
   updateLastActivity,
   clearAuth,
+  autoLogout,
+  forceLogout,
 } = authSlice.actions;
 export default authSlice.reducer;

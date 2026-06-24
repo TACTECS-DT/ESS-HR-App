@@ -47,7 +47,7 @@ export const MOCK_ADMIN_VALIDATE_VALID: ApiSuccess<{
       {name: 'HR Services', code: 'hr_services'},
       {name: 'Analytics', code: 'analytics'},
     ],
-    auto_logout_duration: 72,
+    auto_logout_duration: 4320,
   },
 };
 

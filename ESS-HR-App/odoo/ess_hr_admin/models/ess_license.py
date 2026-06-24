@@ -157,7 +157,7 @@ class EssLicense(models.Model):
             status: 'valid' | 'invalid',
             reason: str,                  # present when invalid
             allowed_modules: [{name, code}, ...],
-            auto_logout_duration: int,    # hours
+            auto_logout_duration: int,    # minutes (always; converted from server unit setting)
           }
         """
         if not server_url:
@@ -220,7 +220,11 @@ class EssLicense(models.Model):
         return {
             'status': 'valid',
             'allowed_modules': allowed_modules,
-            'auto_logout_duration': server.auto_logout_duration,
+            'auto_logout_duration': (
+                server.auto_logout_duration * 60
+                if server.auto_logout_unit == 'hours'
+                else server.auto_logout_duration
+            ),
         }
 
     # ── History ───────────────────────────────────────────────────────────────

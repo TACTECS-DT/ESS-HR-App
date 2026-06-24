@@ -9,6 +9,7 @@
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
                 <field name="code"/>
+                <field name="technical_name"/>
                 <field name="description"/>
                 <field name="active" widget="boolean_toggle"/>
             </list>
@@ -24,6 +25,8 @@
                     <group>
                         <field name="name"/>
                         <field name="code" help="Used by mobile app to enable/disable this module."/>
+                        <field name="technical_name" required="1"
+                               help="Odoo module technical name on the client server (e.g. hr_attendance, hr_holidays). Used to verify installation during server sync."/>
                         <field name="sequence"/>
                         <field name="active"/>
                     </group>

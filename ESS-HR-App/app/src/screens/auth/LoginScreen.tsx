@@ -76,6 +76,7 @@ export default function LoginScreen() {
         companyName,
         loginIdentifier: mockUser.badge_id,
         loginMode: 'badge',
+        forceLogoutGen: 0,
       }),
     );
     setQuickLoading(false);
@@ -92,7 +93,7 @@ export default function LoginScreen() {
       const res = await apiClient.post(API_MAP.auth.login, body);
       const data = res.data;
       if (isApiSuccess(data)) {
-        const {user, tokens} = data.data;
+        const {user, tokens, force_logout_gen} = data.data;
         await saveTokens(tokens.access_token, tokens.refresh_token);
         dispatch(
           setCredentials({
@@ -103,6 +104,7 @@ export default function LoginScreen() {
             companyName,
             loginIdentifier: isBadgeMode ? badgeId : username,
             loginMode: isBadgeMode ? 'badge' : 'username',
+            forceLogoutGen: force_logout_gen ?? 0,
           }),
         );
       } else {

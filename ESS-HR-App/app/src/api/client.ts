@@ -57,6 +57,7 @@ apiClient.interceptors.request.use(
     if (auth.loginIdentifier) {
       config.headers['X-ESS-Login-Identifier'] = auth.loginIdentifier;
     }
+    config.headers['X-ESS-Force-Logout-Gen'] = String(auth.forceLogoutGen ?? 0);
 
     return config;
   },

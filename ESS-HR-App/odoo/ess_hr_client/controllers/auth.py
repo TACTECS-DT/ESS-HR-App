@@ -11,21 +11,29 @@ class AuthController(http.Controller):
         kw = get_body()
         company_id = kw.get('company_id')
 
+        def _with_gen(result):
+            gen = int(
+                request.env['ir.config_parameter'].sudo()
+                .get_param('ess.force_logout.generation', '0') or '0'
+            )
+            result['force_logout_gen'] = gen
+            return result
+
         if kw.get('badge_id'):
             # Badge ID + PIN mode
             return call_and_log(
                 '/ess/api/auth/login',
-                lambda: request.env['hr.employee'].sudo().authenticate_badge_pin(
+                lambda: _with_gen(request.env['hr.employee'].sudo().authenticate_badge_pin(
                     kw.get('badge_id'), kw.get('pin'), company_id,
-                ),
+                )),
             )
         elif kw.get('username'):
             # Username + Password mode
             return call_and_log(
                 '/ess/api/auth/login',
-                lambda: request.env['hr.employee'].sudo().authenticate_username_password(
+                lambda: _with_gen(request.env['hr.employee'].sudo().authenticate_username_password(
                     kw.get('username'), kw.get('password'), company_id,
-                ),
+                )),
             )
         else:
             from .utils import json_error

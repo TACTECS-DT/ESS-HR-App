@@ -57,6 +57,7 @@ _PUBLIC_ENDPOINTS = {
 # Endpoints authenticated by admin API key instead of employee token
 _ADMIN_ENDPOINTS = {
     '/ess/api/stats',
+    '/ess/api/admin/force-logout',
 }
 
 
@@ -82,6 +83,7 @@ def get_auth_context() -> dict:
         'employee_id': _to_int(h.get('X-ESS-Employee-ID')),
         'login_mode': h.get('X-ESS-Login-Mode', ''),
         'login_identifier': h.get('X-ESS-Login-Identifier', ''),
+        'force_logout_gen': _to_int(h.get('X-ESS-Force-Logout-Gen', '0')) or 0,
     }
 
 
@@ -197,6 +199,15 @@ def call_and_log(endpoint: str, fn) -> http.Response:
             return json_error(
                 'Missing authentication context. Please log in again.',
                 401, 'UNAUTHENTICATED',
+            )
+        stored_gen = int(
+            request.env['ir.config_parameter'].sudo()
+            .get_param('ess.force_logout.generation', '0') or '0'
+        )
+        if ctx.get('force_logout_gen') != stored_gen:
+            return json_error(
+                'The administrator has logged you out. Please contact your administrator.',
+                401, 'FORCE_LOGGED_OUT',
             )
 
     start = time.time()

@@ -10,6 +10,9 @@ A cross-platform Employee Self Service (ESS) mobile application built with React
 - [Technology Stack](#technology-stack)
 - [Architecture](#architecture)
 - [Project Structure](#project-structure)
+- [Odoo Modules](#odoo-modules)
+  - [ess_hr_admin](#ess_hr_admin)
+  - [ess_hr_client](#ess_hr_client)
 - [Features & Modules](#features--modules)
   - [Phase 1 - MVP](#phase-1---mvp-months-1-4)
   - [Phase 2 - Growth](#phase-2---growth-months-5-8)
@@ -132,9 +135,117 @@ ESS-HR-App/
 │       ├── wireframes_en.html      # English (LTR) interactive wireframes
 │       └── wireframes_ar.html      # Arabic (RTL) interactive wireframes
 │
+├── odoo/                           # Odoo backend modules
+│   ├── ess_hr_admin/               # Central license & admin server module
+│   └── ess_hr_client/              # Client Odoo server module (HR business logic + API)
 ├── commands.txt                    # Dev environment commands reference
 └── README.md                       # This file
 ```
+
+---
+
+## Odoo Modules
+
+The backend is split into two Odoo modules with distinct responsibilities.
+
+### ess_hr_admin
+
+Installed on the **central admin server**. Acts as the gatekeeper for all client servers.
+
+#### Models
+
+| Model | Purpose |
+|---|---|
+| `ess.server` | One record per client Odoo installation. Tracks URL, license, connection key, live stats, and scan results. |
+| `ess.license` | License records. Controls which servers are authorized, which modules are allowed, and employee count limits. |
+| `ess.module` | Catalog of ESS mobile feature modules. Each record maps a mobile feature to its Odoo technical name for installation verification. |
+| `ess.server.module` | Installed modules fetched from a client server during sync (read-only snapshot). |
+
+#### ess.module — Technical Name field
+
+Each module record now has a **Technical Name** field (`technical_name`) alongside the existing mobile code. This is the Odoo module name as it appears on the client server (e.g. `hr_attendance`, `hr_holidays`). It is required when creating or editing a module record and is used to verify installation during server sync and scan.
+
+Pre-populated standard mappings:
+
+| Module | Mobile Code | Technical Name |
+|---|---|---|
+| Attendance | `attendance` | `hr_attendance` |
+| Leave | `leave` | `hr_holidays` |
+| Payslip | `payslip` | `hr_payroll` |
+| Expense | `expense` | `hr_expense` |
+| Loan | `loan` | `hr_loan` |
+| Advance Salary | `advance_salary` | `advance_salary` |
+| HR Services | `hr_services` | `hr_services` |
+| Announcements | `announcements` | `announcements` |
+| Notifications | `notifications` | `notifications` |
+| Analytics | `analytics` | `analytics` |
+
+#### Server Actions
+
+**Sync Stats Now**
+Pulls live data from the client's `/ess/api/stats` endpoint (authenticated via `X-ESS-Admin-Key`). On success it:
+- Updates employee counts, user counts, and installed module list on the server record
+- Runs the module check (updates the Module Check tab)
+- Deactivates the license if the employee limit is exceeded or the server is unreachable
+
+**Scan** *(read-only health check)*
+Also calls `/ess/api/stats` using the same connection key but **writes nothing back** — no stats update, no server status change, no license deactivation. After fetching, it runs a full health check and saves a formatted HTML report to the **Scan tab**. Checks performed:
+
+| Check | Severity |
+|---|---|
+| Server unreachable / auth failed / HTTP errors | Issue |
+| No license assigned | Issue |
+| License inactive or expired | Issue |
+| Employee count exceeds hard limit (max + overage) | Issue |
+| Employee count exceeds base limit but within overage | Warning |
+| Any license-allowed module not installed on client | Issue (one per module) |
+
+The Scan tab report includes:
+- A colour-coded summary banner (red / yellow / green)
+- Grouped issues and warnings with icons
+- Live stats cards: Employees (red/yellow/green by limit), Active Users, Employee Limit, Installed Modules (red if any required module missing)
+- Odoo Users breakdown: Total, Internal, Portal, Public, Archived
+
+#### Module Check tab
+
+Updated automatically on every **Sync Stats Now** (and scan). Compares the license's Allowed Modules against the modules actually installed on the client using the `technical_name` field. Displays a green confirmation if all modules are present, or a table listing missing and installed modules with status badges.
+
+---
+
+### ess_hr_client
+
+Installed on each **client Odoo server**. Provides all HR REST API endpoints consumed by the mobile app and a stats endpoint used by the admin server.
+
+#### Key endpoints
+
+| Method | Path | Description |
+|---|---|---|
+| `POST` | `/ess/api/auth/login` | Employee login (badge ID + credential) |
+| `GET` | `/ess/api/stats` | Returns employee counts, user counts, and installed module list. Protected by `X-ESS-Admin-Key`. Used by both Sync and Scan on the admin server. |
+| `POST` | `/ess/api/admin/force-logout` | Invalidates all active mobile sessions |
+| `GET/POST` | `/ess/api/*` | All HR feature endpoints (attendance, leave, payslip, expense, loan, etc.) |
+
+#### Stats endpoint response
+
+```json
+{
+  "success": true,
+  "data": {
+    "employee_count": 42,
+    "active_user_count": 18,
+    "odoo_user_count": 6,
+    "internal_user_count": 2,
+    "portal_user_count": 3,
+    "public_user_count": 1,
+    "archived_user_count": 1,
+    "installed_modules": [
+      { "name": "Attendances", "technical_name": "hr_attendance", "version": "19.0.1.0.0" }
+    ]
+  }
+}
+```
+
+> `odoo_user_count` = active users (internal + portal) + archived users. The public system user is counted separately and not included in the total.
 
 ---
 

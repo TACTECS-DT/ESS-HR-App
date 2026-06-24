@@ -41,7 +41,7 @@ for _stream in (sys.stdout, sys.stderr):
 PYTHON_EXE  = r"d:\odoo19\python\python.exe"
 ODOO_BIN    = r"d:\odoo19\server\odoo-bin"
 ODOO_CONF   = r"d:\odoo19\server\odoo.conf"
-DEFAULT_DB  = "ess-19"
+DEFAULT_DB  = "odoo19_comunity"
 SCRIPT_DIR  = Path(__file__).parent  # D:\ESS-HR-App\odoo\
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -86,7 +86,7 @@ RE_API_CALL = re.compile(
 RE_RAN = re.compile(r'Ran\s+(\d+)\s+tests?\s+in\s+([\d.]+)s', re.IGNORECASE)
 # "128 post-tests in 18.73s, 6785 queries"  (Odoo 19 all-pass summary)
 RE_ODOO_POST = re.compile(r'(\d+)\s+post-tests\s+in\s+([\d.]+)s')
-# "14 failed, 11 error(s) of 128 tests when loading database 'ess-19'"  (Odoo 19)
+# "14 failed, 11 error(s) of 128 tests when loading database 'odoo19_comunity '"  (Odoo 19)
 RE_ODOO_SUMMARY = re.compile(
     r'(\d+)\s+failed,\s+(\d+)\s+error\(?s?\)?\s+of\s+(\d+)\s+tests?',
     re.IGNORECASE,
@@ -158,6 +158,7 @@ def build_command(db: str, module: str, tags: str) -> list:
         PYTHON_EXE, ODOO_BIN,
         '--config',        ODOO_CONF,
         '--database',      db,
+        '--update',        modules,
         '--test-enable',
         '--stop-after-init',
         '--test-tags',     test_tags,

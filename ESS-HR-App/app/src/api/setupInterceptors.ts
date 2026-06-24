@@ -2,15 +2,18 @@
  * Call this once after the Redux store is ready.
  * All auth headers are set in client.ts interceptor.
  * This file handles:
- *   - 401 token refresh and retry
+ *   - 401 FORCE_LOGGED_OUT: admin force-logout — clears session and alerts user
+ *   - 401 other: token refresh and retry
  *   - Server unreachable detection (sets connectivity.serverDown)
  */
+import {Alert} from 'react-native';
 import apiClient from './client';
 import {API_MAP} from './apiMap';
 import {store} from '../store';
-import {updateTokens, clearAuth} from '../store/slices/authSlice';
+import {updateTokens, clearAuth, forceLogout} from '../store/slices/authSlice';
 import {setServerDown} from '../store/slices/connectivitySlice';
 import {saveTokens, clearTokens} from '../utils/secureStorage';
+import i18n from '../i18n';
 
 export function setupInterceptors(): void {
   apiClient.interceptors.response.use(
@@ -33,6 +36,19 @@ export function setupInterceptors(): void {
       // Server responded — clear server-down flag
       if (store.getState().connectivity.serverDown) {
         store.dispatch(setServerDown(false));
+      }
+
+      // Handle 401 FORCE_LOGGED_OUT — skip refresh, clear everything, alert user
+      const errorCode = error.response.data?.error?.code;
+      if (error.response.status === 401 && errorCode === 'FORCE_LOGGED_OUT') {
+        store.dispatch(forceLogout());
+        await clearTokens();
+        Alert.alert(
+          i18n.t('auth.errors.forceLogout.title'),
+          i18n.t('auth.errors.forceLogout.body'),
+          [{text: i18n.t('common.ok')}],
+        );
+        return Promise.reject(error);
       }
 
       // Handle 401: attempt token refresh, then retry

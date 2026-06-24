@@ -21,6 +21,11 @@ class EssModule(models.Model):
              'e.g. attendance, leave, payslip, expense, loan, advance_salary, '
              'hr_services, tasks, analytics, notifications, announcements.',
     )
+    technical_name = fields.Char(
+        string='Technical Name',
+        help='Odoo module technical name on the client server (e.g. hr_attendance, hr_holidays). '
+             'Used to verify that the required Odoo module is actually installed on the client.',
+    )
     description = fields.Text(string='Description')
     sequence = fields.Integer(string='Sequence', default=10)
     active = fields.Boolean(string='Active', default=True)

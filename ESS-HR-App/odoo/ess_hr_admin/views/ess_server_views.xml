@@ -39,10 +39,23 @@
                         class="btn-primary"
                         help="Immediately pull employee and user stats from this server."/>
                     <button
+                        name="action_scan"
+                        string="Scan"
+                        type="object"
+                        class="btn-secondary"
+                        help="Run a full health check — syncs stats then reports all issues (license, employee limit, missing modules) in the Scan tab."/>
+                    <button
                         name="action_open_status_wizard"
                         string="Change Status"
                         type="object"
                         class="btn-secondary"/>
+                    <button
+                        name="action_force_logout"
+                        string="Force Logout All Users"
+                        type="object"
+                        class="btn-danger"
+                        confirm="This will log out ALL mobile users on this server. They will be shown a message that the administrator has logged them out. Continue?"
+                        help="Immediately invalidate all active mobile sessions on this server."/>
                     <field name="server_status" widget="statusbar"
                            statusbar_visible="active,unreachable,deactivated"
                            readonly="1"/>
@@ -55,14 +68,18 @@
                             <field name="license_id"/>
                         </group>
                         <group string="Settings">
-                            <field name="auto_logout_duration"
-                                   help="Hours of inactivity before mobile app auto-logs out. Sent to mobile on each Step 1 validation."/>
+                            <label for="auto_logout_duration" string="Auto Logout Duration"/>
+                            <div class="o_row">
+                                <field name="auto_logout_duration"
+                                       help="Duration of inactivity before the mobile app auto-logs out. Sent to the mobile on each Step 1 validation."/>
+                                <field name="auto_logout_unit" class="ms-2"/>
+                            </div>
                         </group>
                     </group>
                     <group string="Admin Connection Key">
                         <group>
                             <field name="connection_key"
-                                   widget="password"
+                                   widget="CopyClipboardChar"
                                    placeholder="Click Generate Key to create a new key"/>
                         </group>
                         <group>
@@ -82,19 +99,49 @@
                         <group>
                             <field name="employee_count" readonly="1"/>
                             <field name="active_user_count" string="Active Users (30d)" readonly="1"/>
-                        </group>
-                        <group>
                             <field name="last_sync_date" readonly="1"/>
                             <field name="last_sync_status" readonly="1" widget="badge"
                                    decoration-success="last_sync_status == 'success'"
                                    decoration-danger="last_sync_status == 'unreachable'"
                                    decoration-warning="last_sync_status == 'failed'"/>
                         </group>
+                        <group string="Odoo Users">
+                            <field name="odoo_user_count" string="Active Users" readonly="1"/>
+                            <field name="archived_user_count" string="Archived Users" readonly="1"/>
+                            <field name="internal_user_count" string="Internal" readonly="1"/>
+                            <field name="portal_user_count" string="Portal" readonly="1"/>
+                            <field name="public_user_count" string="Public" readonly="1"/>
+                        </group>
                     </group>
                     <group string="Sync Error" invisible="not last_sync_error">
                         <field name="last_sync_error" nolabel="1" readonly="1"/>
                     </group>
                     <notebook>
+                        <page string="Scan" name="scan">
+                            <field name="scan_html" readonly="1" widget="html"/>
+                            <div class="text-center text-muted py-4" invisible="scan_html">
+                                <i class="fa fa-search fa-3x mb-3 d-block opacity-50"/>
+                                <p class="mb-1 fw-semibold">No scan has been run yet.</p>
+                                <p class="small">Click <strong>Scan</strong> in the header to run a full health check.</p>
+                            </div>
+                        </page>
+                        <page string="Module Check" name="module_check">
+                            <div class="o_field_html">
+                                <field name="module_check_html" readonly="1"/>
+                            </div>
+                            <p class="text-muted mt-2" invisible="module_check_html">
+                                No module check data yet. Click <strong>Sync Stats Now</strong> to run a check.
+                            </p>
+                        </page>
+                        <page string="Installed Modules" name="installed_modules">
+                            <field name="module_ids" readonly="1">
+                                <list string="Installed Modules" create="0" edit="0" delete="0">
+                                    <field name="module_name" string="Module"/>
+                                    <field name="technical_name" string="Technical Name"/>
+                                    <field name="version" string="Version"/>
+                                </list>
+                            </field>
+                        </page>
                         <page string="Status History" name="status_history">
                             <field name="history_ids" readonly="1">
                                 <list string="Status History" create="0" edit="0" delete="0">

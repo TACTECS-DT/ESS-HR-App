@@ -83,6 +83,7 @@ class EssAdminTestCase(HttpCase):
             'url':                  cls.server_url,
             'license_id':           cls.license.id,
             'auto_logout_duration': 72,
+            'auto_logout_unit':     'hours',
             'employee_count':       10,
             'active_user_count':    3,
         })

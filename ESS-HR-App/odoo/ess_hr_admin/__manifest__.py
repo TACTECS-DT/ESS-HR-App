@@ -1,6 +1,6 @@
 {
     'name': 'ESS HR Admin',
-    'version': '19.1',
+    'version': '19.2',
     'summary': 'Central license manager for ESS Mobile App — validates licenses and controls module access',
     'category': 'Human Resources',
     'author': 'ESS',

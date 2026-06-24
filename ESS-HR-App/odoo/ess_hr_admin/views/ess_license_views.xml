@@ -23,14 +23,6 @@
         <field name="model">ess.license</field>
         <field name="arch" type="xml">
             <form string="ESS License">
-                <div class="oe_button_box" name="button_box">
-                    <button name="action_view_servers"
-                            type="object"
-                            class="oe_stat_button"
-                            icon="fa-server">
-                        <field name="server_count" widget="statinfo" string="Servers"/>
-                    </button>
-                </div>
                 <header>
                     <button name="action_open_activate_wizard"
                             string="Activate Servers"
@@ -47,6 +39,14 @@
                            readonly="1"/>
                 </header>
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_servers"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-server">
+                            <field name="server_count" widget="statinfo" string="Servers"/>
+                        </button>
+                    </div>
                     <group>
                         <group string="License Info">
                             <field name="name"/>
@@ -71,7 +71,7 @@
 
                     <group string="Authorized Servers"
                            help="Servers are managed from the Client Servers page. Assign a license from the server form.">
-                        <field name="server_ids" nolabel="1" readonly="1">
+                        <field name="server_ids"  readonly="1">
                             <list string="Servers">
                                 <field name="name"/>
                                 <field name="url"/>

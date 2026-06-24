@@ -119,6 +119,14 @@
       "employeeLimit": {
         "title": "Employee Limit Exceeded",
         "body": "This server has exceeded its licensed employee count. Please contact your HR administrator."
+      },
+      "forceLogout": {
+        "title": "Logged Out by Administrator",
+        "body": "The administrator has logged you out. Please contact your HR administrator."
+      },
+      "autoLogout": {
+        "title": "Session Expired",
+        "body": "You were automatically logged out due to inactivity. Please sign in again."
       }
     }
   },

@@ -10,28 +10,35 @@
  */
 
 import {useEffect, useRef} from 'react';
-import {AppState, AppStateStatus} from 'react-native';
+import {Alert, AppState, AppStateStatus} from 'react-native';
+import {useTranslation} from 'react-i18next';
 import {useAppSelector} from './useAppSelector';
 import {useAppDispatch} from './useAppDispatch';
-import {clearAuth} from '../store/slices/authSlice';
+import {autoLogout} from '../store/slices/authSlice';
 import {clearTokens} from '../utils/secureStorage';
 
 const CHECK_INTERVAL_MS = 60 * 1000; // 1 minute
 
 export function useAutoLogout() {
+  const {t} = useTranslation();
   const dispatch = useAppDispatch();
   const isAuthenticated = useAppSelector(s => s.auth.isAuthenticated);
   const lastActivityTime = useAppSelector(s => s.auth.lastActivityTime);
-  const autoLogoutDuration = useAppSelector(s => s.auth.autoLogoutDuration ?? 72);
+  const autoLogoutDuration = useAppSelector(s => s.auth.autoLogoutDuration ?? 4320);
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   function checkAndLogout() {
     if (!isAuthenticated || !lastActivityTime) {return;}
-    const maxIdleMs = autoLogoutDuration * 60 * 60 * 1000;
+    const maxIdleMs = autoLogoutDuration * 60 * 1000;
     if (Date.now() - lastActivityTime > maxIdleMs) {
       clearTokens();
-      dispatch(clearAuth());
+      dispatch(autoLogout());
+      Alert.alert(
+        t('auth.errors.autoLogout.title'),
+        t('auth.errors.autoLogout.body'),
+        [{text: t('common.ok')}],
+      );
     }
   }
 

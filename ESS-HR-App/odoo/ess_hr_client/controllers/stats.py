@@ -73,9 +73,46 @@ def _collect_stats(req):
         })
     active_user_list.sort(key=lambda u: u['last_activity'] or '', reverse=True)
 
+    # ── Odoo user counts by type ──────────────────────────────────────────────
+    # share=False → internal (employee) users; share=True → portal users.
+    # The public pseudo-user (base.public_user) is typically inactive, so we
+    # count it separately via env.ref rather than relying on groups_id search.
+    all_users = env['res.users'].sudo().search([('active', '=', True)])
+    internal_users = all_users.filtered(lambda u: not u.share)
+    portal_users = all_users.filtered(lambda u: u.share)
+    try:
+        public_user_ref = env.ref('base.public_user', raise_if_not_found=False)
+        public_count = 1 if public_user_ref else 0
+    except Exception:
+        public_count = 0
+
+    # ── Archived (inactive) users ─────────────────────────────────────────────
+    archived_users = env['res.users'].with_context(active_test=False).sudo().search(
+        [('active', '=', False)]
+    )
+
+    # ── Installed modules ─────────────────────────────────────────────────────
+    modules = env['ir.module.module'].sudo().search(
+        [('state', '=', 'installed')], order='shortdesc asc'
+    )
+    module_list = [
+        {
+            'name': mod.shortdesc or mod.name,
+            'technical_name': mod.name,
+            'version': mod.installed_version or '',
+        }
+        for mod in modules
+    ]
+
     return {
         'employee_count': employee_count,
         'active_user_count': active_user_count,
         'employees': employee_list,
         'active_users': active_user_list,
+        'odoo_user_count': len(all_users) + len(archived_users),
+        'internal_user_count': len(internal_users),
+        'portal_user_count': len(portal_users),
+        'public_user_count': public_count,
+        'archived_user_count': len(archived_users),
+        'installed_modules': module_list,
     }

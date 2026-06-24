@@ -1,5 +1,6 @@
 from . import utils
 from . import auth
+from . import admin
 from . import stats
 from . import employee
 from . import attendance

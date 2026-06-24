@@ -127,13 +127,16 @@ class EssClientTestCase(HttpCase):
             'company_id': self.company_id,
         }, auth=False, log=False)
         self.assertTrue(result.get('success'), f'Test login failed: {result}')
-        tokens = result['data']['tokens']
+        data = result['data']
+        tokens = data['tokens']
+        force_logout_gen = str(data.get('force_logout_gen', 0))
         self._auth_hdrs = {
-            'Authorization':          f"Bearer {tokens['access_token']}",
-            'X-ESS-Company-ID':       str(self.company_id),
-            'X-ESS-Employee-ID':      str(self.emp_id),
-            'X-ESS-Login-Mode':       'badge',
-            'X-ESS-Login-Identifier': self.badge_id,
+            'Authorization':            f"Bearer {tokens['access_token']}",
+            'X-ESS-Company-ID':         str(self.company_id),
+            'X-ESS-Employee-ID':        str(self.emp_id),
+            'X-ESS-Login-Mode':         'badge',
+            'X-ESS-Login-Identifier':   self.badge_id,
+            'X-ESS-Force-Logout-Gen':   force_logout_gen,
         }
         self._refresh_token = tokens.get('refresh_token', '')
 

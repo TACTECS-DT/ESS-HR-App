@@ -9,7 +9,16 @@
       "Bash(Select-Object Name)",
       "Bash(Get-ChildItem -Path \"d:\\\\ESS-HR-App\\\\odoo\\\\ess_hr_admin\\\\models\\\\\" -File | Select-Object Name)",
       "Bash(Get-ChildItem -Path \"d:\\\\ESS-HR-App\\\\odoo\\\\ess_hr_admin\\\\models\" -File)",
-      "Bash(Remove-Item \"d:\\\\ESS-HR-App\\\\odoo\\\\ess_hr_client\\\\models\\\\ess_client_settings.py\")"
+      "Bash(Remove-Item \"d:\\\\ESS-HR-App\\\\odoo\\\\ess_hr_client\\\\models\\\\ess_client_settings.py\")",
+      "Bash(\"d:\\\\odoo19\\\\python\\\\python.exe\" _engine.py --db odoo19_comunity)",
+      "Bash(Get-ChildItem -Path \"D:\\\\ESS-HR-App\" -Recurse -Depth 2)",
+      "Bash(Select-Object FullName)",
+      "PowerShell(head -50)",
+      "Bash(Get-ChildItem -Path \"d:\\\\ESS-HR-App\" -Recurse -Depth 3)",
+      "Bash(Select-Object -Property FullName, PSIsContainer)",
+      "Bash(Sort-Object FullName)",
+      "Bash(Format-Table -AutoSize)",
+      "Bash(Get-ChildItem -Path \"d:\\\\ESS-HR-App\" -Directory)"
     ]
   }
 }

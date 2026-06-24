@@ -36,7 +36,7 @@ class TestValidateEndpoint(EssAdminTestCase):
         self.assertHasKeys(m, ['code', 'name'])
 
     def test_validate_returns_auto_logout_duration(self):
-        """Validate response contains auto_logout_duration in hours."""
+        """Validate response contains auto_logout_duration in minutes."""
         result = self._call('POST', '/ess/admin/api/validate', {
             'server_url': self.server_url,
         })
@@ -44,7 +44,7 @@ class TestValidateEndpoint(EssAdminTestCase):
         duration = data['auto_logout_duration']
         self.assertIsInstance(duration, int)
         self.assertGreater(duration, 0)
-        self.assertEqual(duration, 72)  # matches our fixture server setting
+        self.assertEqual(duration, 72 * 60)  # fixture is 72 hours → sent as 4320 minutes
 
     def test_validate_url_trailing_slash_normalized(self):
         """Validate endpoint normalises trailing slashes in server URL."""

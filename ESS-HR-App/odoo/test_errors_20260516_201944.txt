@@ -1,0 +1,731 @@
+======================================================================
+  ESS HR Odoo Test Run — 2026-05-16 20:20:03
+  Command : d:\odoo19\python\python.exe d:\odoo19\server\odoo-bin --config d:\odoo19\server\odoo.conf --database odoo19_comunity --update ess_hr_client,ess_hr_admin --test-enable --stop-after-init --test-tags ess_api,ess_admin --http-port 8056 --log-level test --log-handler odoo.tests:INFO --log-handler odoo.tests.runner:INFO --log-handler odoo.addons.ess_hr_client.tests:INFO --log-handler odoo.addons.ess_hr_admin.tests:INFO
+======================================================================
+
+SUMMARY
+----------------------------------------
+  Total run  : 123
+  Passed     : 123
+  Failed     : 0
+  Errors     : 0
+  Skipped    : 0
+  Duration   : 11.18s
+  Result     : PASSED
+
+FULL ODOO OUTPUT
+======================================================================
+2026-05-16 17:19:44,822 10020 INFO ? odoo: Odoo version 19.0-20260515 
+2026-05-16 17:19:44,822 10020 INFO ? odoo: Using configuration file at d:\odoo19\server\odoo.conf 
+2026-05-16 17:19:44,822 10020 INFO ? odoo: addons paths: _NamespacePath(['d:\\odoo19\\server\\odoo\\addons', 'c:\\users\\work\\appdata\\local\\openerp s.a\\odoo\\addons\\19.0', 'd:\\ess-hr-app\\odoo', 'd:\\odoo19\\server\\addons']) 
+2026-05-16 17:19:44,823 10020 INFO ? odoo: database: odoo19@localhost:5432 
+2026-05-16 17:19:46,617 10020 INFO ? odoo.service.server: HTTP service (werkzeug) running on WorkPC:8056 
+2026-05-16 17:19:46,655 10020 INFO odoo19_comunity odoo.tests.common: Importing test framework 
+2026-05-16 17:19:46,729 10020 INFO odoo19_comunity odoo.modules.loading: loading 1 modules... 
+2026-05-16 17:19:46,732 10020 INFO odoo19_comunity odoo.modules.loading: 1 modules loaded in 0.00s, 0 queries (+0 extra) 
+2026-05-16 17:19:46,754 10020 INFO odoo19_comunity odoo.modules.loading: updating modules list 
+2026-05-16 17:19:46,759 10020 INFO odoo19_comunity odoo.addons.base.models.ir_module: ALLOW access to module.update_list on [] to user __system__ #1 via n/a 
+2026-05-16 17:19:47,822 10020 INFO odoo19_comunity odoo.addons.base.models.ir_module: ALLOW access to module.button_upgrade on ['ESS HR Admin', 'ESS HR Client'] to user __system__ #1 via n/a 
+2026-05-16 17:19:47,822 10020 INFO odoo19_comunity odoo.addons.base.models.ir_module: ALLOW access to module.update_list on ['ESS HR Admin', 'ESS HR Client'] to user __system__ #1 via n/a 
+2026-05-16 17:19:48,640 10020 INFO odoo19_comunity odoo.addons.base.models.ir_module: ALLOW access to module.button_install on [] to user __system__ #1 via n/a 
+2026-05-16 17:19:48,690 10020 INFO odoo19_comunity odoo.modules.loading: loading 78 modules... 
+2026-05-16 17:19:49,055 10020 INFO odoo19_comunity odoo.modules.loading: Loading module ess_hr_admin (28/78) 
+2026-05-16 17:19:49,112 10020 INFO odoo19_comunity odoo.registry: module ess_hr_admin: creating or updating database tables 
+2026-05-16 17:19:49,193 10020 INFO odoo19_comunity odoo.modules.loading: loading ess_hr_admin/security/security.xml 
+2026-05-16 17:19:49,204 10020 INFO odoo19_comunity odoo.modules.loading: loading ess_hr_admin/security/ir.model.access.csv 
+2026-05-16 17:19:49,223 10020 INFO odoo19_comunity odoo.modules.loading: loading ess_hr_admin/data/ess_modules_data.xml 
+2026-05-16 17:19:49,230 10020 INFO odoo19_comunity odoo.modules.loading: loading ess_hr_admin/data/ess_cron.xml 
+2026-05-16 17:19:49,233 10020 INFO odoo19_comunity odoo.modules.loading: loading ess_hr_admin/views/ess_module_views.xml 
+2026-05-16 17:19:49,265 10020 INFO odoo19_comunity odoo.modules.loading: loading ess_hr_admin/views/ess_server_views.xml 
+2026-05-16 17:19:49,282 10020 INFO odoo19_comunity odoo.modules.loading: loading ess_hr_admin/views/ess_license_views.xml 
+2026-05-16 17:19:49,296 10020 INFO odoo19_comunity odoo.modules.loading: loading ess_hr_admin/views/ess_status_wizard_views.xml 
+2026-05-16 17:19:49,312 10020 INFO odoo19_comunity odoo.modules.loading: loading ess_hr_admin/views/ess_activate_wizard_views.xml 
+2026-05-16 17:19:49,319 10020 INFO odoo19_comunity odoo.modules.loading: loading ess_hr_admin/views/ess_api_call_views.xml 
+2026-05-16 17:19:49,346 10020 INFO odoo19_comunity odoo.modules.loading: loading ess_hr_admin/views/ess_menus.xml 
+2026-05-16 17:19:49,386 10020 INFO odoo19_comunity odoo.modules.loading: Module ess_hr_admin loaded in 0.33s, 384 queries (+384 other) 
+2026-05-16 17:19:49,967 10020 INFO odoo19_comunity odoo.modules.loading: Loading module ess_hr_client (78/78) 
+2026-05-16 17:19:50,128 10020 INFO odoo19_comunity odoo.registry: module ess_hr_client: creating or updating database tables 
+2026-05-16 17:19:50,289 10020 INFO odoo19_comunity odoo.modules.loading: loading ess_hr_client/security/security.xml 
+2026-05-16 17:19:50,295 10020 INFO odoo19_comunity odoo.modules.loading: loading ess_hr_client/security/ir.model.access.csv 
+2026-05-16 17:19:50,319 10020 INFO odoo19_comunity odoo.modules.loading: loading ess_hr_client/data/ess_data.xml 
+2026-05-16 17:19:50,327 10020 INFO odoo19_comunity odoo.modules.loading: loading ess_hr_client/views/ess_employee_credential_views.xml 
+2026-05-16 17:19:50,426 10020 INFO odoo19_comunity odoo.modules.loading: loading ess_hr_client/views/ess_api_log_views.xml 
+2026-05-16 17:19:50,462 10020 INFO odoo19_comunity odoo.modules.loading: loading ess_hr_client/views/res_config_settings_views.xml 
+2026-05-16 17:19:50,514 10020 INFO odoo19_comunity odoo.modules.loading: loading ess_hr_client/views/ess_menus.xml 
+2026-05-16 17:19:50,550 10020 INFO odoo19_comunity odoo.modules.loading: Module ess_hr_client loaded in 0.58s, 537 queries (+537 other) 
+2026-05-16 17:19:50,550 10020 INFO odoo19_comunity odoo.modules.loading: 78 modules loaded in 1.86s, 921 queries (+921 extra) 
+2026-05-16 17:19:50,847 10020 INFO odoo19_comunity odoo.registry: verifying fields for every extended model 
+2026-05-16 17:19:51,520 10020 INFO odoo19_comunity odoo.modules.loading: Modules loaded. 
+2026-05-16 17:19:51,535 10020 INFO odoo19_comunity odoo.registry: Registry changed, signaling through the database 
+2026-05-16 17:19:51,536 10020 INFO odoo19_comunity odoo.registry: Registry loaded in 4.918s 
+2026-05-16 17:19:51,536 10020 INFO odoo19_comunity odoo.service.server: Starting post tests 
+2026-05-16 17:19:51,539 10020 INFO odoo19_comunity odoo.addons.base.models.ir_qweb: Pregenerating assets bundles 
+2026-05-16 17:19:53,193 10020 INFO odoo19_comunity odoo.addons.base.models.ir_qweb: JS Assets bundles generated in 1.238807201385498 seconds 
+2026-05-16 17:19:53,672 10020 INFO odoo19_comunity odoo.addons.base.models.ir_qweb: CSS Assets bundles generated in 0.47844839096069336 seconds 
+2026-05-16 17:19:53,712 10020 INFO odoo19_comunity odoo.addons.ess_hr_admin.tests.test_license: Starting TestLicenseModel.test_validate_for_mobile_employee_limit ... 
+2026-05-16 17:19:53,717 10020 INFO odoo19_comunity odoo.addons.ess_hr_admin.tests.test_license: Starting TestLicenseModel.test_validate_for_mobile_expired_license ... 
+2026-05-16 17:19:53,728 10020 INFO odoo19_comunity odoo.addons.ess_hr_admin.tests.test_license: Starting TestLicenseModel.test_validate_for_mobile_inactive_license ... 
+2026-05-16 17:19:53,737 10020 INFO odoo19_comunity odoo.addons.ess_hr_admin.tests.test_license: Starting TestLicenseModel.test_validate_for_mobile_server_not_found ... 
+2026-05-16 17:19:53,743 10020 INFO odoo19_comunity odoo.addons.ess_hr_admin.tests.test_license: Starting TestLicenseModel.test_validate_for_mobile_url_stripped ... 
+2026-05-16 17:19:53,746 10020 INFO odoo19_comunity odoo.addons.ess_hr_admin.tests.test_license: Starting TestLicenseModel.test_validate_for_mobile_valid ... 
+2026-05-16 17:19:53,797 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted mail.message records with IDs: [1332] 
+2026-05-16 17:19:53,812 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted ess.server records with IDs: [43] 
+2026-05-16 17:19:53,826 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted mail.message records with IDs: [1331] 
+2026-05-16 17:19:53,833 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted ess.license records with IDs: [66] 
+2026-05-16 17:19:53,845 10020 INFO odoo19_comunity odoo.addons.base.models.ir_attachment: filestore gc 0 checked, 0 removed 
+2026-05-16 17:19:53,872 10020 INFO odoo19_comunity odoo.addons.ess_hr_admin.tests.test_license: Starting TestServerModel.test_action_sync_stats_button ... 
+2026-05-16 17:19:53,874 10020 INFO odoo19_comunity odoo.addons.ess_hr_admin.tests.test_license: Starting TestServerModel.test_cron_sync_all_stats_calls_each_server ... 
+2026-05-16 17:19:53,875 10020 INFO odoo19_comunity odoo.addons.ess_hr_admin.tests.test_license: Starting TestServerModel.test_sync_stats_deactivates_on_employee_limit_exceeded ... 
+2026-05-16 17:19:53,885 10020 WARNING odoo19_comunity odoo.addons.ess_hr_admin.models.ess_server: ESS Admin: license ESS Test License deactivated � Employee limit exceeded: 60 employees found, limit is 55 (max 50 + overage allowed 5). 
+2026-05-16 17:19:53,885 10020 INFO odoo19_comunity odoo.addons.ess_hr_admin.tests.test_license: Starting TestServerModel.test_sync_stats_on_connection_error ... 
+2026-05-16 17:19:53,893 10020 WARNING odoo19_comunity odoo.addons.ess_hr_admin.models.ess_server: ESS Admin: license ESS Test License deactivated � Server unreachable: http://test-client-server.local 
+2026-05-16 17:19:53,893 10020 INFO odoo19_comunity odoo.addons.ess_hr_admin.tests.test_license: Starting TestServerModel.test_sync_stats_on_success ... 
+2026-05-16 17:19:53,899 10020 INFO odoo19_comunity odoo.addons.ess_hr_admin.tests.test_license: Starting TestServerModel.test_sync_stats_on_timeout ... 
+2026-05-16 17:19:53,910 10020 WARNING odoo19_comunity odoo.addons.ess_hr_admin.models.ess_server: ESS Admin: license ESS Test License deactivated � Server timed out: http://test-client-server.local 
+2026-05-16 17:19:53,921 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted mail.message records with IDs: [1334] 
+2026-05-16 17:19:53,924 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted ess.server records with IDs: [44] 
+2026-05-16 17:19:53,933 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted mail.message records with IDs: [1333] 
+2026-05-16 17:19:53,937 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted ess.license records with IDs: [67] 
+2026-05-16 17:19:53,948 10020 INFO odoo19_comunity odoo.addons.base.models.ir_attachment: filestore gc 0 checked, 0 removed 
+2026-05-16 17:19:53,973 10020 INFO odoo19_comunity odoo.addons.ess_hr_admin.tests.test_license: Starting TestLicenseFields.test_deactivation_sets_reason_and_date ... 
+2026-05-16 17:19:53,976 10020 WARNING odoo19_comunity odoo.addons.ess_hr_admin.models.ess_server: ESS Admin: license ESS Test License deactivated � Test deactivation reason 
+2026-05-16 17:19:53,976 10020 INFO odoo19_comunity odoo.addons.ess_hr_admin.tests.test_license: Starting TestLicenseFields.test_license_has_required_fields ... 
+2026-05-16 17:19:53,979 10020 INFO odoo19_comunity odoo.addons.ess_hr_admin.tests.test_license: Starting TestLicenseFields.test_module_codes_are_unique ... 
+2026-05-16 17:19:53,981 10020 INFO odoo19_comunity odoo.addons.ess_hr_admin.tests.test_license: Starting TestLicenseFields.test_server_has_required_fields ... 
+2026-05-16 17:19:53,982 10020 INFO odoo19_comunity odoo.addons.ess_hr_admin.tests.test_license: Starting TestLicenseFields.test_server_url_linked_to_license ... 
+2026-05-16 17:19:53,991 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted mail.message records with IDs: [1336] 
+2026-05-16 17:19:53,995 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted ess.server records with IDs: [45] 
+2026-05-16 17:19:54,004 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted mail.message records with IDs: [1335] 
+2026-05-16 17:19:54,006 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted ess.license records with IDs: [68] 
+2026-05-16 17:19:54,019 10020 INFO odoo19_comunity odoo.addons.base.models.ir_attachment: filestore gc 0 checked, 0 removed 
+2026-05-16 17:19:54,045 10020 INFO odoo19_comunity odoo.addons.ess_hr_admin.tests.test_validate: Starting TestValidateEndpoint.test_validate_employee_limit_exceeded_returns_error ... 
+2026-05-16 17:19:54,050 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:54,103 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:54] "POST /ess/admin/api/validate HTTP/1.1" 400 - 10 0.004 0.050
+2026-05-16 17:19:54,106 10020 INFO odoo19_comunity odoo.addons.ess_hr_admin.tests.test_validate: Starting TestValidateEndpoint.test_validate_empty_server_url_fails ... 
+2026-05-16 17:19:54,129 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:54,148 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:54] "POST /ess/admin/api/validate HTTP/1.1" 400 - 7 0.001 0.019
+2026-05-16 17:19:54,149 10020 INFO odoo19_comunity odoo.addons.ess_hr_admin.tests.test_validate: Starting TestValidateEndpoint.test_validate_expired_license_returns_error ... 
+2026-05-16 17:19:54,155 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:54,177 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:54] "POST /ess/admin/api/validate HTTP/1.1" 400 - 12 0.001 0.020
+2026-05-16 17:19:54,181 10020 INFO odoo19_comunity odoo.addons.ess_hr_admin.tests.test_validate: Starting TestValidateEndpoint.test_validate_inactive_license_returns_error ... 
+2026-05-16 17:19:54,208 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:54,230 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:54] "POST /ess/admin/api/validate HTTP/1.1" 400 - 12 0.003 0.019
+2026-05-16 17:19:54,234 10020 INFO odoo19_comunity odoo.addons.ess_hr_admin.tests.test_validate: Starting TestValidateEndpoint.test_validate_missing_server_url_fails ... 
+2026-05-16 17:19:54,239 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:54,260 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:54] "POST /ess/admin/api/validate HTTP/1.1" 400 - 7 0.000 0.022
+2026-05-16 17:19:54,261 10020 INFO odoo19_comunity odoo.addons.ess_hr_admin.tests.test_validate: Starting TestValidateEndpoint.test_validate_module_codes_are_strings ... 
+2026-05-16 17:19:54,286 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:54,311 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:54] "POST /ess/admin/api/validate HTTP/1.1" 200 - 14 0.006 0.020
+2026-05-16 17:19:54,313 10020 INFO odoo19_comunity odoo.addons.ess_hr_admin.tests.test_validate: Starting TestValidateEndpoint.test_validate_no_modules_configured_returns_all ... 
+2026-05-16 17:19:54,322 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:54,349 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:54] "POST /ess/admin/api/validate HTTP/1.1" 200 - 15 0.004 0.022
+2026-05-16 17:19:54,355 10020 INFO odoo19_comunity odoo.addons.ess_hr_admin.tests.test_validate: Starting TestValidateEndpoint.test_validate_returns_allowed_modules_list ... 
+2026-05-16 17:19:54,360 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:54,387 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:54] "POST /ess/admin/api/validate HTTP/1.1" 200 - 14 0.005 0.021
+2026-05-16 17:19:54,388 10020 INFO odoo19_comunity odoo.addons.ess_hr_admin.tests.test_validate: Starting TestValidateEndpoint.test_validate_returns_auto_logout_duration ... 
+2026-05-16 17:19:54,393 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:54,417 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:54] "POST /ess/admin/api/validate HTTP/1.1" 200 - 14 0.002 0.022
+2026-05-16 17:19:54,418 10020 INFO odoo19_comunity odoo.addons.ess_hr_admin.tests.test_validate: Starting TestValidateEndpoint.test_validate_unknown_server_returns_not_found ... 
+2026-05-16 17:19:54,423 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:54,445 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:54] "POST /ess/admin/api/validate HTTP/1.1" 400 - 10 0.003 0.020
+2026-05-16 17:19:54,447 10020 INFO odoo19_comunity odoo.addons.ess_hr_admin.tests.test_validate: Starting TestValidateEndpoint.test_validate_url_case_insensitive ... 
+2026-05-16 17:19:54,452 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:54,476 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:54] "POST /ess/admin/api/validate HTTP/1.1" 200 - 14 0.004 0.022
+2026-05-16 17:19:54,478 10020 INFO odoo19_comunity odoo.addons.ess_hr_admin.tests.test_validate: Starting TestValidateEndpoint.test_validate_url_trailing_slash_normalized ... 
+2026-05-16 17:19:54,484 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:54,508 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:54] "POST /ess/admin/api/validate HTTP/1.1" 200 - 14 0.002 0.023
+2026-05-16 17:19:54,510 10020 INFO odoo19_comunity odoo.addons.ess_hr_admin.tests.test_validate: Starting TestValidateEndpoint.test_validate_valid_server_returns_ok ... 
+2026-05-16 17:19:54,514 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:54,635 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:54] "POST /ess/admin/api/validate HTTP/1.1" 200 - 14 0.002 0.119
+2026-05-16 17:19:54,643 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted mail.message records with IDs: [1338] 
+2026-05-16 17:19:54,647 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted ess.server records with IDs: [46] 
+2026-05-16 17:19:54,656 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted mail.message records with IDs: [1337] 
+2026-05-16 17:19:54,659 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted ess.license records with IDs: [69] 
+2026-05-16 17:19:54,672 10020 INFO odoo19_comunity odoo.addons.base.models.ir_attachment: filestore gc 0 checked, 0 removed 
+2026-05-16 17:19:54,703 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_advance_salary: Starting TestAdvanceSalary.test_advance_approve_then_reset_fails ... 
+2026-05-16 17:19:54,710 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:54,770 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:54] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.022 0.039
+2026-05-16 17:19:54,780 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:54] "GET /ess/api/advance-salary/info HTTP/1.1" 200 - 7 0.002 0.006
+[API] POST   /ess/admin/api/validate                            400  ERR  EMPLOYEE_LIMIT
+[API] POST   /ess/admin/api/validate                            400  ERR  VALIDATION_ERROR
+[API] POST   /ess/admin/api/validate                            400  ERR  LICENSE_EXPIRED
+[API] POST   /ess/admin/api/validate                            400  ERR  LICENSE_INACTIVE
+[API] POST   /ess/admin/api/validate                            400  ERR  VALIDATION_ERROR
+[API] POST   /ess/admin/api/validate                            200  OK  {status, allowed_modules, auto_logout_duration}
+[API] POST   /ess/admin/api/validate                            200  OK  {status, allowed_modules, auto_logout_duration}
+[API] POST   /ess/admin/api/validate                            200  OK  {status, allowed_modules, auto_logout_duration}
+[API] POST   /ess/admin/api/validate                            200  OK  {status, allowed_modules, auto_logout_duration}
+[API] POST   /ess/admin/api/validate                            400  ERR  SERVER_NOT_FOUND
+[API] POST   /ess/admin/api/validate                            200  OK  {status, allowed_modules, auto_logout_duration}
+[API] POST   /ess/admin/api/validate                            200  OK  {status, allowed_modules, auto_logout_duration}
+[API] POST   /ess/admin/api/validate                            200  OK  {status, allowed_modules, auto_logout_duration}
+[API] GET    /ess/api/advance-salary/info                       200  OK  {cap, basic_wage}
+2026-05-16 17:19:54,781 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_advance_salary: skipped TestAdvanceSalary.test_advance_approve_then_reset_fails : No active contract � skipping workflow test 
+2026-05-16 17:19:54,782 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_advance_salary: Starting TestAdvanceSalary.test_advance_create_over_cap_fails ... 
+2026-05-16 17:19:54,786 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:54,824 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:54] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.006 0.033
+2026-05-16 17:19:54,836 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:54] "GET /ess/api/advance-salary/info HTTP/1.1" 200 - 7 0.001 0.006
+[API] GET    /ess/api/advance-salary/info                       200  OK  {cap, basic_wage}
+2026-05-16 17:19:54,837 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_advance_salary: skipped TestAdvanceSalary.test_advance_create_over_cap_fails : No active contract � skipping cap validation test 
+2026-05-16 17:19:54,837 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_advance_salary: Starting TestAdvanceSalary.test_advance_create_within_cap ... 
+2026-05-16 17:19:54,842 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:54,878 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:54] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.006 0.032
+2026-05-16 17:19:54,886 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:54] "GET /ess/api/advance-salary/info HTTP/1.1" 200 - 7 0.003 0.002
+[API] GET    /ess/api/advance-salary/info                       200  OK  {cap, basic_wage}
+2026-05-16 17:19:54,888 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_advance_salary: skipped TestAdvanceSalary.test_advance_create_within_cap : No active contract (cap=0) � skipping advance create test 
+2026-05-16 17:19:54,888 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_advance_salary: Starting TestAdvanceSalary.test_advance_get_by_id ... 
+2026-05-16 17:19:54,892 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:54,928 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:54] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.008 0.029
+2026-05-16 17:19:54,936 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:54] "GET /ess/api/advance-salary/info HTTP/1.1" 200 - 7 0.003 0.001
+[API] GET    /ess/api/advance-salary/info                       200  OK  {cap, basic_wage}
+2026-05-16 17:19:54,937 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_advance_salary: skipped TestAdvanceSalary.test_advance_get_by_id : No active contract � skipping get-by-id test 
+2026-05-16 17:19:54,938 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_advance_salary: Starting TestAdvanceSalary.test_advance_get_nonexistent_fails ... 
+2026-05-16 17:19:54,939 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:54,968 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:54] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.005 0.024
+2026-05-16 17:19:54,976 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:54] "GET /ess/api/advance-salary/999999 HTTP/1.1" 400 - 7 0.001 0.005
+[API] GET    /ess/api/advance-salary/999999                     400  ERR  VALIDATION_ERROR
+2026-05-16 17:19:54,978 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_advance_salary: Starting TestAdvanceSalary.test_advance_info_returns_cap ... 
+2026-05-16 17:19:55,002 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:55,028 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:55] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.006 0.020
+2026-05-16 17:19:55,036 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:55] "GET /ess/api/advance-salary/info HTTP/1.1" 200 - 7 0.002 0.002
+[API] GET    /ess/api/advance-salary/info                       200  OK  {cap, basic_wage}
+2026-05-16 17:19:55,038 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_advance_salary: Starting TestAdvanceSalary.test_advance_list_returns_list ... 
+2026-05-16 17:19:55,041 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:55,067 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:55] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.006 0.022
+2026-05-16 17:19:55,076 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:55] "GET /ess/api/advance-salary HTTP/1.1" 200 - 8 0.002 0.004
+[API] GET    /ess/api/advance-salary                            200  OK  list[0]
+2026-05-16 17:19:55,077 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_advance_salary: Starting TestAdvanceSalary.test_advance_refuse_workflow ... 
+2026-05-16 17:19:55,079 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:55,107 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:55] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.006 0.022
+2026-05-16 17:19:55,114 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:55] "GET /ess/api/advance-salary/info HTTP/1.1" 200 - 7 0.002 0.002
+[API] GET    /ess/api/advance-salary/info                       200  OK  {cap, basic_wage}
+2026-05-16 17:19:55,115 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_advance_salary: skipped TestAdvanceSalary.test_advance_refuse_workflow : No active contract � skipping refuse test 
+2026-05-16 17:19:55,124 10020 INFO odoo19_comunity odoo.addons.base.models.ir_attachment: filestore gc 0 checked, 0 removed 
+2026-05-16 17:19:55,136 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_attendance: Starting TestAttendance.test_check_in_creates_record ... 
+2026-05-16 17:19:55,139 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:55,168 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:55] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.005 0.024
+2026-05-16 17:19:55,209 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:55] "POST /ess/api/attendance/check-in HTTP/1.1" 200 - 19 0.005 0.015
+[API] POST   /ess/api/attendance/check-in                       200  OK  {id, employee_id, employee_name, check_in, ...}
+2026-05-16 17:19:55,217 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted hr.attendance records with IDs: [72] 
+2026-05-16 17:19:55,220 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_attendance: Starting TestAttendance.test_check_in_then_check_out ... 
+2026-05-16 17:19:55,222 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:55,249 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:55] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.004 0.023
+2026-05-16 17:19:55,267 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:55] "POST /ess/api/attendance/check-in HTTP/1.1" 200 - 19 0.004 0.010
+[API] POST   /ess/api/attendance/check-in                       200  OK  {id, employee_id, employee_name, check_in, ...}
+2026-05-16 17:19:55,295 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:55] "POST /ess/api/attendance/check-out HTTP/1.1" 200 - 35 0.016 0.009
+[API] POST   /ess/api/attendance/check-out                      200  OK  {id, employee_id, employee_name, check_in, ...}
+2026-05-16 17:19:55,303 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted hr.attendance records with IDs: [73] 
+2026-05-16 17:19:55,306 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_attendance: Starting TestAttendance.test_check_in_without_timestamp_defaults_to_now ... 
+2026-05-16 17:19:55,308 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:55,337 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:55] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.002 0.028
+2026-05-16 17:19:55,373 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:55] "POST /ess/api/attendance/check-in HTTP/1.1" 200 - 19 0.002 0.010
+[API] POST   /ess/api/attendance/check-in                       200  OK  {id, employee_id, employee_name, check_in, ...}
+2026-05-16 17:19:55,379 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted hr.attendance records with IDs: [74] 
+2026-05-16 17:19:55,381 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_attendance: Starting TestAttendance.test_check_out_without_check_in_fails ... 
+2026-05-16 17:19:55,383 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:55,509 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:55] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.005 0.121
+2026-05-16 17:19:55,518 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:55] "POST /ess/api/attendance/check-out HTTP/1.1" 400 - 8 0.002 0.003
+[API] POST   /ess/api/attendance/check-out                      400  ERR  VALIDATION_ERROR
+2026-05-16 17:19:55,519 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_attendance: Starting TestAttendance.test_daily_sheet_returns_list ... 
+2026-05-16 17:19:55,522 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:55,555 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:55] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.008 0.025
+2026-05-16 17:19:55,564 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:55] "GET /ess/api/attendance/daily-sheet HTTP/1.1" 200 - 8 0.002 0.003
+[API] GET    /ess/api/attendance/daily-sheet                    200  OK  list[0]
+2026-05-16 17:19:55,565 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_attendance: Starting TestAttendance.test_double_check_in_returns_existing ... 
+2026-05-16 17:19:55,568 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:55,601 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:55] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.003 0.030
+2026-05-16 17:19:55,619 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:55] "POST /ess/api/attendance/check-in HTTP/1.1" 200 - 19 0.005 0.009
+[API] POST   /ess/api/attendance/check-in                       200  OK  {id, employee_id, employee_name, check_in, ...}
+2026-05-16 17:19:55,626 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:55] "POST /ess/api/attendance/check-in HTTP/1.1" 200 - 9 0.001 0.003
+[API] POST   /ess/api/attendance/check-in                       200  OK  {id, employee_id, employee_name, check_in, ...}
+2026-05-16 17:19:55,633 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted hr.attendance records with IDs: [75] 
+2026-05-16 17:19:55,636 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_attendance: Starting TestAttendance.test_history_returns_list ... 
+2026-05-16 17:19:55,638 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:55,669 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:55] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.004 0.028
+2026-05-16 17:19:55,680 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:55] "GET /ess/api/attendance/history HTTP/1.1" 200 - 9 0.001 0.005
+[API] GET    /ess/api/attendance/history                        200  OK  {total, page, page_size, records}
+2026-05-16 17:19:55,681 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_attendance: Starting TestAttendance.test_manual_attendance_creates_record ... 
+2026-05-16 17:19:55,706 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:55,733 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:55] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.004 0.023
+2026-05-16 17:19:55,755 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:55] "POST /ess/api/attendance/manual HTTP/1.1" 200 - 29 0.007 0.012
+[API] POST   /ess/api/attendance/manual                         200  OK  {id, employee_id, employee_name, check_in, ...}
+2026-05-16 17:19:55,762 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted hr.attendance records with IDs: [76] 
+2026-05-16 17:19:55,765 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_attendance: Starting TestAttendance.test_monthly_sheet_returns_days ... 
+2026-05-16 17:19:55,782 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:55,814 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:55] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.005 0.027
+2026-05-16 17:19:55,864 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:55] "GET /ess/api/attendance/monthly-sheet HTTP/1.1" 200 - 78 0.014 0.032
+[API] GET    /ess/api/attendance/monthly-sheet                  200  OK  list[31]
+2026-05-16 17:19:55,865 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_attendance: Starting TestAttendance.test_summary_returns_status ... 
+2026-05-16 17:19:55,869 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:55,900 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:55] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.004 0.029
+2026-05-16 17:19:55,911 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:55] "GET /ess/api/attendance/summary HTTP/1.1" 200 - 9 0.001 0.006
+[API] GET    /ess/api/attendance/summary                        200  OK  {status, check_in_time, hours_worked_today, hours_today, ...}
+2026-05-16 17:19:55,913 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_attendance: Starting TestAttendance.test_team_attendance ... 
+2026-05-16 17:19:55,916 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:55,946 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:55] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.005 0.026
+2026-05-16 17:19:55,964 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:55] "GET /ess/api/attendance/team HTTP/1.1" 200 - 17 0.004 0.008
+[API] GET    /ess/api/attendance/team                           200  OK  list[4]
+2026-05-16 17:19:55,975 10020 INFO odoo19_comunity odoo.addons.base.models.ir_attachment: filestore gc 0 checked, 0 removed 
+2026-05-16 17:19:55,988 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_auth: Starting TestAuth.test_by_user_missing_user_id ... 
+2026-05-16 17:19:56,013 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:56,042 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:56] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.007 0.022
+2026-05-16 17:19:56,050 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:56] "GET /ess/api/auth/by-user HTTP/1.1" 400 - 6 0.001 0.004
+[API] GET    /ess/api/auth/by-user                              400  ERR  VALIDATION_ERROR
+2026-05-16 17:19:56,051 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_auth: Starting TestAuth.test_by_user_with_valid_user_id ... 
+2026-05-16 17:19:56,055 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:56,084 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:56] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.006 0.023
+2026-05-16 17:19:56,093 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:56] "GET /ess/api/auth/by-user HTTP/1.1" 400 - 6 0.001 0.005
+[API] GET    /ess/api/auth/by-user                              400  ERR  VALIDATION_ERROR
+2026-05-16 17:19:56,094 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_auth: Starting TestAuth.test_companies_returns_list ... 
+2026-05-16 17:19:56,097 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:56,127 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:56] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.004 0.026
+2026-05-16 17:19:56,135 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:56] "GET /ess/api/auth/companies HTTP/1.1" 200 - 6 0.001 0.005
+[API] GET    /ess/api/auth/companies                            200  OK  list[2]
+2026-05-16 17:19:56,137 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_auth: Starting TestAuth.test_login_badge_pin_success ... 
+2026-05-16 17:19:56,139 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:56,169 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:56] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.003 0.027
+2026-05-16 17:19:56,183 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:56] "POST /ess/api/auth/login HTTP/1.1" 200 - 12 0.002 0.009
+[API] POST   /ess/api/auth/login                                200  OK  {user, tokens, force_logout_gen}
+2026-05-16 17:19:56,184 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_auth: Starting TestAuth.test_login_no_credentials_fails ... 
+2026-05-16 17:19:56,187 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:56,321 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:56] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.004 0.131
+2026-05-16 17:19:56,324 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:56] "POST /ess/api/auth/login HTTP/1.1" 400 - 0 0.000 0.001
+[API] POST   /ess/api/auth/login                                400  ERR  VALIDATION_ERROR
+2026-05-16 17:19:56,327 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_auth: Starting TestAuth.test_login_unknown_badge_fails ... 
+2026-05-16 17:19:56,330 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:56,361 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:56] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.008 0.023
+2026-05-16 17:19:56,368 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:56] "POST /ess/api/auth/login HTTP/1.1" 400 - 5 0.000 0.003
+[API] POST   /ess/api/auth/login                                400  ERR  VALIDATION_ERROR
+2026-05-16 17:19:56,370 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_auth: Starting TestAuth.test_login_wrong_pin_fails ... 
+2026-05-16 17:19:56,373 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:56,403 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:56] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.008 0.022
+2026-05-16 17:19:56,411 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:56] "POST /ess/api/auth/login HTTP/1.1" 400 - 7 0.002 0.004
+[API] POST   /ess/api/auth/login                                400  ERR  VALIDATION_ERROR
+2026-05-16 17:19:56,412 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_auth: Starting TestAuth.test_logout_returns_ok ... 
+2026-05-16 17:19:56,415 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:56,443 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:56] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.006 0.024
+2026-05-16 17:19:56,451 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:56] "POST /ess/api/auth/logout HTTP/1.1" 200 - 6 0.003 0.001
+[API] POST   /ess/api/auth/logout                               200  OK  {logged_out}
+2026-05-16 17:19:56,452 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_auth: Starting TestAuth.test_protected_endpoint_without_token_fails ... 
+2026-05-16 17:19:56,466 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:56,495 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:56] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.005 0.024
+2026-05-16 17:19:56,514 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:56] "GET /ess/api/profile HTTP/1.1" 401 - 0 0.000 0.001
+[API] GET    /ess/api/profile                                   401  ERR  UNAUTHENTICATED
+2026-05-16 17:19:56,515 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_auth: Starting TestAuth.test_refresh_returns_ok ... 
+2026-05-16 17:19:56,518 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:56,545 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:56] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.002 0.025
+2026-05-16 17:19:56,554 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:56] "POST /ess/api/auth/refresh HTTP/1.1" 200 - 6 0.003 0.002
+[API] POST   /ess/api/auth/refresh                              200  OK  {refreshed}
+2026-05-16 17:19:56,566 10020 INFO odoo19_comunity odoo.addons.base.models.ir_attachment: filestore gc 0 checked, 0 removed 
+2026-05-16 17:19:56,578 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_employee: Starting TestEmployee.test_contract_endpoint ... 
+2026-05-16 17:19:56,591 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:56,619 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:56] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.004 0.024
+2026-05-16 17:19:56,643 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:56] "GET /ess/api/profile/contract HTTP/1.1" 200 - 7 0.001 0.004
+[API] GET    /ess/api/profile/contract                          200  OK  {}
+2026-05-16 17:19:56,644 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_employee: Starting TestEmployee.test_employee_directory ... 
+2026-05-16 17:19:56,647 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:56,674 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:56] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.004 0.024
+2026-05-16 17:19:56,691 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:56] "GET /ess/api/employees HTTP/1.1" 200 - 10 0.002 0.012
+[API] GET    /ess/api/employees                                 200  OK  list[22]
+2026-05-16 17:19:56,694 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_employee: Starting TestEmployee.test_employee_directory_search ... 
+2026-05-16 17:19:56,696 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:56,725 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:56] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.007 0.022
+2026-05-16 17:19:56,741 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:56] "GET /ess/api/employees HTTP/1.1" 200 - 10 0.001 0.012
+[API] GET    /ess/api/employees                                 200  OK  list[22]
+2026-05-16 17:19:56,743 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_employee: Starting TestEmployee.test_profile_post_also_works ... 
+2026-05-16 17:19:56,746 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:56,778 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:56] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.006 0.026
+2026-05-16 17:19:56,790 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:56] "POST /ess/api/profile HTTP/1.1" 200 - 11 0.002 0.007
+[API] POST   /ess/api/profile                                   200  OK  {id, name, name_ar, badge_id, ...}
+2026-05-16 17:19:56,791 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_employee: Starting TestEmployee.test_profile_returns_employee_data ... 
+2026-05-16 17:19:56,794 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:56,821 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:56] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.002 0.027
+2026-05-16 17:19:56,834 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:56] "GET /ess/api/profile HTTP/1.1" 200 - 11 0.005 0.005
+[API] GET    /ess/api/profile                                   200  OK  {id, name, name_ar, badge_id, ...}
+2026-05-16 17:19:56,845 10020 INFO odoo19_comunity odoo.addons.base.models.ir_attachment: filestore gc 0 checked, 0 removed 
+2026-05-16 17:19:56,867 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_expense: Starting TestExpense.test_categories_returns_list ... 
+2026-05-16 17:19:56,870 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:56,908 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:56] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.007 0.030
+2026-05-16 17:19:56,922 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:56] "GET /ess/api/expenses/categories HTTP/1.1" 200 - 12 0.006 0.006
+[API] GET    /ess/api/expenses/categories                       200  OK  list[6]
+2026-05-16 17:19:56,924 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_expense: Starting TestExpense.test_currencies_returns_list ... 
+2026-05-16 17:19:56,927 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:57,070 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:57] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.003 0.140
+2026-05-16 17:19:57,087 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:57] "GET /ess/api/expenses/currencies HTTP/1.1" 200 - 12 0.007 0.007
+[API] GET    /ess/api/expenses/currencies                       200  OK  list[2]
+2026-05-16 17:19:57,088 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_expense: Starting TestExpense.test_expense_attach_file ... 
+2026-05-16 17:19:57,106 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:57,137 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:57] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.002 0.029
+2026-05-16 17:19:57,211 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:57] "POST /ess/api/expenses HTTP/1.1" 200 - 58 0.044 0.026
+[API] POST   /ess/api/expenses                                  200  OK  {id, name, employee_id, employee, ...}
+2026-05-16 17:19:57,222 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:57] "POST /ess/api/expenses/attach HTTP/1.1" 200 - 11 0.005 0.003
+[API] POST   /ess/api/expenses/attach                           200  OK  {id, name, mimetype, file_size}
+2026-05-16 17:19:57,231 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted mail.message records with IDs: [1339] 
+2026-05-16 17:19:57,283 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted ir.attachment records with IDs: [1411] 
+2026-05-16 17:19:57,284 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted hr.expense records with IDs: [63] 
+2026-05-16 17:19:57,287 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted mail.followers records with IDs: [385] 
+2026-05-16 17:19:57,290 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_expense: Starting TestExpense.test_expense_create_missing_product_fails ... 
+2026-05-16 17:19:57,292 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:57,322 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:57] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.008 0.023
+2026-05-16 17:19:57,330 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:57] "POST /ess/api/expenses HTTP/1.1" 400 - 7 0.001 0.003
+[API] POST   /ess/api/expenses                                  400  ERR  VALIDATION_ERROR
+2026-05-16 17:19:57,332 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_expense: Starting TestExpense.test_expense_create_success ... 
+2026-05-16 17:19:57,334 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:57,362 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:57] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.003 0.026
+2026-05-16 17:19:57,405 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:57] "POST /ess/api/expenses HTTP/1.1" 200 - 58 0.017 0.023
+[API] POST   /ess/api/expenses                                  200  OK  {id, name, employee_id, employee, ...}
+2026-05-16 17:19:57,413 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted mail.message records with IDs: [1340] 
+2026-05-16 17:19:57,416 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted hr.expense records with IDs: [64] 
+2026-05-16 17:19:57,420 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted mail.followers records with IDs: [386] 
+2026-05-16 17:19:57,422 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_expense: Starting TestExpense.test_expense_get_by_id ... 
+2026-05-16 17:19:57,424 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:57,451 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:57] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.004 0.024
+2026-05-16 17:19:57,492 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:57] "POST /ess/api/expenses HTTP/1.1" 200 - 58 0.017 0.021
+[API] POST   /ess/api/expenses                                  200  OK  {id, name, employee_id, employee, ...}
+2026-05-16 17:19:57,503 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:57] "GET /ess/api/expenses/65 HTTP/1.1" 200 - 13 0.005 0.003
+[API] GET    /ess/api/expenses/65                               200  OK  {id, name, employee_id, employee, ...}
+2026-05-16 17:19:57,510 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted mail.message records with IDs: [1341] 
+2026-05-16 17:19:57,513 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted hr.expense records with IDs: [65] 
+2026-05-16 17:19:57,516 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted mail.followers records with IDs: [387] 
+2026-05-16 17:19:57,518 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_expense: Starting TestExpense.test_expense_get_nonexistent_fails ... 
+2026-05-16 17:19:57,520 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:57,549 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:57] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.005 0.024
+2026-05-16 17:19:57,556 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:57] "GET /ess/api/expenses/999999 HTTP/1.1" 400 - 7 0.001 0.003
+[API] GET    /ess/api/expenses/999999                           400  ERR  VALIDATION_ERROR
+2026-05-16 17:19:57,558 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_expense: Starting TestExpense.test_expense_list_returns_list ... 
+2026-05-16 17:19:57,561 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:57,592 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:57] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.005 0.026
+2026-05-16 17:19:57,604 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:57] "GET /ess/api/expenses HTTP/1.1" 200 - 13 0.003 0.007
+[API] GET    /ess/api/expenses                                  200  OK  list[8]
+2026-05-16 17:19:57,605 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_expense: Starting TestExpense.test_expense_submit ... 
+2026-05-16 17:19:57,608 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:57,636 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:57] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.005 0.024
+2026-05-16 17:19:57,676 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:57] "POST /ess/api/expenses HTTP/1.1" 200 - 58 0.017 0.021
+[API] POST   /ess/api/expenses                                  200  OK  {id, name, employee_id, employee, ...}
+2026-05-16 17:19:57,721 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:57] "POST /ess/api/expenses/submit HTTP/1.1" 200 - 48 0.019 0.023
+[API] POST   /ess/api/expenses/submit                           200  OK  {id, name, employee_id, employee, ...}
+2026-05-16 17:19:57,722 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_expense: Starting TestExpense.test_taxes_returns_list ... 
+2026-05-16 17:19:57,724 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:57,754 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:57] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.005 0.025
+2026-05-16 17:19:57,763 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:57] "GET /ess/api/expenses/taxes HTTP/1.1" 200 - 8 0.001 0.004
+[API] GET    /ess/api/expenses/taxes                            200  OK  list[2]
+2026-05-16 17:19:57,773 10020 INFO odoo19_comunity odoo.addons.base.models.ir_attachment: filestore gc 0 checked, 0 removed 
+2026-05-16 17:19:57,785 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_hr_services: Starting TestDocumentRequests.test_document_types_returns_list ... 
+2026-05-16 17:19:57,789 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:57,820 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:57] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.006 0.024
+2026-05-16 17:19:57,826 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:57] "GET /ess/api/document-requests/types HTTP/1.1" 200 - 7 0.002 0.002
+[API] GET    /ess/api/document-requests/types                   200  OK  list[10]
+2026-05-16 17:19:57,838 10020 INFO odoo19_comunity odoo.addons.base.models.ir_attachment: filestore gc 0 checked, 0 removed 
+2026-05-16 17:19:57,850 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_hr_services: Starting TestBusinessServices.test_business_service_types_returns_list ... 
+2026-05-16 17:19:57,853 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:57,882 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:57] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.004 0.024
+2026-05-16 17:19:57,891 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:57] "GET /ess/api/business-services/types HTTP/1.1" 200 - 8 0.000 0.006
+[API] GET    /ess/api/business-services/types                   200  OK  list[3]
+2026-05-16 17:19:57,901 10020 INFO odoo19_comunity odoo.addons.base.models.ir_attachment: filestore gc 0 checked, 0 removed 
+2026-05-16 17:19:57,916 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_leave: Starting TestLeave.test_leave_approve_workflow ... 
+2026-05-16 17:19:57,921 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:57,950 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:57] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.003 0.026
+2026-05-16 17:19:58,124 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:58] "POST /ess/api/leave/requests HTTP/1.1" 200 - 121 0.063 0.107
+[API] POST   /ess/api/leave/requests                            200  OK  {id, employee_id, employee, employee_ar, ...}
+2026-05-16 17:19:58,280 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:58] "POST /ess/api/leave/approve HTTP/1.1" 200 - 145 0.068 0.084
+[API] POST   /ess/api/leave/approve                             200  OK  {id, employee_id, employee, employee_ar, ...}
+2026-05-16 17:19:58,305 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted resource.calendar.leaves records with IDs: [25] 
+2026-05-16 17:19:58,358 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted mail.message records with IDs: [1351, 1350, 1349, 1348, 1347, 1345, 1344] 
+2026-05-16 17:19:58,365 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted hr.leave records with IDs: [69] 
+2026-05-16 17:19:58,369 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted mail.activity records with IDs: [111] 
+2026-05-16 17:19:58,372 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted mail.followers records with IDs: [389] 
+2026-05-16 17:19:58,375 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_leave: Starting TestLeave.test_leave_balances_returns_list ... 
+2026-05-16 17:19:58,377 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:58,515 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:58] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.004 0.135
+2026-05-16 17:19:58,579 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:58] "GET /ess/api/leave/balances HTTP/1.1" 200 - 36 0.008 0.051
+[API] GET    /ess/api/leave/balances                            200  OK  list[2]
+2026-05-16 17:19:58,580 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_leave: Starting TestLeave.test_leave_create_invalid_dates_fails ... 
+2026-05-16 17:19:58,603 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:58,630 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:58] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.006 0.021
+2026-05-16 17:19:58,636 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:58] "POST /ess/api/leave/requests HTTP/1.1" 400 - 6 0.000 0.003
+[API] POST   /ess/api/leave/requests                            400  ERR  VALIDATION_ERROR
+2026-05-16 17:19:58,639 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_leave: Starting TestLeave.test_leave_create_missing_dates_fails ... 
+2026-05-16 17:19:58,641 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:58,670 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:58] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.003 0.026
+2026-05-16 17:19:58,679 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:58] "POST /ess/api/leave/requests HTTP/1.1" 400 - 6 0.001 0.003
+[API] POST   /ess/api/leave/requests                            400  ERR  VALIDATION_ERROR
+2026-05-16 17:19:58,680 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_leave: Starting TestLeave.test_leave_create_success ... 
+2026-05-16 17:19:58,683 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:58,711 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:58] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.004 0.024
+2026-05-16 17:19:58,855 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:58] "POST /ess/api/leave/requests HTTP/1.1" 200 - 121 0.040 0.101
+[API] POST   /ess/api/leave/requests                            200  OK  {id, employee_id, employee, employee_ar, ...}
+2026-05-16 17:19:58,891 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted mail.activity records with IDs: [112] 
+2026-05-16 17:19:58,900 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted mail.message records with IDs: [1354, 1353, 1352] 
+2026-05-16 17:19:58,906 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted hr.leave records with IDs: [70] 
+2026-05-16 17:19:58,911 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted mail.followers records with IDs: [391] 
+2026-05-16 17:19:58,913 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_leave: Starting TestLeave.test_leave_get_by_id ... 
+2026-05-16 17:19:58,915 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:58,944 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:58] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.004 0.026
+2026-05-16 17:19:59,092 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:59] "POST /ess/api/leave/requests HTTP/1.1" 200 - 121 0.042 0.104
+[API] POST   /ess/api/leave/requests                            200  OK  {id, employee_id, employee, employee_ar, ...}
+2026-05-16 17:19:59,104 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:59] "GET /ess/api/leave/requests/71 HTTP/1.1" 200 - 12 0.003 0.006
+[API] GET    /ess/api/leave/requests/71                         200  OK  {id, employee_id, employee, employee_ar, ...}
+2026-05-16 17:19:59,135 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted mail.activity records with IDs: [113] 
+2026-05-16 17:19:59,145 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted mail.message records with IDs: [1357, 1356, 1355] 
+2026-05-16 17:19:59,150 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted hr.leave records with IDs: [71] 
+2026-05-16 17:19:59,153 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted mail.followers records with IDs: [392] 
+2026-05-16 17:19:59,155 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_leave: Starting TestLeave.test_leave_get_nonexistent_fails ... 
+2026-05-16 17:19:59,158 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:59,188 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:59] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.005 0.025
+2026-05-16 17:19:59,195 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:59] "GET /ess/api/leave/requests/999999 HTTP/1.1" 400 - 7 0.001 0.003
+[API] GET    /ess/api/leave/requests/999999                     400  ERR  VALIDATION_ERROR
+2026-05-16 17:19:59,196 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_leave: Starting TestLeave.test_leave_list_returns_list ... 
+2026-05-16 17:19:59,212 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:59,240 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:59] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.005 0.024
+2026-05-16 17:19:59,256 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:59] "GET /ess/api/leave/requests HTTP/1.1" 200 - 17 0.004 0.010
+[API] GET    /ess/api/leave/requests                            200  OK  list[2]
+2026-05-16 17:19:59,258 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_leave: Starting TestLeave.test_leave_refuse_workflow ... 
+2026-05-16 17:19:59,260 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:59,292 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:59] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.006 0.026
+2026-05-16 17:19:59,435 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:59] "POST /ess/api/leave/requests HTTP/1.1" 200 - 121 0.039 0.102
+[API] POST   /ess/api/leave/requests                            200  OK  {id, employee_id, employee, employee_ar, ...}
+2026-05-16 17:19:59,468 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted mail.activity records with IDs: [114] 
+2026-05-16 17:19:59,488 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:59] "POST /ess/api/leave/refuse HTTP/1.1" 200 - 70 0.024 0.026
+[API] POST   /ess/api/leave/refuse                              200  OK  {id, employee_id, employee, employee_ar, ...}
+2026-05-16 17:19:59,501 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted mail.message records with IDs: [1362, 1361, 1360, 1359, 1358] 
+2026-05-16 17:19:59,506 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted hr.leave records with IDs: [72] 
+2026-05-16 17:19:59,509 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted mail.followers records with IDs: [393] 
+2026-05-16 17:19:59,511 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_leave: Starting TestLeave.test_leave_reset_to_draft ... 
+2026-05-16 17:19:59,513 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:59,541 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:59] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.004 0.024
+2026-05-16 17:19:59,689 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:59] "POST /ess/api/leave/requests HTTP/1.1" 200 - 121 0.038 0.108
+[API] POST   /ess/api/leave/requests                            200  OK  {id, employee_id, employee, employee_ar, ...}
+2026-05-16 17:19:59,752 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:59] "POST /ess/api/leave/reset HTTP/1.1" 200 - 48 0.016 0.044
+[API] POST   /ess/api/leave/reset                               200  OK  {id, employee_id, employee, employee_ar, ...}
+2026-05-16 17:19:59,785 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted mail.activity records with IDs: [115] 
+2026-05-16 17:19:59,794 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted mail.message records with IDs: [1365, 1364, 1363] 
+2026-05-16 17:19:59,799 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted hr.leave records with IDs: [73] 
+2026-05-16 17:19:59,802 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted mail.followers records with IDs: [394] 
+2026-05-16 17:19:59,803 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_leave: Starting TestLeave.test_leave_types_returns_list ... 
+2026-05-16 17:19:59,806 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:59,835 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:59] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.004 0.026
+2026-05-16 17:19:59,901 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:59] "GET /ess/api/leave/types HTTP/1.1" 200 - 40 0.011 0.052
+[API] GET    /ess/api/leave/types                               200  OK  list[10]
+2026-05-16 17:19:59,902 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_leave: Starting TestLeave.test_team_balances_returns_list ... 
+2026-05-16 17:19:59,922 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:19:59,949 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:19:59] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.005 0.023
+2026-05-16 17:20:00,102 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:00] "GET /ess/api/leave/team-balances HTTP/1.1" 200 - 86 0.020 0.130
+[API] GET    /ess/api/leave/team-balances                       200  OK  list[4]
+2026-05-16 17:20:00,113 10020 INFO odoo19_comunity odoo.addons.base.models.ir_attachment: filestore gc 0 checked, 0 removed 
+2026-05-16 17:20:00,126 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_loans: Starting TestLoans.test_loan_approve_workflow ... 
+2026-05-16 17:20:00,131 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:20:00,159 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:00] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.005 0.024
+2026-05-16 17:20:00,180 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:00] "POST /ess/api/loans HTTP/1.1" 200 - 24 0.009 0.010
+[API] POST   /ess/api/loans                                     200  OK  {id, name, employee_id, employee_name, ...}
+2026-05-16 17:20:00,191 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:00] "POST /ess/api/loans/approve HTTP/1.1" 200 - 10 0.003 0.004
+[API] POST   /ess/api/loans/approve                             200  OK  True
+2026-05-16 17:20:00,194 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted hr.loan records with IDs: [45] 
+2026-05-16 17:20:00,195 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_loans: Starting TestLoans.test_loan_create_returns_record ... 
+2026-05-16 17:20:00,221 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:20:00,362 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:00] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.005 0.136
+2026-05-16 17:20:00,379 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:00] "POST /ess/api/loans HTTP/1.1" 200 - 24 0.006 0.008
+[API] POST   /ess/api/loans                                     200  OK  {id, name, employee_id, employee_name, ...}
+2026-05-16 17:20:00,384 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted hr.loan records with IDs: [46] 
+2026-05-16 17:20:00,385 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_loans: Starting TestLoans.test_loan_create_zero_amount_fails ... 
+2026-05-16 17:20:00,409 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:20:00,438 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:00] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.005 0.024
+2026-05-16 17:20:00,446 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:00] "POST /ess/api/loans HTTP/1.1" 400 - 7 0.002 0.002
+[API] POST   /ess/api/loans                                     400  ERR  VALIDATION_ERROR
+2026-05-16 17:20:00,447 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_loans: Starting TestLoans.test_loan_get_by_id ... 
+2026-05-16 17:20:00,472 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:20:00,499 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:00] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.003 0.024
+2026-05-16 17:20:00,514 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:00] "POST /ess/api/loans HTTP/1.1" 200 - 24 0.006 0.006
+[API] POST   /ess/api/loans                                     200  OK  {id, name, employee_id, employee_name, ...}
+2026-05-16 17:20:00,523 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:00] "GET /ess/api/loans/47 HTTP/1.1" 200 - 10 0.001 0.005
+[API] GET    /ess/api/loans/47                                  200  OK  {id, name, employee_id, employee_name, ...}
+2026-05-16 17:20:00,526 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted hr.loan records with IDs: [47] 
+2026-05-16 17:20:00,527 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_loans: Starting TestLoans.test_loan_get_nonexistent_fails ... 
+2026-05-16 17:20:00,529 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:20:00,563 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:00] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.004 0.031
+2026-05-16 17:20:00,573 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:00] "GET /ess/api/loans/999999 HTTP/1.1" 400 - 7 0.001 0.006
+[API] GET    /ess/api/loans/999999                              400  ERR  VALIDATION_ERROR
+2026-05-16 17:20:00,575 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_loans: Starting TestLoans.test_loan_list_returns_list ... 
+2026-05-16 17:20:00,578 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:20:00,616 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:00] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.007 0.032
+2026-05-16 17:20:00,627 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:00] "GET /ess/api/loans HTTP/1.1" 200 - 8 0.002 0.004
+[API] GET    /ess/api/loans                                     200  OK  list[0]
+2026-05-16 17:20:00,628 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_loans: Starting TestLoans.test_loan_refuse_workflow ... 
+2026-05-16 17:20:00,630 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:20:00,659 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:00] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.003 0.026
+2026-05-16 17:20:00,674 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:00] "POST /ess/api/loans HTTP/1.1" 200 - 24 0.005 0.008
+[API] POST   /ess/api/loans                                     200  OK  {id, name, employee_id, employee_name, ...}
+2026-05-16 17:20:00,683 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:00] "POST /ess/api/loans/refuse HTTP/1.1" 200 - 10 0.001 0.007
+[API] POST   /ess/api/loans/refuse                              200  OK  True
+2026-05-16 17:20:00,687 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted hr.loan records with IDs: [48] 
+2026-05-16 17:20:00,688 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_loans: Starting TestLoans.test_loan_rules_returns_config ... 
+2026-05-16 17:20:00,691 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:20:00,719 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:00] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.005 0.025
+2026-05-16 17:20:00,727 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:00] "GET /ess/api/loans/rules HTTP/1.1" 200 - 8 0.000 0.006
+[API] GET    /ess/api/loans/rules                               200  OK  {min_hiring_months, max_duration_months, min_gap_months, max_amount_percentage}
+2026-05-16 17:20:00,737 10020 INFO odoo19_comunity odoo.addons.base.models.ir_attachment: filestore gc 0 checked, 0 removed 
+2026-05-16 17:20:00,748 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_misc: Starting TestNotifications.test_mark_all_read ... 
+2026-05-16 17:20:00,768 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:20:00,796 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:00] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.004 0.025
+2026-05-16 17:20:00,806 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:00] "POST /ess/api/notifications/read-all HTTP/1.1" 200 - 7 0.003 0.003
+[API] POST   /ess/api/notifications/read-all                    200  OK  {updated}
+2026-05-16 17:20:00,807 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_misc: Starting TestNotifications.test_mark_single_read_if_available ... 
+2026-05-16 17:20:00,831 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:20:00,860 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:00] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.004 0.025
+2026-05-16 17:20:00,885 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:00] "POST /ess/api/notifications/17/read HTTP/1.1" 200 - 9 0.000 0.007
+[API] POST   /ess/api/notifications/17/read                     200  OK  {id, employee_id, title, body, ...}
+2026-05-16 17:20:00,888 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted ess.notification records with IDs: [17] 
+2026-05-16 17:20:00,889 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_misc: Starting TestNotifications.test_mark_single_read_nonexistent_fails ... 
+2026-05-16 17:20:00,891 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:20:00,921 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:00] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.006 0.025
+2026-05-16 17:20:00,929 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:00] "POST /ess/api/notifications/999999/read HTTP/1.1" 400 - 7 0.002 0.003
+[API] POST   /ess/api/notifications/999999/read                 400  ERR  VALIDATION_ERROR
+2026-05-16 17:20:00,930 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_misc: Starting TestNotifications.test_notifications_list ... 
+2026-05-16 17:20:00,957 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:20:00,985 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:00] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.005 0.024
+2026-05-16 17:20:00,995 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:00] "GET /ess/api/notifications HTTP/1.1" 200 - 8 0.001 0.005
+[API] GET    /ess/api/notifications                             200  OK  list[0]
+2026-05-16 17:20:00,996 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_misc: Starting TestNotifications.test_notifications_unread_only_filter ... 
+2026-05-16 17:20:00,999 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:20:01,136 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:01] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.005 0.133
+2026-05-16 17:20:01,144 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:01] "GET /ess/api/notifications HTTP/1.1" 200 - 8 0.002 0.003
+[API] GET    /ess/api/notifications                             200  OK  list[0]
+2026-05-16 17:20:01,156 10020 INFO odoo19_comunity odoo.addons.base.models.ir_attachment: filestore gc 0 checked, 0 removed 
+2026-05-16 17:20:01,168 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_misc: Starting TestAnnouncements.test_announcements_list ... 
+2026-05-16 17:20:01,172 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:20:01,202 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:01] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.007 0.022
+2026-05-16 17:20:01,232 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:01] "GET /ess/api/announcements HTTP/1.1" 200 - 9 0.005 0.003
+[API] GET    /ess/api/announcements                             200  OK  list[0]
+2026-05-16 17:20:01,243 10020 INFO odoo19_comunity odoo.addons.base.models.ir_attachment: filestore gc 0 checked, 0 removed 
+2026-05-16 17:20:01,256 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_misc: Starting TestPersonalNotes.test_note_access_denied_wrong_employee ... 
+2026-05-16 17:20:01,261 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:20:01,292 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:01] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.008 0.024
+2026-05-16 17:20:01,415 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:01] "GET /ess/api/personal-notes/39 HTTP/1.1" 400 - 8 0.002 0.004
+[API] GET    /ess/api/personal-notes/39                         400  ERR  VALIDATION_ERROR
+2026-05-16 17:20:01,418 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted ess.personal.note records with IDs: [39] 
+2026-05-16 17:20:01,426 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted mail.message records with IDs: [1369, 1367] 
+2026-05-16 17:20:01,475 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted ir.attachment records with IDs: [1412, 1414, 1415, 1416, 1417] 
+2026-05-16 17:20:01,477 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted hr.employee records with IDs: [39] 
+2026-05-16 17:20:01,482 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted resource.resource records with IDs: [39] 
+2026-05-16 17:20:01,483 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_misc: Starting TestPersonalNotes.test_note_create ... 
+2026-05-16 17:20:01,485 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:20:01,515 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:01] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.003 0.027
+2026-05-16 17:20:01,543 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:01] "POST /ess/api/personal-notes HTTP/1.1" 200 - 9 0.002 0.004
+[API] POST   /ess/api/personal-notes                            200  OK  {id, employee_id, title, body, ...}
+2026-05-16 17:20:01,546 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted ess.personal.note records with IDs: [40] 
+2026-05-16 17:20:01,548 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_misc: Starting TestPersonalNotes.test_note_full_crud ... 
+2026-05-16 17:20:01,570 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:20:01,602 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:01] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.007 0.027
+2026-05-16 17:20:01,622 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:01] "POST /ess/api/personal-notes HTTP/1.1" 200 - 9 0.002 0.004
+[API] POST   /ess/api/personal-notes                            200  OK  {id, employee_id, title, body, ...}
+2026-05-16 17:20:01,630 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:01] "GET /ess/api/personal-notes/41 HTTP/1.1" 200 - 8 0.004 0.002
+[API] GET    /ess/api/personal-notes/41                         200  OK  {id, employee_id, title, body, ...}
+2026-05-16 17:20:01,638 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:01] "PATCH /ess/api/personal-notes/41 HTTP/1.1" 200 - 9 0.001 0.004
+[API] PATCH  /ess/api/personal-notes/41                         200  OK  {id, employee_id, title, body, ...}
+2026-05-16 17:20:01,645 10020 INFO odoo19_comunity odoo.models.unlink: User #1 deleted ess.personal.note records with IDs: [41] 
+2026-05-16 17:20:01,650 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:01] "DELETE /ess/api/personal-notes/41 HTTP/1.1" 200 - 13 0.004 0.005
+[API] DELETE /ess/api/personal-notes/41                         200  OK  True
+2026-05-16 17:20:01,657 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:01] "GET /ess/api/personal-notes/41 HTTP/1.1" 400 - 7 0.001 0.005
+[API] GET    /ess/api/personal-notes/41                         400  ERR  VALIDATION_ERROR
+2026-05-16 17:20:01,658 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_misc: Starting TestPersonalNotes.test_note_get_nonexistent_fails ... 
+2026-05-16 17:20:01,661 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:20:01,690 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:01] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.003 0.026
+2026-05-16 17:20:01,714 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:01] "GET /ess/api/personal-notes/999999 HTTP/1.1" 400 - 7 0.001 0.003
+[API] GET    /ess/api/personal-notes/999999                     400  ERR  VALIDATION_ERROR
+2026-05-16 17:20:01,715 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_misc: Starting TestPersonalNotes.test_notes_list ... 
+2026-05-16 17:20:01,718 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:20:01,746 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:01] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.006 0.022
+2026-05-16 17:20:01,754 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:01] "GET /ess/api/personal-notes HTTP/1.1" 200 - 8 0.001 0.004
+[API] GET    /ess/api/personal-notes                            200  OK  list[0]
+2026-05-16 17:20:01,765 10020 INFO odoo19_comunity odoo.addons.base.models.ir_attachment: filestore gc 1 checked, 1 removed 
+2026-05-16 17:20:01,777 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_misc: Starting TestAnalytics.test_analytics_daily_totals ... 
+2026-05-16 17:20:01,781 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:20:01,811 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:01] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.003 0.028
+2026-05-16 17:20:01,820 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:01] "POST /ess/api/analytics/daily-totals HTTP/1.1" 200 - 8 0.002 0.004
+[API] POST   /ess/api/analytics/daily-totals                    200  OK  list[2]
+2026-05-16 17:20:01,822 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_misc: Starting TestAnalytics.test_analytics_employee_activity ... 
+2026-05-16 17:20:01,824 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:20:01,854 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:01] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.003 0.026
+2026-05-16 17:20:01,863 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:01] "POST /ess/api/analytics/employee-activity HTTP/1.1" 200 - 9 0.001 0.006
+[API] POST   /ess/api/analytics/employee-activity               200  OK  list[1]
+2026-05-16 17:20:01,864 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_misc: Starting TestAnalytics.test_analytics_error_summary ... 
+2026-05-16 17:20:01,881 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:20:01,912 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:01] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.006 0.025
+2026-05-16 17:20:01,934 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:01] "POST /ess/api/analytics/error-summary HTTP/1.1" 200 - 8 0.000 0.005
+[API] POST   /ess/api/analytics/error-summary                   200  OK  list[1]
+2026-05-16 17:20:01,935 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_misc: Starting TestAnalytics.test_analytics_hourly_distribution ... 
+2026-05-16 17:20:01,938 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:20:01,967 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:01] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.004 0.025
+2026-05-16 17:20:01,976 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:01] "POST /ess/api/analytics/hourly-distribution HTTP/1.1" 200 - 8 0.002 0.004
+[API] POST   /ess/api/analytics/hourly-distribution             200  OK  list[24]
+2026-05-16 17:20:01,978 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_misc: Starting TestAnalytics.test_analytics_module_stats ... 
+2026-05-16 17:20:01,981 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:20:02,012 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:02] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.005 0.025
+2026-05-16 17:20:02,020 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:02] "POST /ess/api/analytics/module-stats HTTP/1.1" 200 - 8 0.004 0.003
+[API] POST   /ess/api/analytics/module-stats                    200  OK  list[8]
+2026-05-16 17:20:02,021 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_misc: Starting TestAnalytics.test_analytics_summary ... 
+2026-05-16 17:20:02,025 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:20:02,168 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:02] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.005 0.140
+2026-05-16 17:20:02,178 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:02] "GET /ess/api/analytics HTTP/1.1" 200 - 9 0.001 0.006
+[API] GET    /ess/api/analytics                                 200  OK  {total_requests, total_success, total_errors, error_rate, ...}
+2026-05-16 17:20:02,188 10020 INFO odoo19_comunity odoo.addons.base.models.ir_attachment: filestore gc 0 checked, 0 removed 
+2026-05-16 17:20:02,200 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_misc: Starting TestTeamHours.test_team_hours_returns_list ... 
+2026-05-16 17:20:02,203 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:20:02,231 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:02] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.003 0.025
+2026-05-16 17:20:02,243 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:02] "GET /ess/api/team-hours HTTP/1.1" 200 - 11 0.002 0.007
+[API] GET    /ess/api/team-hours                                200  OK  list[4]
+2026-05-16 17:20:02,252 10020 INFO odoo19_comunity odoo.addons.base.models.ir_attachment: filestore gc 0 checked, 0 removed 
+2026-05-16 17:20:02,264 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_misc: Starting TestPendingApprovals.test_pending_approvals_list ... 
+2026-05-16 17:20:02,268 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:20:02,300 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:02] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.005 0.029
+2026-05-16 17:20:02,313 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:02] "GET /ess/api/pending-approvals HTTP/1.1" 200 - 15 0.003 0.007
+[API] GET    /ess/api/pending-approvals                         200  OK  list[1]
+2026-05-16 17:20:02,324 10020 INFO odoo19_comunity odoo.addons.base.models.ir_attachment: filestore gc 0 checked, 0 removed 
+2026-05-16 17:20:02,335 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_misc: Starting TestTasksDisabled.test_task_attachments_disabled ... 
+2026-05-16 17:20:02,340 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:20:02,372 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:02] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.007 0.025
+2026-05-16 17:20:02,376 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:02] "GET /ess/api/tasks/1/attachments HTTP/1.1" 503 - 0 0.000 0.001
+[API] GET    /ess/api/tasks/1/attachments                       503  ERR  FEATURE_DISABLED
+2026-05-16 17:20:02,378 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_misc: Starting TestTasksDisabled.test_task_by_id_disabled ... 
+2026-05-16 17:20:02,381 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:20:02,410 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:02] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.008 0.022
+2026-05-16 17:20:02,413 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:02] "GET /ess/api/tasks/1 HTTP/1.1" 503 - 0 0.000 0.001
+[API] GET    /ess/api/tasks/1                                   503  ERR  FEATURE_DISABLED
+2026-05-16 17:20:02,415 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_misc: Starting TestTasksDisabled.test_tasks_list_disabled ... 
+2026-05-16 17:20:02,418 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:20:02,448 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:02] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.003 0.027
+2026-05-16 17:20:02,451 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:02] "GET /ess/api/tasks HTTP/1.1" 503 - 0 0.000 0.001
+[API] GET    /ess/api/tasks                                     503  ERR  FEATURE_DISABLED
+2026-05-16 17:20:02,453 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_misc: Starting TestTasksDisabled.test_timesheet_daily_disabled ... 
+2026-05-16 17:20:02,456 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:20:02,486 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:02] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.005 0.025
+2026-05-16 17:20:02,510 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:02] "GET /ess/api/timesheets/daily HTTP/1.1" 503 - 0 0.000 0.001
+[API] GET    /ess/api/timesheets/daily                          503  ERR  FEATURE_DISABLED
+2026-05-16 17:20:02,511 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_misc: Starting TestTasksDisabled.test_timesheet_weekly_disabled ... 
+2026-05-16 17:20:02,514 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:20:02,543 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:02] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.003 0.026
+2026-05-16 17:20:02,548 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:02] "GET /ess/api/timesheets/weekly HTTP/1.1" 503 - 0 0.000 0.002
+[API] GET    /ess/api/timesheets/weekly                         503  ERR  FEATURE_DISABLED
+2026-05-16 17:20:02,549 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_misc: Starting TestTasksDisabled.test_timesheets_list_disabled ... 
+2026-05-16 17:20:02,552 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:20:02,580 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:02] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.004 0.024
+2026-05-16 17:20:02,584 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:02] "GET /ess/api/timesheets HTTP/1.1" 503 - 0 0.000 0.001
+[API] GET    /ess/api/timesheets                                503  ERR  FEATURE_DISABLED
+2026-05-16 17:20:02,594 10020 INFO odoo19_comunity odoo.addons.base.models.ir_attachment: filestore gc 0 checked, 0 removed 
+2026-05-16 17:20:02,606 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_misc: Starting TestStatsEndpoint.test_stats_with_admin_key_returns_data ... 
+2026-05-16 17:20:02,610 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:20:02,639 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:02] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.007 0.023
+2026-05-16 17:20:02,664 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:02] "GET /ess/api/stats HTTP/1.1" 200 - 17 0.012 0.009
+[API] GET    /ess/api/stats                                     200  OK  {employee_count, active_user_count, employees, active_users, ...}
+2026-05-16 17:20:02,666 10020 INFO odoo19_comunity odoo.addons.ess_hr_client.tests.test_misc: Starting TestStatsEndpoint.test_stats_without_admin_key_fails ... 
+2026-05-16 17:20:02,669 10020 INFO odoo19_comunity odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-05-16 17:20:02,700 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:02] "POST /ess/api/auth/login HTTP/1.1" 200 - 19 0.002 0.029
+2026-05-16 17:20:02,704 10020 INFO odoo19_comunity werkzeug: 127.0.0.1 - - [16/May/2026 17:20:02] "GET /ess/api/stats HTTP/1.1" 401 - 0 0.000 0.001
+[API] GET    /ess/api/stats                                     401  ERR  UNAUTHORIZED
+2026-05-16 17:20:02,715 10020 INFO odoo19_comunity odoo.addons.base.models.ir_attachment: filestore gc 0 checked, 0 removed 
+2026-05-16 17:20:02,720 10020 INFO odoo19_comunity odoo.service.server: 123 post-tests in 11.18s, 6246 queries 
+2026-05-16 17:20:02,720 10020 INFO odoo19_comunity odoo.tests.stats: ess_hr_admin: 38 tests 1.00s 673 queries 
+2026-05-16 17:20:02,720 10020 INFO odoo19_comunity odoo.tests.stats: ess_hr_client: 127 tests 8.03s 5301 queries 
+2026-05-16 17:20:02,720 10020 INFO odoo19_comunity odoo.tests.result: 0 failed, 0 error(s) of 123 tests when loading database 'odoo19_comunity' 
+2026-05-16 17:20:02,720 10020 INFO odoo19_comunity odoo.service.server: Initiating shutdown 
+2026-05-16 17:20:02,720 10020 INFO odoo19_comunity odoo.service.server: Hit CTRL-C again or send a second signal to force the shutdown. 
+2026-05-16 17:20:03,212 10020 INFO odoo19_comunity odoo.sql_db: ConnectionPool(read/write;used=0/count=0/max=64): Closed 1 connections  
