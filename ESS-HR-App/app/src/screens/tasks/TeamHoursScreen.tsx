@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+﻿import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -18,7 +18,7 @@ import {useTheme} from '../../hooks/useTheme';
 import {useRBAC} from '../../hooks/useRBAC';
 import AccessDenied from '../../components/common/AccessDenied';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
-import type {TeamHoursSummary, TeamMemberHours} from '../../api/mocks/team-hours.mock';
+import type {TeamHoursSummary, TeamMemberHours} from '../../api/types/team-hours';
 import {API_MAP} from '../../api/apiMap';
 
 function ProgressBar({percent, color}: {percent: number; color: string}) {

@@ -1,4 +1,4 @@
-from datetime import datetime
+﻿from datetime import datetime
 from odoo import models, fields, api, _, SUPERUSER_ID
 from odoo.exceptions import UserError, ValidationError
 
@@ -258,26 +258,82 @@ class HrLeaveExt(models.Model):
 
         return self._format_leave_record(leave)
 
+    def _get_leave_managed_employee_ids(self, user):
+        """Return IDs of active employees where the given res.users is their leave_manager_id."""
+        employees = self.env['hr.employee'].with_user(SUPERUSER_ID).search([
+            ('leave_manager_id', '=', user.id),
+            ('active', '=', True),
+        ])
+        return employees.ids
+
     @api.model
-    def get_leave_requests(self, employee_id, state_filter=None):
-        """Return list of leave requests for the employee, optionally filtered by state."""
-        domain = [('employee_id', '=', employee_id)]
-        if state_filter:
-            # state_filter is an Odoo state key: confirm/validate1/validate/refuse/cancel
-            if state_filter in _ODOO_STATES:
-                domain.append(('state', '=', state_filter))
+    def get_leave_requests(self, employee_id, state_filter=None, scope='mine'):
+        """Return leave requests filtered by scope and optional state.
+
+        scope='mine'  — only the employee's own records (all roles).
+        scope='all'   — manager: own + team; hr/admin: all company records.
+                        Regular employees fall back to 'mine' silently.
+        """
+        employee = self._get_employee(employee_id)
+
+        if scope == 'all':
+            role = self.env['hr.employee']._compute_ess_role(employee)
+            if role in ('hr', 'admin'):
+                domain = []
+            elif role == 'manager' and employee.user_id:
+                managed_ids = self._get_leave_managed_employee_ids(employee.user_id)
+                domain = [('employee_id', 'in', list(set(managed_ids + [employee_id])))]
+            else:
+                domain = [('employee_id', '=', employee_id)]
+        else:
+            domain = [('employee_id', '=', employee_id)]
+
+        if state_filter and state_filter in _ODOO_STATES:
+            domain.append(('state', '=', state_filter))
+
         leaves = self.with_user(SUPERUSER_ID).search(domain, order='date_from desc')
         return [self._format_leave_record(l) for l in leaves]
 
     @api.model
-    def get_leave_request_detail(self, leave_id):
-        """Return a full leave request dict including approval history."""
+    def get_leave_request_detail(self, leave_id, acting_employee_id=None):
+        """Return a full leave request dict including approval history and can_approve flag.
+
+        can_approve=True only when the acting employee is the leave_manager_id of the
+        leave's employee (or parent_id user when leave_manager_id is not set).
+        parent_id-only managers see the leave but get can_approve=False.
+        """
         leave = self.with_user(SUPERUSER_ID).browse(leave_id)
         if not leave.exists():
             raise UserError(_('Leave request not found.'))
         result = self._format_leave_record(leave)
         result['approval_history'] = self._get_approval_history(leave)
+        result['can_approve'] = self._can_employee_approve_leave(leave, acting_employee_id)
         return result
+
+    def _can_employee_approve_leave(self, leave, acting_employee_id):
+        """Return True if acting_employee_id is the authorised first-level leave approver.
+
+        Priority:
+          1. If employee has leave_manager_id set → only that user qualifies.
+          2. Fallback: if no leave_manager_id → parent_id user qualifies.
+          3. HR/admin always qualify (they use validate, not approve, but we allow both).
+        """
+        if not acting_employee_id:
+            return False
+        acting_emp = self.env['hr.employee'].with_user(SUPERUSER_ID).browse(acting_employee_id)
+        if not acting_emp.exists() or not acting_emp.user_id:
+            return False
+        user = acting_emp.user_id
+        # HR / admin can always act
+        if user.has_group('hr_holidays.group_hr_holidays_user') or user.has_group('base.group_system'):
+            return True
+        leave_emp = leave.employee_id
+        if leave_emp.leave_manager_id:
+            return leave_emp.leave_manager_id.id == user.id
+        # Fallback to direct manager
+        if leave_emp.parent_id and leave_emp.parent_id.user_id:
+            return leave_emp.parent_id.user_id.id == user.id
+        return False
 
     @api.model
     def update_leave_request(self, leave_id, vals):
@@ -322,10 +378,30 @@ class HrLeaveExt(models.Model):
 
     @api.model
     def approve_leave(self, leave_id, manager_employee_id):
-        """First-level approval of a leave request. Returns updated leave dict."""
+        """First-level approval of a leave request.
+
+        Validates that the acting user is the leave_manager_id of the leave's
+        employee. Falls back to parent_id user when leave_manager_id is not set.
+        Returns updated leave dict.
+        """
         leave = self.with_user(SUPERUSER_ID).browse(leave_id)
         if not leave.exists():
             raise UserError(_('Leave request not found.'))
+        if leave.state != 'confirm':
+            raise UserError(_('Only leaves in "To Approve" state can be approved at this stage.'))
+
+        manager_emp = self.env['hr.employee'].with_user(SUPERUSER_ID).browse(manager_employee_id)
+        if not manager_emp.exists() or not manager_emp.user_id:
+            raise UserError(_('Manager employee not found.'))
+
+        leave_employee = leave.employee_id
+        if leave_employee.leave_manager_id:
+            if leave_employee.leave_manager_id.id != manager_emp.user_id.id:
+                raise UserError(_('You are not the assigned leave manager for this employee.'))
+        elif leave_employee.parent_id and leave_employee.parent_id.user_id:
+            if leave_employee.parent_id.user_id.id != manager_emp.user_id.id:
+                raise UserError(_('You are not the direct manager for this employee.'))
+
         leave.with_user(SUPERUSER_ID).action_approve()
         return self._format_leave_record(leave)
 
@@ -367,18 +443,43 @@ class HrLeaveExt(models.Model):
 
     @api.model
     def get_team_leave_allocations(self, manager_employee_id):
-        """Return status + leave balance dicts for all employees reporting to the manager."""
+        """Return status + leave balance dicts for all employees reporting to the manager.
+
+        Each employee's balances only include leave types they have a validated
+        allocation for — same source-of-truth as get_leave_balance().
+        All team allocations are loaded in a single bulk query for efficiency.
+        """
         manager = self._get_employee(manager_employee_id)
         company_id = manager.company_id.id if manager.company_id else False
         team_domain = [('parent_id', '=', manager_employee_id), ('active', '=', True)]
         if company_id:
             team_domain.append(('company_id', '=', company_id))
         team_members = self.env['hr.employee'].with_user(SUPERUSER_ID).search(team_domain)
-        lt_domain = [('active', '=', True)]
-        if company_id:
-            lt_domain.append(('company_id', 'in', [company_id, False]))
-        leave_types = self.env['hr.leave.type'].with_user(SUPERUSER_ID).search(lt_domain)
+
+        if not team_members:
+            return []
+
         today = fields.Date.today()
+
+        # Bulk-load all validated allocations for the whole team in one query
+        all_allocations = self.env['hr.leave.allocation'].with_user(SUPERUSER_ID).search([
+            ('employee_id', 'in', team_members.ids),
+            ('state', '=', 'validate'),
+        ])
+
+        # Group: {employee_id: {lt_id: {'lt': record, 'allocated': float}}}
+        emp_lt_data = {}
+        for alloc in all_allocations:
+            emp_id = alloc.employee_id.id
+            lt = alloc.holiday_status_id
+            if not lt or not lt.active:
+                continue
+            if emp_id not in emp_lt_data:
+                emp_lt_data[emp_id] = {}
+            if lt.id not in emp_lt_data[emp_id]:
+                emp_lt_data[emp_id][lt.id] = {'lt': lt, 'allocated': 0.0}
+            emp_lt_data[emp_id][lt.id]['allocated'] += alloc.number_of_days
+
         result = []
         for emp in team_members:
             # Determine today's leave status
@@ -408,13 +509,15 @@ class HrLeaveExt(models.Model):
                 leave_info = ''
                 leave_info_ar = ''
 
+            # Only include leave types this employee has a validated allocation for
             emp_balances = []
-            for lt in leave_types:
+            for lt_id, data in (emp_lt_data.get(emp.id) or {}).items():
+                lt = data['lt']
                 lt_ctx = lt.with_context(employee_id=emp.id)
-                allocated = lt_ctx.max_leaves
+                allocated = data['allocated']
                 used = lt_ctx.leaves_taken
                 remaining = lt_ctx.virtual_remaining_leaves
-                pending_days = max(0, allocated - used - remaining)
+                pending_days = max(0.0, allocated - used - remaining)
                 emp_balances.append({
                     'leave_type_id': lt.id,
                     'leave_type_name': lt.name,
@@ -428,7 +531,7 @@ class HrLeaveExt(models.Model):
             result.append({
                 'employee_id': emp.id,
                 'employee': emp.name,
-                'employee_ar': emp.name,  # Arabic name not standard in Odoo; same until localised
+                'employee_ar': emp.name,
                 'status': status,
                 'leave_info': leave_info,
                 'leave_info_ar': leave_info_ar,

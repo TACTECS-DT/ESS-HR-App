@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+﻿import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -26,8 +26,8 @@ import {useAppSelector} from '../../hooks/useAppSelector';
 import {useApiError} from '../../hooks/useApiError';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {TasksStackParamList} from '../../navigation/types';
-import type {Task} from '../../api/mocks/tasks.mock';
-import type {DailyTimesheetSummary} from '../../api/mocks/timesheets.mock';
+import type {Task} from '../../api/types/tasks';
+import type {DailyTimesheetSummary} from '../../api/types/timesheets';
 import {API_MAP} from '../../api/apiMap';
 
 type Route = RouteProp<TasksStackParamList, 'LogTime'>;

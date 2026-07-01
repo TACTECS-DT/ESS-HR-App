@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+﻿import React, {useState} from 'react';
 import {View, Text, StyleSheet, ScrollView, TouchableOpacity} from 'react-native';
 import {useTranslation} from 'react-i18next';
 import {useQuery} from '@tanstack/react-query';
@@ -8,7 +8,7 @@ import {isApiSuccess} from '../../types/api';
 import ScreenHeader from '../../components/common/ScreenHeader';
 import {useTheme} from '../../hooks/useTheme';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
-import type {AttendanceRecord, DayStatus, SheetStatus} from '../../api/mocks/attendance.mock';
+import type {AttendanceRecord, DayStatus, SheetStatus} from '../../api/types/attendance';
 import {API_MAP} from '../../api/apiMap';
 
 const MONTH_NAMES_EN = ['January','February','March','April','May','June','July','August','September','October','November','December'];

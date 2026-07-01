@@ -34,7 +34,6 @@ export default function PasswordResetScreen() {
   async function handleSendCode() {
     if (!email.trim()) {return;}
     setLoading(true);
-    // Mock: always succeeds
     await new Promise(r => setTimeout(r, 600));
     setLoading(false);
     setStep('code');

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+﻿import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -22,7 +22,7 @@ import ScreenHeader from '../../components/common/ScreenHeader';
 import EmptyState from '../../components/common/EmptyState';
 import LoadingSkeleton from '../../components/common/LoadingSkeleton';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
-import type {Announcement, AnnouncementPriority} from '../../api/mocks/announcements.mock';
+import type {Announcement, AnnouncementPriority} from '../../api/types/announcements';
 import {API_MAP} from '../../api/apiMap';
 
 const PRIORITY_COLORS: Record<AnnouncementPriority, string> = {

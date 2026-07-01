@@ -1,5 +1,5 @@
 from odoo import models, fields, api, _, SUPERUSER_ID
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, AccessError
 
 
 class EssNotification(models.Model):
@@ -59,6 +59,8 @@ class EssNotification(models.Model):
         notif = self.with_user(SUPERUSER_ID).browse(notification_id)
         if not notif.exists():
             raise UserError(_('Notification not found.'))
+        if notif.employee_id.id != employee_id:
+            raise AccessError(_('Access denied: this notification belongs to another employee.'))
         notif.with_user(SUPERUSER_ID).write({'is_read': True, 'read_date': fields.Datetime.now()})
         return self._format_notification(notif)
 

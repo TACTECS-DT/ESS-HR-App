@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import {View, Text, StyleSheet, ScrollView} from 'react-native';
 import {useTranslation} from 'react-i18next';
 import {useRoute} from '@react-navigation/native';
@@ -13,7 +13,7 @@ import StatusChip from '../../components/common/StatusChip';
 import {useTheme} from '../../hooks/useTheme';
 import {spacing, fontSize, colors} from '../../config/theme';
 import type {AttendanceStackParamList} from '../../navigation/types';
-import type {AttendanceRecord} from '../../api/mocks/attendance.mock';
+import type {AttendanceRecord} from '../../api/types/attendance';
 import {API_MAP} from '../../api/apiMap';
 
 type Route = RouteProp<AttendanceStackParamList, 'AttendanceDailySheet'>;
@@ -78,15 +78,21 @@ export default function AttendanceDailySheetScreen() {
               </View>
             </Card>
 
-            {record.location_in ? (
+            {(record.gps_latitude || record.gps_longitude) ? (
               <Card style={styles.card}>
                 <Text style={[styles.sectionLabel, {color: theme.textSecondary}]}>
                   📍 {t('attendance.location')}
                 </Text>
                 <Text style={[styles.value, {color: theme.text}]}>
-                  {t('attendance.checkIn')}: {record.location_in.lat.toFixed(4)},{' '}
-                  {record.location_in.lng.toFixed(4)}
+                  {t('attendance.checkIn')}: {(record.gps_latitude ?? 0).toFixed(6)},{' '}
+                  {(record.gps_longitude ?? 0).toFixed(6)}
                 </Text>
+                {(record.checkout_latitude || record.checkout_longitude) ? (
+                  <Text style={[styles.value, {color: theme.text}]}>
+                    {t('attendance.checkOut')}: {(record.checkout_latitude ?? 0).toFixed(6)},{' '}
+                    {(record.checkout_longitude ?? 0).toFixed(6)}
+                  </Text>
+                ) : null}
               </Card>
             ) : null}
           </>

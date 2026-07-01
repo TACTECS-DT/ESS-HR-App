@@ -1,10 +1,9 @@
 
-Test credentials to use:
 
-Any license key except "INVALID" → goes to login
-PIN: anything except 0000 → logs in successfully
-Password: anything except "wrong" → logs in successfully
+******** Important note******** : the  (Managers / HR / Admin ) REQUIRED related user in order to make cycle work for approvals .(because of holiday_manager_id  , attendance_manager_id ) live in res.users
 
+
+if change in env file 
 npx react-native start --reset-cache                                    
 ---run emulator  vs code terminal:
 
@@ -16,6 +15,10 @@ emulator -avd Pixel_9a -no-snapshot-load
 
      npx react-native run-android
 
+
+server url : 
+
+http://10.0.2.2:8069
 
 
 

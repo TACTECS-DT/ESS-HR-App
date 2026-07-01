@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+﻿import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -21,7 +21,7 @@ import LoadingSkeleton from '../../components/common/LoadingSkeleton';
 import {useTheme} from '../../hooks/useTheme';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
-import type {DocumentRequest} from '../../api/mocks/document-requests.mock';
+import type {DocumentRequest} from '../../api/types/document-requests';
 import {API_MAP} from '../../api/apiMap';
 
 type Nav = StackNavigationProp<RequestsStackParamList>;

@@ -103,9 +103,9 @@ class TestExpense(EssClientTestCase):
         """POST /ess/api/expenses/attach → attaches file to expense."""
         exp = self._create_expense()
         result = self._call('POST', '/ess/api/expenses/attach', {
-            'expense_id': exp['id'],
-            'filename':   'receipt.pdf',
-            'data':       'dGVzdCByZWNlaXB0',  # base64 'test receipt'
+            'expense_id':  exp['id'],
+            'filename':    'receipt.pdf',
+            'file_base64': 'dGVzdCByZWNlaXB0',  # base64 'test receipt'
         })
         data = self.assertOk(result)
         self.assertHasKeys(data, ['id', 'name'])

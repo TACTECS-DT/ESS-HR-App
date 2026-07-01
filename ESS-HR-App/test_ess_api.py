@@ -8,7 +8,7 @@ Usage:
     python3 test_ess_api.py [options]
 
 Options:
-    --base     Base URL of the Odoo server  (default: http://localhost:8055)
+    --base     Base URL of the Odoo server  (default: http://localhost:8069)
     --badge    Employee badge ID            (default: 001)
     --pin      Employee PIN                 (default: 1234)
     --company  Company ID                   (default: 1)
@@ -655,7 +655,7 @@ def main():
     global BASE, VERBOSE
 
     parser = argparse.ArgumentParser(description='ESS HR API Test Suite')
-    parser.add_argument('--base',    default='http://localhost:8055',
+    parser.add_argument('--base',    default='http://localhost:8069',
                         help='Odoo server base URL')
     parser.add_argument('--badge',   default='001',   help='Employee badge ID')
     parser.add_argument('--pin',     default='1234',  help='Employee PIN')

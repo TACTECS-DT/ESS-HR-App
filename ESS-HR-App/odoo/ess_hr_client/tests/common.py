@@ -65,28 +65,32 @@ class EssClientTestCase(HttpCase):
         cls.company_id = cls.company.id
 
         # ── Reuse or create test employee ─────────────────────────────────────
-        cred = env['ess.employee.credential'].sudo().search(
-            [('badge_id', '=', _BADGE), ('company_id', '=', cls.company_id)],
+        # Admin may already have an employee record — reuse it to avoid
+        # the hr_employee_user_uniq constraint violation.
+        admin_user = env.ref('base.user_admin')
+        existing_emp = env['hr.employee'].sudo().search(
+            [('user_id', '=', admin_user.id), ('company_id', '=', cls.company_id)],
             limit=1,
         )
-        if cred:
-            cls.employee = cred.employee_id
+        if existing_emp:
+            cls.employee = existing_emp
         else:
-            admin_user = env.ref('base.user_admin')
-            # Admin may already have an employee record — reuse it to avoid
-            # the hr_employee_user_uniq constraint violation.
-            existing_emp = env['hr.employee'].sudo().search(
-                [('user_id', '=', admin_user.id), ('company_id', '=', cls.company_id)],
-                limit=1,
-            )
-            if existing_emp:
-                cls.employee = existing_emp
-            else:
-                cls.employee = env['hr.employee'].sudo().create({
-                    'name': 'ESS API Test Employee',
-                    'company_id': cls.company_id,
-                    'user_id': admin_user.id,
-                })
+            cls.employee = env['hr.employee'].sudo().create({
+                'name': 'ESS API Test Employee',
+                'company_id': cls.company_id,
+                'user_id': admin_user.id,
+            })
+
+        # The admin employee may already have a credential (production data or
+        # a previous crashed test run). Update it with test badge/pin rather
+        # than creating a duplicate, which would violate the employee_unique
+        # constraint.
+        emp_cred = env['ess.employee.credential'].sudo().search(
+            [('employee_id', '=', cls.employee.id)], limit=1,
+        )
+        if emp_cred:
+            emp_cred.write({'badge_id': _BADGE, 'new_pin': _PIN})
+        else:
             env['ess.employee.credential'].sudo().create({
                 'employee_id': cls.employee.id,
                 'badge_id':    _BADGE,

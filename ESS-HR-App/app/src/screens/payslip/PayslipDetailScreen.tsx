@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import {View, Text, StyleSheet, ScrollView, Share, TouchableOpacity, Alert} from 'react-native';
 import {useTranslation} from 'react-i18next';
 import {useRoute} from '@react-navigation/native';
@@ -13,7 +13,7 @@ import {useTheme} from '../../hooks/useTheme';
 import {useAppSelector} from '../../hooks/useAppSelector';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
-import type {Payslip, PayslipLine} from '../../api/mocks/payslip.mock';
+import type {Payslip, PayslipLine} from '../../api/types/payslip';
 import {API_MAP} from '../../api/apiMap';
 
 type Route = RouteProp<RequestsStackParamList, 'PayslipDetail'>;

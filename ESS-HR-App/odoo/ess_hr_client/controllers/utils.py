@@ -39,7 +39,7 @@ import logging
 
 from odoo import http
 from odoo.http import request
-from odoo.exceptions import UserError, ValidationError
+from odoo.exceptions import UserError, ValidationError, AccessError
 
 _logger = logging.getLogger(__name__)
 
@@ -160,6 +160,56 @@ def json_error(message: str, status: int = 400, code: str = None) -> http.Respon
 
 # ─── Main entry point ─────────────────────────────────────────────────────────
 
+# ─── Record-level access helpers ─────────────────────────────────────────────
+
+def check_record_access(env, acting_employee_id, record_employee_id, write=False):
+    """
+    Enforce record-level authorization.
+
+    GET (write=False): own record, OR direct/leave manager of that employee, OR HR/Admin.
+    PATCH / DELETE (write=True): own record only — managers cannot edit another employee's data.
+    Raises AccessError on denial.
+    """
+    if not acting_employee_id:
+        raise AccessError('Authentication required.')
+    if acting_employee_id == record_employee_id:
+        return
+    if write:
+        raise AccessError('You can only modify your own records.')
+    acting_emp = env['hr.employee'].sudo().browse(acting_employee_id)
+    if not acting_emp.exists() or not acting_emp.user_id:
+        raise AccessError('Access denied.')
+    user = acting_emp.user_id
+    if (user.has_group('base.group_system') or
+            user.has_group('hr.group_hr_manager') or
+            user.has_group('hr.group_hr_user') or
+            user.has_group('hr_holidays.group_hr_holidays_user')):
+        return
+    record_emp = env['hr.employee'].sudo().browse(record_employee_id)
+    if record_emp.exists():
+        if record_emp.parent_id and record_emp.parent_id.user_id.id == user.id:
+            return
+        if record_emp.leave_manager_id and record_emp.leave_manager_id.id == user.id:
+            return
+    raise AccessError('Access denied: this record belongs to another employee.')
+
+
+def require_hr_or_admin(env, acting_employee_id):
+    """Raise AccessError unless the acting employee is HR Officer or Admin."""
+    emp = env['hr.employee'].sudo().browse(acting_employee_id)
+    if not emp.exists() or not emp.user_id:
+        raise AccessError('Access denied.')
+    user = emp.user_id
+    if (user.has_group('base.group_system') or
+            user.has_group('hr.group_hr_manager') or
+            user.has_group('hr.group_hr_user') or
+            user.has_group('hr_holidays.group_hr_holidays_user')):
+        return
+    raise AccessError('Access denied: HR Officer or Admin role required.')
+
+
+# ─── Main entry point ─────────────────────────────────────────────────────────
+
 def call_and_log(endpoint: str, fn) -> http.Response:
     """
     Single entry point for every controller route:
@@ -178,6 +228,9 @@ def call_and_log(endpoint: str, fn) -> http.Response:
         try:
             result = fn()
             return json_ok(result)
+        except AccessError as exc:
+            error_msg = str(exc).strip()
+            return json_error(error_msg, 403, 'ACCESS_DENIED')
         except (UserError, ValidationError) as exc:
             error_msg = str(exc).strip()
             return json_error(error_msg, 400, 'VALIDATION_ERROR')
@@ -215,6 +268,9 @@ def call_and_log(endpoint: str, fn) -> http.Response:
     try:
         result = fn()
         return json_ok(result)
+    except AccessError as exc:
+        error_msg = str(exc).strip()
+        return json_error(error_msg, 403, 'ACCESS_DENIED')
     except (UserError, ValidationError) as exc:
         error_msg = str(exc).strip()
         return json_error(error_msg, 400, 'VALIDATION_ERROR')

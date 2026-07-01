@@ -7,10 +7,8 @@ class HrAttendanceExt(models.Model):
     _name = 'hr.attendance'
     _inherit = ['hr.attendance', 'ess.mixin']
 
-    gps_latitude = fields.Float(string='Check-in Latitude', digits=(10, 7))
-    gps_longitude = fields.Float(string='Check-in Longitude', digits=(10, 7))
-    checkout_latitude = fields.Float(string='Check-out Latitude', digits=(10, 7))
-    checkout_longitude = fields.Float(string='Check-out Longitude', digits=(10, 7))
+    # in_latitude, in_longitude, out_latitude, out_longitude are standard Odoo 19 fields on hr.attendance
+    # Do not redefine them here — writing to custom aliases caused values to be invisible in the Odoo UI
 
     def _update_overtime(self, attendance_domain=None):
         """Override to guard against enterprise-only overtime computation failures."""
@@ -32,10 +30,9 @@ class HrAttendanceExt(models.Model):
         vals = {
             'employee_id': employee_id,
             'check_in': check_in_dt,
-            'gps_latitude': latitude or 0.0,
-            'gps_longitude': longitude or 0.0,
+            'in_latitude': float(latitude) if latitude else 0.0,
+            'in_longitude': float(longitude) if longitude else 0.0,
         }
-        # task_id is not a field on hr.attendance in Odoo 19 — removed
         attendance = self.with_user(SUPERUSER_ID).with_context(tracking_disable=True).create(vals)
         return self._format_attendance_record(attendance)
 
@@ -49,8 +46,8 @@ class HrAttendanceExt(models.Model):
         check_out_dt = self._parse_timestamp(timestamp)
         open_att.with_user(SUPERUSER_ID).with_context(tracking_disable=True).write({
             'check_out': check_out_dt,
-            'checkout_latitude': latitude or 0.0,
-            'checkout_longitude': longitude or 0.0,
+            'out_latitude': float(latitude) if latitude else 0.0,
+            'out_longitude': float(longitude) if longitude else 0.0,
         })
         return self._format_attendance_record(open_att)
 
@@ -145,13 +142,38 @@ class HrAttendanceExt(models.Model):
 
     @api.model
     def get_team_attendance(self, manager_employee_id, attendance_date=None):
-        """Return attendance status for all direct reports of the manager on a given date."""
+        """Return attendance status for all employees under this manager on a given date.
+
+        Scope:
+          - attendance_manager_id match → employees where this user is their attendance manager
+          - parent_id match             → direct subordinates (fallback / additional scope)
+          Both sets are unioned so a manager sees everyone they are responsible for.
+        """
         manager = self._get_employee(manager_employee_id)
         company_id = manager.company_id.id if manager.company_id else False
-        team_domain = [('parent_id', '=', manager_employee_id), ('active', '=', True)]
+        Employee = self.env['hr.employee'].with_user(SUPERUSER_ID)
+
+        base = [('active', '=', True)]
         if company_id:
-            team_domain.append(('company_id', '=', company_id))
-        team = self.env['hr.employee'].with_user(SUPERUSER_ID).search(team_domain)
+            base.append(('company_id', '=', company_id))
+
+        # Collect employee IDs via attendance_manager_id (res.users link)
+        att_mgr_ids = set()
+        if manager.user_id:
+            try:
+                att_mgr_ids = set(Employee.search(
+                    base + [('attendance_manager_id', '=', manager.user_id.id)]
+                ).ids)
+            except Exception:
+                pass
+
+        # Collect employee IDs via parent_id (direct reports)
+        direct_ids = set(Employee.search(
+            base + [('parent_id', '=', manager_employee_id)]
+        ).ids)
+
+        all_team_ids = list(att_mgr_ids | direct_ids)
+        team = Employee.browse(all_team_ids)
         target_date = attendance_date or fields.Date.today()
         if isinstance(target_date, str):
             from datetime import datetime as _dt
@@ -192,8 +214,8 @@ class HrAttendanceExt(models.Model):
         vals = {
             'employee_id': employee_id,
             'check_in': check_in_dt,
-            'gps_latitude': latitude or 0.0,
-            'gps_longitude': longitude or 0.0,
+            'in_latitude': float(latitude) if latitude else 0.0,
+            'in_longitude': float(longitude) if longitude else 0.0,
         }
         if check_out_str:
             vals['check_out'] = self._parse_timestamp(check_out_str)
@@ -257,12 +279,6 @@ class HrAttendanceExt(models.Model):
             worked_hours = round(att.worked_hours or 0.0, 2)
         except Exception:
             worked_hours = 0.0
-        try:
-            checkout_lat = att.checkout_latitude
-            checkout_lon = att.checkout_longitude
-        except Exception:
-            checkout_lat = 0.0
-            checkout_lon = 0.0
         return {
             'id': att.id,
             'employee_id': att.employee_id.id,
@@ -270,10 +286,10 @@ class HrAttendanceExt(models.Model):
             'check_in': att.check_in.strftime('%Y-%m-%d %H:%M:%S') if att.check_in else False,
             'check_out': att.check_out.strftime('%Y-%m-%d %H:%M:%S') if att.check_out else False,
             'worked_hours': worked_hours,
-            'gps_latitude': att.gps_latitude or 0.0,
-            'gps_longitude': att.gps_longitude or 0.0,
-            'checkout_latitude': checkout_lat,
-            'checkout_longitude': checkout_lon,
+            'gps_latitude': att.in_latitude or 0.0,
+            'gps_longitude': att.in_longitude or 0.0,
+            'checkout_latitude': att.out_latitude or 0.0,
+            'checkout_longitude': att.out_longitude or 0.0,
         }
 
     def _parse_timestamp(self, timestamp_str):

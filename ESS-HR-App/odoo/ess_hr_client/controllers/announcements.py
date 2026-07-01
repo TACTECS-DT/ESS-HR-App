@@ -10,7 +10,7 @@ class AnnouncementsController(http.Controller):
     def announcements(self):
         kw = get_body()
         ctx = get_auth_context()
-        employee_id = kw.get('employee_id') or ctx.get('employee_id')
+        employee_id = ctx.get('employee_id')
         company_id = kw.get('company_id') or ctx.get('company_id')
         return call_and_log(
             '/ess/api/announcements',

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+﻿import React, {useState} from 'react';
 import {View, Text, FlatList, StyleSheet, TouchableOpacity, RefreshControl} from 'react-native';
 import {useTranslation} from 'react-i18next';
 import {useNavigation} from '@react-navigation/native';
@@ -13,7 +13,7 @@ import EmptyState from '../../components/common/EmptyState';
 import {useTheme} from '../../hooks/useTheme';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
-import type {Expense} from '../../api/mocks/expense.mock';
+import type {Expense} from '../../api/types/expense';
 import {API_MAP} from '../../api/apiMap';
 
 type Nav = StackNavigationProp<RequestsStackParamList>;

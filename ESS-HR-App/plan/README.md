@@ -4,7 +4,7 @@ Three-stage delivery plan. Each stage is a separate file.
 
 | File | Stage | Description |
 |---|---|---|
-| [stage-1-mobile-mock.md](stage-1-mobile-mock.md) | Stage 1 | React Native mobile app with mock JSON responses |
+| [stage-1-mobile-app.md](stage-1-mobile-app.md) | Stage 1 | React Native mobile app — all screens and modules, connects to Odoo backend |
 | [stage-2-odoo-module.md](stage-2-odoo-module.md) | Stage 2 | Custom Odoo addon that exposes all HR data via RPC |
 | [stage-3-django-backend.md](stage-3-django-backend.md) | Stage 3 | Django REST Framework middleware — connects mobile to Odoo |
 
@@ -13,9 +13,9 @@ Three-stage delivery plan. Each stage is a separate file.
 ## Stages Overview
 
 ```
-Stage 1 — Mobile App (Mock)
+Stage 1 — Mobile App
   Full React Native app, all screens and modules working
-  against static mock JSON — no backend needed.
+  against the real Odoo backend REST API.
   Deliverable: complete, navigable mobile app.
 
 Stage 2 — Odoo Custom Module

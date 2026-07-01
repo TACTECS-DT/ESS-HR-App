@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+﻿import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -18,7 +18,7 @@ import {useTheme} from '../../hooks/useTheme';
 import {useRBAC} from '../../hooks/useRBAC';
 import AccessDenied from '../../components/common/AccessDenied';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
-import type {AnalyticsData} from '../../api/mocks/analytics.mock';
+import type {AnalyticsData} from '../../api/types/analytics';
 import {API_MAP} from '../../api/apiMap';
 
 type Period = 'this_month' | 'last_month' | 'quarter' | 'year';

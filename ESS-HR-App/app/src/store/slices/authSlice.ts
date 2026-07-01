@@ -1,5 +1,5 @@
-import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-import type {UserInfo} from '../../api/mocks/auth.mock';
+﻿import {createSlice, PayloadAction} from '@reduxjs/toolkit';
+import type {UserInfo} from '../../api/types/auth';
 
 export interface AllowedModule {
   name: string;

@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import {View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity} from 'react-native';
 import {useTranslation} from 'react-i18next';
 import {useRoute} from '@react-navigation/native';
@@ -15,7 +15,7 @@ import {useRBAC} from '../../hooks/useRBAC';
 import {useApiError} from '../../hooks/useApiError';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
-import type {BusinessService} from '../../api/mocks/business-services.mock';
+import type {BusinessService} from '../../api/types/business-services';
 import {API_MAP} from '../../api/apiMap';
 
 type Route = RouteProp<RequestsStackParamList, 'BusinessServiceDetail'>;

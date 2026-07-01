@@ -26,7 +26,6 @@ import {setAdminContext} from '../../store/slices/authSlice';
 import type {AuthStackParamList} from '../../navigation/types';
 import {API_MAP} from '../../api/apiMap';
 import {ENV} from '../../config/appConfig';
-import {MOCK_ADMIN_VALIDATE_VALID} from '../../api/mocks/auth.mock';
 
 type Nav = StackNavigationProp<AuthStackParamList, 'LicenseActivation'>;
 
@@ -45,7 +44,7 @@ export default function LicenseActivationScreen() {
   // Auto-refresh allowedModules from the admin server on every visit to this screen.
   // This ensures module permissions are always up-to-date after an admin changes the license.
   useEffect(() => {
-    if (!ENV.MOCK_MODE && cachedServerUrl && cachedServerUrl !== 'mock') {
+    if (cachedServerUrl) {
       handleActivate(cachedServerUrl);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -118,22 +117,6 @@ export default function LicenseActivationScreen() {
   };
 
   async function handleActivate(urlOverride?: string) {
-    // ── Mock mode: skip URL validation and admin server call entirely ──────────
-    if (ENV.MOCK_MODE) {
-      setLoading(true);
-      await new Promise(r => setTimeout(r, 600));
-      const d = MOCK_ADMIN_VALIDATE_VALID;
-      dispatch(setAdminContext({
-        serverUrl: 'mock',
-        allowedModules: d.data.allowed_modules ?? [],
-        autoLogoutDuration: d.data.auto_logout_duration ?? 72,
-      }));
-      setLoading(false);
-      navigation.navigate('CompanySelection');
-      return;
-    }
-
-    // ── Real mode: validate URL and call admin server ──────────────────────────
     const raw = (urlOverride ?? serverUrl).trim();
     if (!raw) {
       showError('GENERIC', t('common.errorGeneric', 'An error occurred. Please try again.'));
@@ -227,23 +210,21 @@ export default function LicenseActivationScreen() {
 
         {/* Form card */}
         <View style={[styles.card, {backgroundColor: theme.surface, borderColor: theme.border}]}>
-          {!ENV.MOCK_MODE && (
-            <TextInput
-              label={t('auth.serverUrl') + ' *'}
-              placeholder={t('auth.serverUrlPlaceholder')}
-              value={serverUrl}
-              onChangeText={v => { setServerUrl(v); setErrorType(null); }}
-              autoCapitalize="none"
-              autoCorrect={false}
-              keyboardType="url"
-            />
-          )}
+          <TextInput
+            label={t('auth.serverUrl') + ' *'}
+            placeholder={t('auth.serverUrlPlaceholder')}
+            value={serverUrl}
+            onChangeText={v => { setServerUrl(v); setErrorType(null); }}
+            autoCapitalize="none"
+            autoCorrect={false}
+            keyboardType="url"
+          />
 
           <Button
             label={t('auth.activate')}
             onPress={() => handleActivate()}
             loading={loading}
-            disabled={!ENV.MOCK_MODE && !serverUrl.trim()}
+            disabled={!serverUrl.trim()}
             fullWidth
           />
         </View>

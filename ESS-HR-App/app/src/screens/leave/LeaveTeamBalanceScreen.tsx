@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+﻿import React, {useState} from 'react';
 import {View, Text, StyleSheet, ScrollView, TouchableOpacity} from 'react-native';
 import {useTranslation} from 'react-i18next';
 import {useQuery} from '@tanstack/react-query';
@@ -10,7 +10,7 @@ import {useTheme} from '../../hooks/useTheme';
 import {useRBAC} from '../../hooks/useRBAC';
 import AccessDenied from '../../components/common/AccessDenied';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
-import type {TeamMember, TeamMemberStatus} from '../../api/mocks/leave.mock';
+import type {TeamMember, TeamMemberStatus} from '../../api/types/leave';
 import {API_MAP} from '../../api/apiMap';
 
 const STATUS_COLORS: Record<TeamMemberStatus, string> = {
@@ -174,7 +174,12 @@ export default function LeaveTeamBalanceScreen() {
                   <Text style={[styles.memberName, {color: theme.text}]}>{name}</Text>
                 </View>
                 {/* Per-balance progress bars */}
-                {(member.balances ?? []).slice(0, 3).map((bal, idx) => {
+                {(member.balances ?? []).length === 0 && (
+                  <Text style={[styles.noBalance, {color: theme.textSecondary}]}>
+                    {t('leave.noLeaveBalance')}
+                  </Text>
+                )}
+                {(member.balances ?? []).map((bal, idx) => {
                   const barColor = BALANCE_COLORS[idx % BALANCE_COLORS.length];
                   const pct = bal.allocated > 0 ? Math.min(bal.remaining / bal.allocated, 1) : 0;
                   return (
@@ -269,6 +274,7 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   balanceMemberRow: {flexDirection: 'row', alignItems: 'center', gap: spacing.sm},
+  noBalance: {fontSize: fontSize.xs, fontStyle: 'italic', textAlign: 'center', paddingVertical: spacing.xs},
   balRow: {gap: 4},
   balRowHeader: {flexDirection: 'row', justifyContent: 'space-between'},
   balTypeName: {fontSize: fontSize.sm, fontWeight: '500'},

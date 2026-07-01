@@ -18,20 +18,11 @@ apiClient.interceptors.request.use(
     const auth = store.getState().auth;
 
     // Dynamic base URL:
-    //  - MOCK_MODE: leave baseURL unset so axios-mock-adapter receives the bare
-    //    relative path and can match its registered handlers.
-    //  - Real mode: use the client server URL from Redux (set after Step 1 succeeds).
-    //    If serverUrl is null the user hasn't completed Step 1 yet — reject the call
-    //    rather than silently hitting a wrong hardcoded server.
-    // Dynamic base URL resolution:
-    //  - mock:   serverUrl = 'mock', leave baseURL unset — mock adapter intercepts bare paths
     //  - django: use DJANGO_BASE_URL from .env (fixed middleware address)
     //  - odoo:   use serverUrl from Redux (user-entered at Step 1) + /ess/api suffix
     //            if serverUrl is null, Step 1 hasn't completed — reject the call
     if (!config.baseURL) {
-      if (ENV.MOCK_MODE || auth.serverUrl === 'mock') {
-        // leave unset — mock adapter handles it
-      } else if (ENV.ACTIVE_BACKEND === 'django') {
+      if (ENV.ACTIVE_BACKEND === 'django') {
         config.baseURL = ENV.DJANGO_BASE_URL.replace(/\/$/, '');
       } else {
         const serverUrl = auth.serverUrl;

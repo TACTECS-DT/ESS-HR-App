@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+﻿import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -19,8 +19,8 @@ import {useAppSelector} from '../../hooks/useAppSelector';
 import {useAppDispatch} from '../../hooks/useAppDispatch';
 import {startTimer, stopTimer, pauseTimer, resumeTimer, tickTimer} from '../../store/slices/timerSlice';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
-import type {Task} from '../../api/mocks/tasks.mock';
-import type {DailyTimesheetSummary} from '../../api/mocks/timesheets.mock';
+import type {Task} from '../../api/types/tasks';
+import type {DailyTimesheetSummary} from '../../api/types/timesheets';
 import {API_MAP} from '../../api/apiMap';
 
 function formatTime(seconds: number): string {

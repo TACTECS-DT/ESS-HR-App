@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import {
   View,
   Text,
@@ -23,7 +23,7 @@ import {useAppSelector} from '../../hooks/useAppSelector';
 import {useNavigation} from '@react-navigation/native';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {TasksStackParamList} from '../../navigation/types';
-import type {DailyTimesheetSummary} from '../../api/mocks/timesheets.mock';
+import type {DailyTimesheetSummary} from '../../api/types/timesheets';
 import type {StackNavigationProp} from '@react-navigation/stack';
 
 type Nav = StackNavigationProp<TasksStackParamList>;

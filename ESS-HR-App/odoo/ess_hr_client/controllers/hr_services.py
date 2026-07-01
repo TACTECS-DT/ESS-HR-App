@@ -4,8 +4,9 @@ Experience Certificates, and Business Service Requests.
 """
 from odoo import http
 from odoo.http import request
+from odoo.exceptions import UserError
 
-from .utils import call_and_log, get_body, get_auth_context
+from .utils import call_and_log, get_body, get_auth_context, check_record_access
 
 _DEFAULT_DOCUMENT_TYPES = [
     'Passport', 'National ID', 'Salary Certificate', 'Employment Letter',
@@ -28,7 +29,7 @@ class HrServicesController(http.Controller):
     @http.route('/ess/api/hr-letters', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
     def letters(self):
         kw = get_body()
-        employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
+        employee_id = get_auth_context().get('employee_id')
         if request.httprequest.method == 'GET':
             return call_and_log(
                 '/ess/api/hr-letters',
@@ -46,29 +47,40 @@ class HrServicesController(http.Controller):
     @http.route('/ess/api/hr-letters/<int:letter_id>', type='http', auth='none', methods=['GET', 'PATCH', 'DELETE'], csrf=False, readonly=False)
     def letter_by_id(self, letter_id):
         kw = get_body()
+        acting_employee_id = get_auth_context().get('employee_id')
         method = request.httprequest.method
+
         if method == 'GET':
-            return call_and_log(
-                '/ess/api/hr-letters/<id>',
-                lambda: request.env['hr.letter.request'].sudo().get_letter_detail(letter_id),
-            )
+            def _get():
+                record = request.env['hr.letter.request'].sudo().browse(letter_id)
+                if not record.exists():
+                    raise UserError('HR letter not found.')
+                check_record_access(request.env, acting_employee_id, record.employee_id.id)
+                return request.env['hr.letter.request'].sudo().get_letter_detail(letter_id)
+            return call_and_log('/ess/api/hr-letters/<id>', _get)
+
         if method == 'PATCH':
-            return call_and_log(
-                '/ess/api/hr-letters/<id>',
-                lambda: request.env['hr.letter.request'].sudo().update_letter(
-                    letter_id, kw.get('vals', {}),
-                ),
-            )
-        return call_and_log(
-            '/ess/api/hr-letters/<id>',
-            lambda: request.env['hr.letter.request'].sudo().delete_letter(letter_id),
-        )
+            def _patch():
+                record = request.env['hr.letter.request'].sudo().browse(letter_id)
+                if not record.exists():
+                    raise UserError('HR letter not found.')
+                check_record_access(request.env, acting_employee_id, record.employee_id.id, write=True)
+                return request.env['hr.letter.request'].sudo().update_letter(letter_id, kw.get('vals', {}))
+            return call_and_log('/ess/api/hr-letters/<id>', _patch)
+
+        def _delete():
+            record = request.env['hr.letter.request'].sudo().browse(letter_id)
+            if not record.exists():
+                raise UserError('HR letter not found.')
+            check_record_access(request.env, acting_employee_id, record.employee_id.id, write=True)
+            return request.env['hr.letter.request'].sudo().delete_letter(letter_id)
+        return call_and_log('/ess/api/hr-letters/<id>', _delete)
 
     @http.route('/ess/api/hr-letters/approve', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def letter_approve(self):
         kw = get_body()
         record_id = kw.get('letter_id') or kw.get('record_id')
-        approver_employee_id = kw.get('approver_employee_id') or get_auth_context().get('employee_id')
+        approver_employee_id = get_auth_context().get('employee_id')
         return call_and_log(
             '/ess/api/hr-letters/approve',
             lambda: request.env['hr.letter.request'].sudo().approve_letter(
@@ -80,7 +92,7 @@ class HrServicesController(http.Controller):
     def letter_refuse(self):
         kw = get_body()
         record_id = kw.get('letter_id') or kw.get('record_id')
-        approver_employee_id = kw.get('approver_employee_id') or get_auth_context().get('employee_id')
+        approver_employee_id = get_auth_context().get('employee_id')
         return call_and_log(
             '/ess/api/hr-letters/refuse',
             lambda: request.env['hr.letter.request'].sudo().refuse_letter(
@@ -91,11 +103,15 @@ class HrServicesController(http.Controller):
     @http.route('/ess/api/hr-letters/reset', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def letter_reset(self):
         kw = get_body()
-        record_id = kw.get('letter_id') or kw.get('record_id')
-        return call_and_log(
-            '/ess/api/hr-letters/reset',
-            lambda: request.env['hr.letter.request'].sudo().reset_letter(record_id),
-        )
+        acting_employee_id = get_auth_context().get('employee_id')
+        def _do():
+            record_id = kw.get('letter_id') or kw.get('record_id')
+            record = request.env['hr.letter.request'].sudo().browse(record_id)
+            if not record.exists():
+                raise UserError('HR letter not found.')
+            check_record_access(request.env, acting_employee_id, record.employee_id.id)
+            return request.env['hr.letter.request'].sudo().reset_letter(record_id)
+        return call_and_log('/ess/api/hr-letters/reset', _do)
 
     # ── Document Requests ─────────────────────────────────────────────────────
 
@@ -109,7 +125,7 @@ class HrServicesController(http.Controller):
     @http.route('/ess/api/document-requests', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
     def document_requests(self):
         kw = get_body()
-        employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
+        employee_id = get_auth_context().get('employee_id')
         if request.httprequest.method == 'GET':
             return call_and_log(
                 '/ess/api/document-requests',
@@ -127,29 +143,40 @@ class HrServicesController(http.Controller):
     @http.route('/ess/api/document-requests/<int:doc_id>', type='http', auth='none', methods=['GET', 'PATCH', 'DELETE'], csrf=False, readonly=False)
     def document_by_id(self, doc_id):
         kw = get_body()
+        acting_employee_id = get_auth_context().get('employee_id')
         method = request.httprequest.method
+
         if method == 'GET':
-            return call_and_log(
-                '/ess/api/document-requests/<id>',
-                lambda: request.env['hr.document.request'].sudo().get_document_detail(doc_id),
-            )
+            def _get():
+                record = request.env['hr.document.request'].sudo().browse(doc_id)
+                if not record.exists():
+                    raise UserError('Document request not found.')
+                check_record_access(request.env, acting_employee_id, record.employee_id.id)
+                return request.env['hr.document.request'].sudo().get_document_detail(doc_id)
+            return call_and_log('/ess/api/document-requests/<id>', _get)
+
         if method == 'PATCH':
-            return call_and_log(
-                '/ess/api/document-requests/<id>',
-                lambda: request.env['hr.document.request'].sudo().update_document(
-                    doc_id, kw.get('vals', {}),
-                ),
-            )
-        return call_and_log(
-            '/ess/api/document-requests/<id>',
-            lambda: request.env['hr.document.request'].sudo().delete_document(doc_id),
-        )
+            def _patch():
+                record = request.env['hr.document.request'].sudo().browse(doc_id)
+                if not record.exists():
+                    raise UserError('Document request not found.')
+                check_record_access(request.env, acting_employee_id, record.employee_id.id, write=True)
+                return request.env['hr.document.request'].sudo().update_document(doc_id, kw.get('vals', {}))
+            return call_and_log('/ess/api/document-requests/<id>', _patch)
+
+        def _delete():
+            record = request.env['hr.document.request'].sudo().browse(doc_id)
+            if not record.exists():
+                raise UserError('Document request not found.')
+            check_record_access(request.env, acting_employee_id, record.employee_id.id, write=True)
+            return request.env['hr.document.request'].sudo().delete_document(doc_id)
+        return call_and_log('/ess/api/document-requests/<id>', _delete)
 
     @http.route('/ess/api/document-requests/approve', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def document_approve(self):
         kw = get_body()
         record_id = kw.get('doc_id') or kw.get('record_id')
-        approver_employee_id = kw.get('approver_employee_id') or get_auth_context().get('employee_id')
+        approver_employee_id = get_auth_context().get('employee_id')
         return call_and_log(
             '/ess/api/document-requests/approve',
             lambda: request.env['hr.document.request'].sudo().approve_document(
@@ -161,7 +188,7 @@ class HrServicesController(http.Controller):
     def document_refuse(self):
         kw = get_body()
         record_id = kw.get('doc_id') or kw.get('record_id')
-        approver_employee_id = kw.get('approver_employee_id') or get_auth_context().get('employee_id')
+        approver_employee_id = get_auth_context().get('employee_id')
         return call_and_log(
             '/ess/api/document-requests/refuse',
             lambda: request.env['hr.document.request'].sudo().refuse_document(
@@ -172,18 +199,22 @@ class HrServicesController(http.Controller):
     @http.route('/ess/api/document-requests/reset', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def document_reset(self):
         kw = get_body()
-        record_id = kw.get('doc_id') or kw.get('record_id')
-        return call_and_log(
-            '/ess/api/document-requests/reset',
-            lambda: request.env['hr.document.request'].sudo().reset_document(record_id),
-        )
+        acting_employee_id = get_auth_context().get('employee_id')
+        def _do():
+            record_id = kw.get('doc_id') or kw.get('record_id')
+            record = request.env['hr.document.request'].sudo().browse(record_id)
+            if not record.exists():
+                raise UserError('Document request not found.')
+            check_record_access(request.env, acting_employee_id, record.employee_id.id)
+            return request.env['hr.document.request'].sudo().reset_document(record_id)
+        return call_and_log('/ess/api/document-requests/reset', _do)
 
     # ── Experience Certificates ───────────────────────────────────────────────
 
     @http.route('/ess/api/experience-certificates', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
     def certificates(self):
         kw = get_body()
-        employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
+        employee_id = get_auth_context().get('employee_id')
         if request.httprequest.method == 'GET':
             return call_and_log(
                 '/ess/api/experience-certificates',
@@ -201,29 +232,40 @@ class HrServicesController(http.Controller):
     @http.route('/ess/api/experience-certificates/<int:cert_id>', type='http', auth='none', methods=['GET', 'PATCH', 'DELETE'], csrf=False, readonly=False)
     def certificate_by_id(self, cert_id):
         kw = get_body()
+        acting_employee_id = get_auth_context().get('employee_id')
         method = request.httprequest.method
+
         if method == 'GET':
-            return call_and_log(
-                '/ess/api/experience-certificates/<id>',
-                lambda: request.env['hr.experience.certificate'].sudo().get_certificate_detail(cert_id),
-            )
+            def _get():
+                record = request.env['hr.experience.certificate'].sudo().browse(cert_id)
+                if not record.exists():
+                    raise UserError('Experience certificate not found.')
+                check_record_access(request.env, acting_employee_id, record.employee_id.id)
+                return request.env['hr.experience.certificate'].sudo().get_certificate_detail(cert_id)
+            return call_and_log('/ess/api/experience-certificates/<id>', _get)
+
         if method == 'PATCH':
-            return call_and_log(
-                '/ess/api/experience-certificates/<id>',
-                lambda: request.env['hr.experience.certificate'].sudo().update_certificate(
-                    cert_id, kw.get('vals', {}),
-                ),
-            )
-        return call_and_log(
-            '/ess/api/experience-certificates/<id>',
-            lambda: request.env['hr.experience.certificate'].sudo().delete_certificate(cert_id),
-        )
+            def _patch():
+                record = request.env['hr.experience.certificate'].sudo().browse(cert_id)
+                if not record.exists():
+                    raise UserError('Experience certificate not found.')
+                check_record_access(request.env, acting_employee_id, record.employee_id.id, write=True)
+                return request.env['hr.experience.certificate'].sudo().update_certificate(cert_id, kw.get('vals', {}))
+            return call_and_log('/ess/api/experience-certificates/<id>', _patch)
+
+        def _delete():
+            record = request.env['hr.experience.certificate'].sudo().browse(cert_id)
+            if not record.exists():
+                raise UserError('Experience certificate not found.')
+            check_record_access(request.env, acting_employee_id, record.employee_id.id, write=True)
+            return request.env['hr.experience.certificate'].sudo().delete_certificate(cert_id)
+        return call_and_log('/ess/api/experience-certificates/<id>', _delete)
 
     @http.route('/ess/api/experience-certificates/approve', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def certificate_approve(self):
         kw = get_body()
         record_id = kw.get('cert_id') or kw.get('record_id')
-        approver_employee_id = kw.get('approver_employee_id') or get_auth_context().get('employee_id')
+        approver_employee_id = get_auth_context().get('employee_id')
         return call_and_log(
             '/ess/api/experience-certificates/approve',
             lambda: request.env['hr.experience.certificate'].sudo().approve_certificate(
@@ -235,7 +277,7 @@ class HrServicesController(http.Controller):
     def certificate_refuse(self):
         kw = get_body()
         record_id = kw.get('cert_id') or kw.get('record_id')
-        approver_employee_id = kw.get('approver_employee_id') or get_auth_context().get('employee_id')
+        approver_employee_id = get_auth_context().get('employee_id')
         return call_and_log(
             '/ess/api/experience-certificates/refuse',
             lambda: request.env['hr.experience.certificate'].sudo().refuse_certificate(
@@ -246,11 +288,15 @@ class HrServicesController(http.Controller):
     @http.route('/ess/api/experience-certificates/reset', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def certificate_reset(self):
         kw = get_body()
-        record_id = kw.get('cert_id') or kw.get('record_id')
-        return call_and_log(
-            '/ess/api/experience-certificates/reset',
-            lambda: request.env['hr.experience.certificate'].sudo().reset_certificate(record_id),
-        )
+        acting_employee_id = get_auth_context().get('employee_id')
+        def _do():
+            record_id = kw.get('cert_id') or kw.get('record_id')
+            record = request.env['hr.experience.certificate'].sudo().browse(record_id)
+            if not record.exists():
+                raise UserError('Experience certificate not found.')
+            check_record_access(request.env, acting_employee_id, record.employee_id.id)
+            return request.env['hr.experience.certificate'].sudo().reset_certificate(record_id)
+        return call_and_log('/ess/api/experience-certificates/reset', _do)
 
     # ── Business Services ─────────────────────────────────────────────────────
 
@@ -269,7 +315,7 @@ class HrServicesController(http.Controller):
     @http.route('/ess/api/business-services', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
     def business_services(self):
         kw = get_body()
-        employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
+        employee_id = get_auth_context().get('employee_id')
         if request.httprequest.method == 'GET':
             return call_and_log(
                 '/ess/api/business-services',
@@ -288,29 +334,40 @@ class HrServicesController(http.Controller):
     @http.route('/ess/api/business-services/<int:service_id>', type='http', auth='none', methods=['GET', 'PATCH', 'DELETE'], csrf=False, readonly=False)
     def business_service_by_id(self, service_id):
         kw = get_body()
+        acting_employee_id = get_auth_context().get('employee_id')
         method = request.httprequest.method
+
         if method == 'GET':
-            return call_and_log(
-                '/ess/api/business-services/<id>',
-                lambda: request.env['hr.business.service.request'].sudo().get_business_service_detail(service_id),
-            )
+            def _get():
+                record = request.env['hr.business.service.request'].sudo().browse(service_id)
+                if not record.exists():
+                    raise UserError('Business service request not found.')
+                check_record_access(request.env, acting_employee_id, record.employee_id.id)
+                return request.env['hr.business.service.request'].sudo().get_business_service_detail(service_id)
+            return call_and_log('/ess/api/business-services/<id>', _get)
+
         if method == 'PATCH':
-            return call_and_log(
-                '/ess/api/business-services/<id>',
-                lambda: request.env['hr.business.service.request'].sudo().update_business_service(
-                    service_id, kw.get('vals', {}),
-                ),
-            )
-        return call_and_log(
-            '/ess/api/business-services/<id>',
-            lambda: request.env['hr.business.service.request'].sudo().delete_business_service(service_id),
-        )
+            def _patch():
+                record = request.env['hr.business.service.request'].sudo().browse(service_id)
+                if not record.exists():
+                    raise UserError('Business service request not found.')
+                check_record_access(request.env, acting_employee_id, record.employee_id.id, write=True)
+                return request.env['hr.business.service.request'].sudo().update_business_service(service_id, kw.get('vals', {}))
+            return call_and_log('/ess/api/business-services/<id>', _patch)
+
+        def _delete():
+            record = request.env['hr.business.service.request'].sudo().browse(service_id)
+            if not record.exists():
+                raise UserError('Business service request not found.')
+            check_record_access(request.env, acting_employee_id, record.employee_id.id, write=True)
+            return request.env['hr.business.service.request'].sudo().delete_business_service(service_id)
+        return call_and_log('/ess/api/business-services/<id>', _delete)
 
     @http.route('/ess/api/business-services/approve', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def business_service_approve(self):
         kw = get_body()
         record_id = kw.get('service_id') or kw.get('record_id')
-        approver_employee_id = kw.get('approver_employee_id') or get_auth_context().get('employee_id')
+        approver_employee_id = get_auth_context().get('employee_id')
         return call_and_log(
             '/ess/api/business-services/approve',
             lambda: request.env['hr.business.service.request'].sudo().approve_business_service(
@@ -322,7 +379,7 @@ class HrServicesController(http.Controller):
     def business_service_refuse(self):
         kw = get_body()
         record_id = kw.get('service_id') or kw.get('record_id')
-        approver_employee_id = kw.get('approver_employee_id') or get_auth_context().get('employee_id')
+        approver_employee_id = get_auth_context().get('employee_id')
         return call_and_log(
             '/ess/api/business-services/refuse',
             lambda: request.env['hr.business.service.request'].sudo().refuse_business_service(
@@ -333,8 +390,12 @@ class HrServicesController(http.Controller):
     @http.route('/ess/api/business-services/reset', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def business_service_reset(self):
         kw = get_body()
-        record_id = kw.get('service_id') or kw.get('record_id')
-        return call_and_log(
-            '/ess/api/business-services/reset',
-            lambda: request.env['hr.business.service.request'].sudo().reset_business_service(record_id),
-        )
+        acting_employee_id = get_auth_context().get('employee_id')
+        def _do():
+            record_id = kw.get('service_id') or kw.get('record_id')
+            record = request.env['hr.business.service.request'].sudo().browse(record_id)
+            if not record.exists():
+                raise UserError('Business service request not found.')
+            check_record_access(request.env, acting_employee_id, record.employee_id.id)
+            return request.env['hr.business.service.request'].sudo().reset_business_service(record_id)
+        return call_and_log('/ess/api/business-services/reset', _do)

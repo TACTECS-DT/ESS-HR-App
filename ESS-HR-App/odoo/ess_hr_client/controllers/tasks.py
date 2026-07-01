@@ -30,7 +30,7 @@ class TasksController(http.Controller):
         if not _FEATURES_ENABLED:
             return _disabled()
         kw = get_body()
-        employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
+        employee_id = get_auth_context().get('employee_id')
         return call_and_log(
             '/ess/api/tasks',
             lambda: request.env['project.task'].sudo().get_tasks(employee_id),
@@ -75,7 +75,7 @@ class TasksController(http.Controller):
         if not _FEATURES_ENABLED:
             return _disabled()
         kw = get_body()
-        employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
+        employee_id = get_auth_context().get('employee_id')
         method = request.httprequest.method
         if method == 'GET':
             return call_and_log(
@@ -99,7 +99,7 @@ class TasksController(http.Controller):
         if not _FEATURES_ENABLED:
             return _disabled()
         kw = get_body()
-        employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
+        employee_id = get_auth_context().get('employee_id')
         if request.httprequest.method == 'GET':
             return call_and_log(
                 '/ess/api/timesheets',
@@ -121,7 +121,7 @@ class TasksController(http.Controller):
         if not _FEATURES_ENABLED:
             return _disabled()
         kw = get_body()
-        employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
+        employee_id = get_auth_context().get('employee_id')
         return call_and_log(
             '/ess/api/timesheets/daily',
             lambda: request.env['account.analytic.line'].sudo().get_daily_timesheet(
@@ -134,7 +134,7 @@ class TasksController(http.Controller):
         if not _FEATURES_ENABLED:
             return _disabled()
         kw = get_body()
-        employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
+        employee_id = get_auth_context().get('employee_id')
         return call_and_log(
             '/ess/api/timesheets/weekly',
             lambda: request.env['account.analytic.line'].sudo().get_weekly_timesheet(

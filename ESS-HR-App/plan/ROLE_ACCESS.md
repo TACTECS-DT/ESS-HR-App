@@ -330,33 +330,20 @@
 
 ## How to Test
 
-### Mock Users
+### Test Accounts
 
-Four test accounts are pre-configured in `app/src/api/mocks/auth.mock.ts`. Each maps to a distinct role. The badge ID is simply the role name for easy recall:
+Create four employee accounts in Odoo, each assigned a distinct role. Use their badge IDs and PINs on the Login screen to test each role:
 
-| Role | Name | Badge ID | PIN |
-|---|---|---|---|
-| `employee` | Employee | `employee` | any (not `0000`) |
-| `manager` | Manager | `manager` | any (not `0000`) |
-| `hr` | HR | `hr` | any (not `0000`) |
-| `admin` | Admin | `admin` | any (not `0000`) |
-
-### Quick Login (DEV bar)
-
-When `MOCK_MODE = true` (default in development), a **DEV — Quick Login** bar appears at the bottom of the Login screen with four color-coded buttons:
-
-| Button | Color | Logs in as |
+| Role | Suggested Badge ID | Odoo Group |
 |---|---|---|
-| Employee | Gray | Employee (`employee`) |
-| Manager | Blue | Manager (`manager`) |
-| HR | Green | HR (`hr`) |
-| Admin | Red | Admin (`admin`) |
+| `employee` | `EMP-TEST` | Internal User only |
+| `manager` | `MGR-TEST` | HR User + set as leave/attendance approver |
+| `hr` | `HR-TEST` | HR Officer (`hr.group_hr_manager`) |
+| `admin` | `ADM-TEST` | HR Administrator + System |
 
-Tap any button to bypass the login form and jump straight into the app as that role. No badge ID or PIN required.
+### Login
 
-### Manual Login
-
-You can also log in manually using the standard form. Type the role name as the badge ID (e.g. `manager`) with any PIN — except `0000` which returns an invalid credentials error.
+Use the standard Login screen — enter the employee's badge ID and PIN, or username and password. Select the correct company on the Company Selection screen before logging in.
 
 ### What to Verify Per Role
 
@@ -402,4 +389,4 @@ You can also log in manually using the standard form. Type the role name as the 
 | `app/src/config/roleAccess.ts` | Single source of truth — all permissions per role |
 | `app/src/hooks/useRBAC.ts` | Hook consumed by screens to read permissions |
 | `app/src/components/common/AccessDenied.tsx` | Screen shown when role lacks access |
-| `app/src/api/mocks/auth.mock.ts` | Mock user definitions and `mockLoginAs()` helper |
+| `app/src/api/types/auth.ts` | `UserInfo`, `Company`, `AuthTokens` type definitions |

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+﻿import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -15,7 +15,7 @@ import {useTheme} from '../../hooks/useTheme';
 import ScreenHeader from '../../components/common/ScreenHeader';
 import Card from '../../components/common/Card';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
-import type {AttendanceSummary} from '../../api/mocks/attendance.mock';
+import type {AttendanceSummary} from '../../api/types/attendance';
 import {API_MAP} from '../../api/apiMap';
 
 type DayStatus = 'present' | 'absent' | 'on_leave' | 'holiday' | 'weekend' | 'late' | 'future';
@@ -35,7 +35,7 @@ const STATUS_COLORS: Record<DayStatus, string> = {
   future: 'transparent',
 };
 
-/** Generate mock calendar data for a given month/year */
+/** Build calendar data for a given month/year */
 function buildCalendar(year: number, month: number): DayInfo[] {
   const today = new Date();
   const daysInMonth = new Date(year, month, 0).getDate();

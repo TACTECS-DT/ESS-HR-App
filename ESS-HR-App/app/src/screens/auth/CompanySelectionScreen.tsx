@@ -38,7 +38,6 @@ export default function CompanySelectionScreen() {
       setLoading(false);
       return;
     }
-    // Uses apiClient so mock adapter intercepts this in MOCK_MODE.
     // baseURL is set by the request interceptor from auth.serverUrl.
     apiClient
       .get<{data: Company[]}>(API_MAP.auth.companies, {timeout: 15000})

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+﻿import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -22,7 +22,7 @@ import {useRBAC} from '../../hooks/useRBAC';
 import {useAppSelector} from '../../hooks/useAppSelector';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {TasksStackParamList} from '../../navigation/types';
-import type {DailyTimesheetSummary} from '../../api/mocks/timesheets.mock';
+import type {DailyTimesheetSummary} from '../../api/types/timesheets';
 import {API_MAP} from '../../api/apiMap';
 
 type Nav = StackNavigationProp<TasksStackParamList>;

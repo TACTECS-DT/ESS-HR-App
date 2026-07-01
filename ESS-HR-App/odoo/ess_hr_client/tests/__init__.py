@@ -9,4 +9,6 @@ from . import (
     test_advance_salary,
     test_hr_services,
     test_misc,
+    test_security,
+    test_ownership,
 )

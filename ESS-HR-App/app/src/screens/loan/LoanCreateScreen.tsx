@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+﻿import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -24,7 +24,7 @@ import {useTheme} from '../../hooks/useTheme';
 import {useAppSelector} from '../../hooks/useAppSelector';
 import {useApiError} from '../../hooks/useApiError';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
-import type {LoanRules} from '../../api/mocks/loan.mock';
+import type {LoanRules} from '../../api/types/loan';
 import {API_MAP} from '../../api/apiMap';
 
 type TransferMethod = 'bank_transfer' | 'cash' | 'cheque';

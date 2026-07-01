@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from 'react';
+﻿import React, {useMemo, useState} from 'react';
 import {
   View,
   Text,
@@ -23,7 +23,7 @@ import {useTheme} from '../../hooks/useTheme';
 import {useAppSelector} from '../../hooks/useAppSelector';
 import {useApiError} from '../../hooks/useApiError';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
-import type {ServiceType} from '../../api/mocks/business-services.mock';
+import type {ServiceType} from '../../api/types/business-services';
 import {API_MAP} from '../../api/apiMap';
 
 export default function BusinessServiceCreateScreen() {

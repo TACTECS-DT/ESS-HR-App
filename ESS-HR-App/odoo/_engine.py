@@ -41,7 +41,7 @@ for _stream in (sys.stdout, sys.stderr):
 PYTHON_EXE  = r"d:\odoo19\python\python.exe"
 ODOO_BIN    = r"d:\odoo19\server\odoo-bin"
 ODOO_CONF   = r"d:\odoo19\server\odoo.conf"
-DEFAULT_DB  = "odoo19_comunity"
+DEFAULT_DB  = "odoo19_c"
 SCRIPT_DIR  = Path(__file__).parent  # D:\ESS-HR-App\odoo\
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -136,7 +136,7 @@ def strip_log_prefix(line: str) -> str:
 MODULE_CONFIG = {
     'client': {
         'modules': 'ess_hr_client',
-        'tags':    'ess_api',
+        'tags':    'ess_api,ess_ownership',
     },
     'admin': {
         'modules': 'ess_hr_admin',
@@ -144,7 +144,7 @@ MODULE_CONFIG = {
     },
     'both': {
         'modules': 'ess_hr_client,ess_hr_admin',
-        'tags':    'ess_api,ess_admin',
+        'tags':    'ess_api,ess_ownership,ess_admin',
     },
 }
 
@@ -162,7 +162,7 @@ def build_command(db: str, module: str, tags: str) -> list:
         '--test-enable',
         '--stop-after-init',
         '--test-tags',     test_tags,
-        '--http-port',     '8056',       # use a different port to avoid conflict with live server on 8055
+        '--http-port',     '8056',       # use a different port to avoid conflict with live server on 8069
         '--log-level',     'test',
         '--log-handler',   'odoo.tests:INFO',
         '--log-handler',   'odoo.tests.runner:INFO',
@@ -217,9 +217,15 @@ class TestResult:
         # ── Detect start of a failure/error traceback block ───────────────────
         m_hdr = RE_FAIL_HEADER.match(line)
         if m_hdr:
-            kind = m_hdr.group(1).upper()   # FAIL or ERROR
-            # Emit the current test as FAIL/ERROR immediately
-            if self._current_test:
+            kind      = m_hdr.group(1).upper()   # FAIL or ERROR
+            hdr_body  = m_hdr.group(2)            # text after "ERROR: "
+            # setUpClass/tearDownClass are class-level infrastructure errors —
+            # flush the pending test as PASS (it already finished) and don't
+            # blame it for the infrastructure failure.
+            is_class_error = hdr_body.startswith(('setUpClass', 'tearDownClass'))
+            if self._current_test and is_class_error:
+                self._flush_current_as_pass()
+            elif self._current_test:
                 name, cls = self._current_test
                 calls = list(self._pending_calls)
                 self._pending_calls = []
@@ -230,6 +236,9 @@ class TestResult:
                 else:
                     self.errors.append((name, cls))
                     _print_test(name, cls, 'ERROR', calls)
+                # Clear so subsequent ERROR: lines are not blamed on this test.
+                self._current_test = None
+                self._current_test_failed = False
             # Start collecting the traceback
             if self._current_block_lines:
                 self.failure_blocks.append('\n'.join(self._current_block_lines))

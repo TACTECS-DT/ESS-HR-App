@@ -1,7 +1,7 @@
 from odoo import http
 from odoo.http import request
 
-from .utils import call_and_log, get_body
+from .utils import call_and_log, get_body, get_auth_context, require_hr_or_admin
 
 
 def _build_analytics_summary(req, date_from=None, date_to=None):
@@ -44,57 +44,63 @@ class AnalyticsController(http.Controller):
     @http.route('/ess/api/analytics', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
     def summary(self):
         kw = get_body()
-        return call_and_log(
-            '/ess/api/analytics',
-            lambda: _build_analytics_summary(request, kw.get('date_from'), kw.get('date_to')),
-        )
+        acting_employee_id = get_auth_context().get('employee_id')
+        def _do():
+            require_hr_or_admin(request.env, acting_employee_id)
+            return _build_analytics_summary(request, kw.get('date_from'), kw.get('date_to'))
+        return call_and_log('/ess/api/analytics', _do)
 
     @http.route('/ess/api/analytics/module-stats', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def module_stats(self):
         kw = get_body()
-        return call_and_log(
-            '/ess/api/analytics/module-stats',
-            lambda: request.env['ess.api.log'].sudo().get_module_stats(
+        acting_employee_id = get_auth_context().get('employee_id')
+        def _do():
+            require_hr_or_admin(request.env, acting_employee_id)
+            return request.env['ess.api.log'].sudo().get_module_stats(
                 kw.get('date_from'), kw.get('date_to'),
-            ),
-        )
+            )
+        return call_and_log('/ess/api/analytics/module-stats', _do)
 
     @http.route('/ess/api/analytics/employee-activity', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def employee_activity(self):
         kw = get_body()
-        return call_and_log(
-            '/ess/api/analytics/employee-activity',
-            lambda: request.env['ess.api.log'].sudo().get_employee_activity(
+        acting_employee_id = get_auth_context().get('employee_id')
+        def _do():
+            require_hr_or_admin(request.env, acting_employee_id)
+            return request.env['ess.api.log'].sudo().get_employee_activity(
                 kw.get('date_from'), kw.get('date_to'), kw.get('limit', 20),
-            ),
-        )
+            )
+        return call_and_log('/ess/api/analytics/employee-activity', _do)
 
     @http.route('/ess/api/analytics/hourly-distribution', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def hourly_distribution(self):
         kw = get_body()
-        return call_and_log(
-            '/ess/api/analytics/hourly-distribution',
-            lambda: request.env['ess.api.log'].sudo().get_hourly_distribution(
+        acting_employee_id = get_auth_context().get('employee_id')
+        def _do():
+            require_hr_or_admin(request.env, acting_employee_id)
+            return request.env['ess.api.log'].sudo().get_hourly_distribution(
                 kw.get('date_from'), kw.get('date_to'),
-            ),
-        )
+            )
+        return call_and_log('/ess/api/analytics/hourly-distribution', _do)
 
     @http.route('/ess/api/analytics/error-summary', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def error_summary(self):
         kw = get_body()
-        return call_and_log(
-            '/ess/api/analytics/error-summary',
-            lambda: request.env['ess.api.log'].sudo().get_error_summary(
+        acting_employee_id = get_auth_context().get('employee_id')
+        def _do():
+            require_hr_or_admin(request.env, acting_employee_id)
+            return request.env['ess.api.log'].sudo().get_error_summary(
                 kw.get('date_from'), kw.get('date_to'),
-            ),
-        )
+            )
+        return call_and_log('/ess/api/analytics/error-summary', _do)
 
     @http.route('/ess/api/analytics/daily-totals', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def daily_totals(self):
         kw = get_body()
-        return call_and_log(
-            '/ess/api/analytics/daily-totals',
-            lambda: request.env['ess.api.log'].sudo().get_daily_totals(
+        acting_employee_id = get_auth_context().get('employee_id')
+        def _do():
+            require_hr_or_admin(request.env, acting_employee_id)
+            return request.env['ess.api.log'].sudo().get_daily_totals(
                 kw.get('date_from'), kw.get('date_to'),
-            ),
-        )
+            )
+        return call_and_log('/ess/api/analytics/daily-totals', _do)

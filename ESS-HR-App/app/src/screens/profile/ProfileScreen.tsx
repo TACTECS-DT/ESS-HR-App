@@ -1,15 +1,22 @@
-import React from 'react';
+﻿import React, {useState} from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   RefreshControl,
+  Image,
+  Modal,
+  TouchableOpacity,
+  StatusBar,
+  Dimensions,
 } from 'react-native';
 import {useTranslation} from 'react-i18next';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import type {StackNavigationProp, RouteProp} from '@react-navigation/stack';
 import {useQuery} from '@tanstack/react-query';
+import {useAppDispatch} from '../../hooks/useAppDispatch';
+import {clearAuth} from '../../store/slices/authSlice';
 
 import apiClient from '../../api/client';
 import type {MoreStackParamList} from '../../navigation/types';
@@ -21,8 +28,9 @@ import AccessDenied from '../../components/common/AccessDenied';
 import {useTheme} from '../../hooks/useTheme';
 import {useRBAC} from '../../hooks/useRBAC';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
-import type {EmployeeProfile} from '../../api/mocks/profile.mock';
+import type {EmployeeProfile} from '../../api/types/profile';
 import {API_MAP} from '../../api/apiMap';
+import {avatarUri} from '../../utils/avatarUri';
 
 function ProfileRow({label, value, theme}: {label: string; value?: string; theme: ReturnType<typeof useTheme>}) {
   if (!value) {return null;}
@@ -42,6 +50,7 @@ export default function ProfileScreen() {
   const isAr = i18n.language === 'ar';
 
   const {canViewOtherProfiles, role} = useRBAC();
+  const dispatch = useAppDispatch();
 
   const employeeId = route.params?.employeeId;
   const employeeName = route.params?.employeeName;
@@ -49,6 +58,9 @@ export default function ProfileScreen() {
   const accessAllowed = !isViewingOther || canViewOtherProfiles;
 
   const roleLabel = role ? role.charAt(0).toUpperCase() + role.slice(1) : '';
+
+  const [avatarError,    setAvatarError]    = useState(false);
+  const [showFullImage, setShowFullImage] = useState(false);
 
   const {data: profile, isLoading, refetch} = useQuery({
     queryKey: ['profile', employeeId ?? 'me'],
@@ -102,11 +114,47 @@ export default function ProfileScreen() {
 
         {/* Centered avatar header */}
         <View style={styles.avatarSection}>
-          <View style={[styles.avatar, {backgroundColor: colors.primary + '33'}]}>
-            <Text style={[styles.avatarInitial, {color: colors.primary}]}>
-              {profile.name.charAt(0)}
-            </Text>
-          </View>
+          {avatarUri(profile.avatar) && !avatarError ? (
+            <TouchableOpacity
+              activeOpacity={0.88}
+              onPress={() => setShowFullImage(true)}>
+              <Image
+                source={{uri: avatarUri(profile.avatar)}}
+                style={styles.avatarImage}
+                resizeMode="cover"
+                onError={() => setAvatarError(true)}
+              />
+            </TouchableOpacity>
+          ) : (
+            <View style={[styles.avatarCircle, {backgroundColor: colors.primary + '22'}]}>
+              <Text style={[styles.avatarInitial, {color: colors.primary}]}>
+                {profile.name.charAt(0).toUpperCase()}
+              </Text>
+            </View>
+          )}
+
+          {/* Full-screen avatar viewer */}
+          <Modal
+            visible={showFullImage}
+            transparent
+            animationType="fade"
+            statusBarTranslucent
+            onRequestClose={() => setShowFullImage(false)}>
+            <StatusBar barStyle="light-content" backgroundColor="rgba(0,0,0,0.95)" />
+            <View style={styles.fullscreenOverlay}>
+              <Image
+                source={{uri: avatarUri(profile.avatar)!}}
+                style={styles.fullscreenImage}
+                resizeMode="contain"
+              />
+              <TouchableOpacity
+                style={styles.fullscreenClose}
+                onPress={() => setShowFullImage(false)}
+                hitSlop={{top: 12, bottom: 12, left: 12, right: 12}}>
+                <Text style={styles.fullscreenCloseText}>✕</Text>
+              </TouchableOpacity>
+            </View>
+          </Modal>
           <Text style={[styles.profileName, {color: theme.text}]}>
             {isAr ? profile.name_ar : profile.name}
           </Text>
@@ -194,6 +242,16 @@ export default function ProfileScreen() {
             />
           ) : null}
         </Card>
+
+        {/* Logout — own profile only */}
+        {!isViewingOther && (
+          <TouchableOpacity
+            style={styles.logoutBtn}
+            activeOpacity={0.8}
+            onPress={() => dispatch(clearAuth())}>
+            <Text style={styles.logoutText}>{t('auth.logout')}</Text>
+          </TouchableOpacity>
+        )}
       </ScrollView>
     </View>
   );
@@ -205,15 +263,66 @@ const styles = StyleSheet.create({
   content: {padding: spacing.md, gap: spacing.md, paddingBottom: spacing.xl},
 
   avatarSection: {alignItems: 'center', paddingVertical: spacing.lg, gap: spacing.xs},
-  avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+
+  // Real photo
+  avatarImage: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    marginBottom: spacing.xs,
+    borderWidth: 3,
+    borderColor: colors.primary + '40',
+    // shadow
+    shadowColor: '#000',
+    shadowOpacity: 0.18,
+    shadowRadius: 10,
+    shadowOffset: {width: 0, height: 4},
+    elevation: 6,
+    overflow: 'hidden',      // clip to circle on Android
+    backgroundColor: colors.gray200,
+  },
+
+  // Initials fallback
+  avatarCircle: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: spacing.xs,
+    borderWidth: 3,
+    borderColor: colors.primary + '30',
   },
-  avatarInitial: {fontSize: 32, fontWeight: '700'},
+
+  avatarInitial: {fontSize: 38, fontWeight: '700'},
+
+  // Full-screen image viewer
+  fullscreenOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.95)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  fullscreenImage: {
+    width:  Dimensions.get('window').width,
+    height: Dimensions.get('window').width,  // square crop area; resizeMode=contain adapts
+  },
+  fullscreenClose: {
+    position:        'absolute',
+    top:             52,
+    right:           20,
+    width:           40,
+    height:          40,
+    borderRadius:    20,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    justifyContent:  'center',
+    alignItems:      'center',
+  },
+  fullscreenCloseText: {
+    color:      '#fff',
+    fontSize:   18,
+    fontWeight: '700',
+  },
   profileName: {fontSize: fontSize.xl, fontWeight: '700'},
   profileJobTitle: {fontSize: fontSize.sm},
   badgePill: {
@@ -232,4 +341,21 @@ const styles = StyleSheet.create({
   profileValue: {fontSize: fontSize.sm, fontWeight: '600', flex: 1, textAlign: 'right'},
   skeletons: {padding: spacing.md, gap: spacing.sm},
   skeleton: {borderRadius: radius.md},
+
+  logoutBtn: {
+    marginTop:       spacing.sm,
+    marginBottom:    spacing.lg,
+    marginHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    borderRadius:    radius.md,
+    borderWidth:     1,
+    borderColor:     colors.error + '60',
+    backgroundColor: colors.error + '10',
+    alignItems:      'center',
+  },
+  logoutText: {
+    color:      colors.error,
+    fontSize:   fontSize.md,
+    fontWeight: '700',
+  },
 });

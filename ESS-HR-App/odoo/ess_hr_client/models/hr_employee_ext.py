@@ -1,8 +1,28 @@
-import base64
+﻿import base64
 import hashlib
 import secrets
 from odoo import models, fields, api, _, SUPERUSER_ID
 from odoo.exceptions import UserError
+
+
+def _image_to_b64(img):
+    """
+    Return a base64 string suitable for JSON from an Odoo Binary/Image field value.
+
+    Odoo's ORM caches Binary/Image field data as the base64 string encoded as
+    ASCII bytes (e.g. b'/9j/4AAQ...').  Calling base64.b64encode() on that
+    would double-encode it and produce unreadable data.  We just decode the
+    bytes back to a plain string.  The try/except fallback handles the rare
+    case where the field returns raw binary bytes instead.
+    """
+    if not img:
+        return False
+    if isinstance(img, bytes):
+        try:
+            return img.decode('ascii')   # already base64 — just convert to str
+        except UnicodeDecodeError:
+            return base64.b64encode(img).decode('utf-8')   # raw bytes — encode once
+    return str(img)   # already a string
 
 
 class HrEmployeeExt(models.Model):
@@ -127,7 +147,7 @@ class HrEmployeeExt(models.Model):
                 'job_title': job_title,
                 'work_phone': emp.work_phone or '',
                 'mobile_phone': emp.mobile_phone or '',
-                'avatar': base64.b64encode(emp.image_128).decode('utf-8') if emp.image_128 else False,
+                'avatar': _image_to_b64(emp.image_128),
                 'company_id': emp.company_id.id if emp.company_id else False,
             })
         return result
@@ -171,6 +191,52 @@ class HrEmployeeExt(models.Model):
         """Verify a plain PIN against its stored hash. Returns bool."""
         return self._hash_pin(str(pin)) == hashed_pin
 
+    def _compute_ess_role(self, employee):
+        """
+        Determine the ESS mobile role for an employee based on their Odoo user
+        and manager assignments. Priority order: admin > hr > manager > employee.
+
+        Manager qualifies if the linked res.users is:
+          - leave_manager_id of at least one active employee  → can approve leaves
+          - attendance_manager_id of at least one active employee → can approve attendance
+          - parent_id (direct manager) of at least one active employee → general manager
+        """
+        if not employee or not employee.user_id:
+            return 'employee'
+
+        user = employee.user_id
+        Employee = self.env['hr.employee'].with_user(SUPERUSER_ID)
+
+        if user.has_group('base.group_system'):
+            return 'admin'
+
+        if user.has_group('hr_holidays.group_hr_holidays_user') or user.has_group('hr.group_hr_user'):
+            return 'hr'
+
+        is_leave_manager = Employee.search_count([
+            ('leave_manager_id', '=', user.id),
+            ('active', '=', True),
+        ]) > 0
+
+        is_direct_manager = Employee.search_count([
+            ('parent_id.user_id', '=', user.id),
+            ('active', '=', True),
+        ]) > 0
+
+        is_attendance_manager = False
+        try:
+            is_attendance_manager = Employee.search_count([
+                ('attendance_manager_id', '=', user.id),
+                ('active', '=', True),
+            ]) > 0
+        except Exception:
+            pass
+
+        if is_leave_manager or is_direct_manager or is_attendance_manager:
+            return 'manager'
+
+        return 'employee'
+
     def _format_employee_profile(self, employee):
         """
         Format an hr.employee record into a plain dict for the mobile app.
@@ -195,8 +261,8 @@ class HrEmployeeExt(models.Model):
             'department_ar': dept_name,      # extend when Arabic dept field exists
             'job_title': job_title,
             'job_title_ar': job_title,       # extend when Arabic job title field exists
-            'avatar': base64.b64encode(employee.image_128).decode('utf-8') if employee.image_128 else False,
-            'role': 'employee',              # default; extend via ess_mobile_role field if needed
+            'avatar': _image_to_b64(employee.image_128),
+            'role': self._compute_ess_role(employee),
             'company_id': employee.company_id.id if employee.company_id else False,
             # ── Extra context (not in UserInfo but useful) ────────────────────
             'company_name': employee.company_id.name if employee.company_id else '',

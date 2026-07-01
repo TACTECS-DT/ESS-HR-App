@@ -5,8 +5,9 @@
  *
  * Also renders the persistent offline banner and mini timer bar.
  */
-import React from 'react';
+import React, {useEffect, useRef} from 'react';
 import {View, StatusBar} from 'react-native';
+import {useQueryClient} from '@tanstack/react-query';
 
 import RootNavigator from './navigation/RootNavigator';
 import OfflineBanner from './components/common/OfflineBanner';
@@ -20,6 +21,17 @@ export default function AppNavigator() {
   const language = useAppSelector(state => state.settings.language);
   const theme = useTheme();
   const isDark = theme.isDark;
+  const queryClient = useQueryClient();
+
+  // Clear the entire React Query cache on logout so stale data
+  // (profile, avatar, leave balances, etc.) never bleeds into the next session.
+  const prevAuth = useRef(isAuthenticated);
+  useEffect(() => {
+    if (prevAuth.current && !isAuthenticated) {
+      queryClient.clear();
+    }
+    prevAuth.current = isAuthenticated;
+  }, [isAuthenticated, queryClient]);
 
   useAutoLogout();
 

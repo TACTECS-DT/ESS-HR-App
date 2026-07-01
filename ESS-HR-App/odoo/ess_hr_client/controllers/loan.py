@@ -1,7 +1,8 @@
 from odoo import http
 from odoo.http import request
+from odoo.exceptions import UserError
 
-from .utils import call_and_log, get_body, get_auth_context
+from .utils import call_and_log, get_body, get_auth_context, check_record_access
 
 
 class LoanController(http.Controller):
@@ -19,7 +20,7 @@ class LoanController(http.Controller):
     @http.route('/ess/api/loans', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
     def loans(self):
         kw = get_body()
-        employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
+        employee_id = get_auth_context().get('employee_id')
         if request.httprequest.method == 'GET':
             return call_and_log(
                 '/ess/api/loans',
@@ -37,15 +38,19 @@ class LoanController(http.Controller):
 
     @http.route('/ess/api/loans/<int:loan_id>', type='http', auth='none', methods=['GET'], csrf=False, readonly=False)
     def loan_by_id(self, loan_id):
-        return call_and_log(
-            '/ess/api/loans/<id>',
-            lambda: request.env['hr.loan'].sudo().get_loan_detail(loan_id),
-        )
+        acting_employee_id = get_auth_context().get('employee_id')
+        def _do():
+            record = request.env['hr.loan'].sudo().browse(loan_id)
+            if not record.exists():
+                raise UserError('Loan not found.')
+            check_record_access(request.env, acting_employee_id, record.employee_id.id)
+            return request.env['hr.loan'].sudo().get_loan_detail(loan_id)
+        return call_and_log('/ess/api/loans/<id>', _do)
 
     @http.route('/ess/api/loans/approve', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def approve(self):
         kw = get_body()
-        approver_employee_id = kw.get('approver_employee_id') or get_auth_context().get('employee_id')
+        approver_employee_id = get_auth_context().get('employee_id')
         return call_and_log(
             '/ess/api/loans/approve',
             lambda: request.env['hr.loan'].sudo().approve_loan(kw.get('loan_id'), approver_employee_id),
@@ -54,7 +59,7 @@ class LoanController(http.Controller):
     @http.route('/ess/api/loans/refuse', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def refuse(self):
         kw = get_body()
-        approver_employee_id = kw.get('approver_employee_id') or get_auth_context().get('employee_id')
+        approver_employee_id = get_auth_context().get('employee_id')
         return call_and_log(
             '/ess/api/loans/refuse',
             lambda: request.env['hr.loan'].sudo().refuse_loan(

@@ -1,4 +1,4 @@
-import React, {useState, useMemo} from 'react';
+﻿import React, {useState, useMemo} from 'react';
 import {
   View,
   Text,
@@ -19,7 +19,7 @@ import AccessDenied from '../../components/common/AccessDenied';
 import {useTheme} from '../../hooks/useTheme';
 import {useRBAC} from '../../hooks/useRBAC';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
-import type {TeamAttendanceRecord} from '../../api/mocks/attendance.mock';
+import type {TeamAttendanceRecord} from '../../api/types/attendance';
 import {API_MAP} from '../../api/apiMap';
 
 const STATUS_COLOR: Record<string, string> = {

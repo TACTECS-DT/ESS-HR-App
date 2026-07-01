@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import {
   View,
   Text,
@@ -21,7 +21,7 @@ import LoadingSkeleton from '../../components/common/LoadingSkeleton';
 import {useTheme} from '../../hooks/useTheme';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
-import type {Loan, LoanRules} from '../../api/mocks/loan.mock';
+import type {Loan, LoanRules} from '../../api/types/loan';
 import {API_MAP} from '../../api/apiMap';
 
 type Nav = StackNavigationProp<RequestsStackParamList>;

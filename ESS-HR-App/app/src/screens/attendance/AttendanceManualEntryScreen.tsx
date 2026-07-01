@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+﻿import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -20,7 +20,7 @@ import {useTheme} from '../../hooks/useTheme';
 import {useRBAC} from '../../hooks/useRBAC';
 import {useApiError} from '../../hooks/useApiError';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
-import type {EmployeeListItem} from '../../api/mocks/profile.mock';
+import type {EmployeeListItem} from '../../api/types/profile';
 import {API_MAP} from '../../api/apiMap';
 
 export default function AttendanceManualEntryScreen() {

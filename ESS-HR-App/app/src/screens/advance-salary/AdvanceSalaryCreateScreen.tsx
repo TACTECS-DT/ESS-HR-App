@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+﻿import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -23,7 +23,7 @@ import {useTheme} from '../../hooks/useTheme';
 import {useAppSelector} from '../../hooks/useAppSelector';
 import {useApiError} from '../../hooks/useApiError';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
-import type {AdvanceSalary} from '../../api/mocks/advance-salary.mock';
+import type {AdvanceSalary} from '../../api/types/advance-salary';
 import {API_MAP} from '../../api/apiMap';
 
 interface AdvanceSalaryInfo {

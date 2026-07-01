@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+﻿import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -25,9 +25,9 @@ import {useRBAC} from '../../hooks/useRBAC';
 import {startTimer, stopTimer, resumeTimer} from '../../store/slices/timerSlice';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {TasksStackParamList} from '../../navigation/types';
-import type {Task, TaskStage} from '../../api/mocks/tasks.mock';
-import type {DailyTimesheetSummary} from '../../api/mocks/timesheets.mock';
-import type {EmployeeListItem} from '../../api/mocks/profile.mock';
+import type {Task, TaskStage} from '../../api/types/tasks';
+import type {DailyTimesheetSummary} from '../../api/types/timesheets';
+import type {EmployeeListItem} from '../../api/types/profile';
 import {API_MAP} from '../../api/apiMap';
 
 type Route = RouteProp<TasksStackParamList, 'TaskDetail'>;

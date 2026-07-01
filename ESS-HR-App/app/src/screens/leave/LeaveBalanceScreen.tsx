@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import {
   View,
   Text,
@@ -16,7 +16,7 @@ import LoadingSkeleton from '../../components/common/LoadingSkeleton';
 import EmptyState from '../../components/common/EmptyState';
 import {useTheme} from '../../hooks/useTheme';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
-import type {LeaveBalance} from '../../api/mocks/leave.mock';
+import type {LeaveBalance} from '../../api/types/leave';
 import {API_MAP} from '../../api/apiMap';
 
 const BAR_COLORS = [colors.primary, colors.warning, colors.success, '#9c27b0', colors.info, '#ff5722'];

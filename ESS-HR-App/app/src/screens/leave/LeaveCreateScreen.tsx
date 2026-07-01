@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+﻿import React, {useEffect, useMemo, useState} from 'react';
 import {
   View,
   Text,
@@ -23,7 +23,7 @@ import {useTheme} from '../../hooks/useTheme';
 import {useAppSelector} from '../../hooks/useAppSelector';
 import {useApiError} from '../../hooks/useApiError';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
-import type {LeaveType, LeaveBalance} from '../../api/mocks/leave.mock';
+import type {LeaveType, LeaveBalance} from '../../api/types/leave';
 import {API_MAP} from '../../api/apiMap';
 
 // ─── helpers ──────────────────────────────────────────────────────────────────

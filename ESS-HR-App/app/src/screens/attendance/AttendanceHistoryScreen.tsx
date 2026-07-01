@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from 'react';
+﻿import React, {useMemo, useState} from 'react';
 import {
   View,
   Text,
@@ -17,7 +17,7 @@ import LoadingSkeleton from '../../components/common/LoadingSkeleton';
 import EmptyState from '../../components/common/EmptyState';
 import {useTheme} from '../../hooks/useTheme';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
-import type {AttendanceRecord} from '../../api/mocks/attendance.mock';
+import type {AttendanceRecord} from '../../api/types/attendance';
 import {API_MAP} from '../../api/apiMap';
 
 type FilterPeriod = 'this_month' | 'last_month' | 'custom';

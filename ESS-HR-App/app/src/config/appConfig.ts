@@ -9,7 +9,6 @@
  * ─── To switch backends ───────────────────────────────────────────────────────
  *   Edit ACTIVE_BACKEND in .env, then restart Metro bundler.
  *
- *   mock   → axios-mock-adapter intercepts all calls locally (no server needed)
  *   odoo   → client server URL comes from user input at login (Step 1), stored in Redux
  *   django → calls go through the Django middleware at DJANGO_BASE_URL
  *            Django mirrors the same REST paths — API_MAP needs no change
@@ -21,22 +20,17 @@
 // ─────────────────────────────────────────────────────────────────────────────
 import {
   ACTIVE_BACKEND,
-  MOCK_MODE,
   ESS_ADMIN_URL,
   DJANGO_BASE_URL,
-  MOCK_DELAY_MIN,
-  MOCK_DELAY_MAX,
 } from '@env';
 
-export type BackendMode = 'mock' | 'odoo' | 'django';
+export type BackendMode = 'odoo' | 'django';
 
 const _backend = ACTIVE_BACKEND as BackendMode;
 
 export const ENV = {
-  /** Active backend: 'mock' | 'odoo' | 'django' */
+  /** Active backend: 'odoo' | 'django' */
   ACTIVE_BACKEND: _backend,
-  /** True when MOCK_MODE=true in .env — disables all network calls */
-  MOCK_MODE: MOCK_MODE === 'true',
   /**
    * Central ESS Admin server root URL (no path suffix).
    * Used ONLY for Step 1 of login: POST /ess/admin/api/validate
@@ -46,8 +40,6 @@ export const ENV = {
   ESS_ADMIN_URL,
   /** Django / middleware server root — used when ACTIVE_BACKEND=django */
   DJANGO_BASE_URL,
-  MOCK_DELAY_MIN: Number(MOCK_DELAY_MIN),
-  MOCK_DELAY_MAX: Number(MOCK_DELAY_MAX),
 } as const;
 
 

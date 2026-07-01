@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+﻿import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -22,7 +22,7 @@ import TimerBar from '../../components/common/TimerBar';
 import {useTheme} from '../../hooks/useTheme';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {TasksStackParamList} from '../../navigation/types';
-import type {Task, TaskStage} from '../../api/mocks/tasks.mock';
+import type {Task, TaskStage} from '../../api/types/tasks';
 import {API_MAP} from '../../api/apiMap';
 
 type Nav = StackNavigationProp<TasksStackParamList>;

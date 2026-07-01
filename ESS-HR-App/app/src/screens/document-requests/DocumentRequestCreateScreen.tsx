@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from 'react';
+﻿import React, {useMemo, useState} from 'react';
 import {
   View,
   Text,
@@ -24,7 +24,7 @@ import {useTheme} from '../../hooks/useTheme';
 import {useAppSelector} from '../../hooks/useAppSelector';
 import {useApiError} from '../../hooks/useApiError';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
-import type {DocumentType, DocumentRequest} from '../../api/mocks/document-requests.mock';
+import type {DocumentType, DocumentRequest} from '../../api/types/document-requests';
 import {API_MAP} from '../../api/apiMap';
 
 export default function DocumentRequestCreateScreen() {

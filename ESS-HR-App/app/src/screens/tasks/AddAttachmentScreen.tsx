@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+﻿import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -20,7 +20,7 @@ import {useTheme} from '../../hooks/useTheme';
 import {useApiError} from '../../hooks/useApiError';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {MoreStackParamList} from '../../navigation/types';
-import type {Task} from '../../api/mocks/tasks.mock';
+import type {Task} from '../../api/types/tasks';
 import {API_MAP} from '../../api/apiMap';
 
 type Route = RouteProp<MoreStackParamList, 'AddAttachment'>;

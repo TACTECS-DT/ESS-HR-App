@@ -489,7 +489,7 @@ Token:       refreshed each test run via /ess/api/auth/login
 
 ```bash
 # After server restart — get new token first:
-curl -s http://localhost:8055/ess/api/auth/login \
+curl -s http://localhost:8069/ess/api/auth/login \
   -X POST -H "Content-Type: application/json" \
   -d '{"badge_id":"001","pin":"1234","company_id":1}'
 

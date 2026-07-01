@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -22,9 +22,11 @@ import {useRBAC} from '../../hooks/useRBAC';
 import {toggleDarkMode, setLanguage} from '../../store/slices/settingsSlice';
 import {toggleLanguage} from '../../i18n/';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
-import type {LeaveBalance} from '../../api/mocks/leave.mock';
-import type {AppNotification} from '../../api/mocks/notifications.mock';
+import type {LeaveBalance} from '../../api/types/leave';
+import type {AppNotification} from '../../api/types/notifications';
+import type {EmployeeProfile} from '../../api/types/profile';
 import {API_MAP} from '../../api/apiMap';
+import {avatarUri} from '../../utils/avatarUri';
 
 // ─── leave type → color ───────────────────────────────────────
 const LEAVE_COLORS = [colors.primary, colors.warning, colors.success, '#AF52DE', colors.info];
@@ -72,6 +74,7 @@ export default function HomeScreen() {
   const dispatch = useAppDispatch();
   const insets = useSafeAreaInsets();
   const user = useAppSelector(state => state.auth.user);
+  const [avatarError, setAvatarError] = useState(false);
   const darkMode = useAppSelector(state => state.settings.darkMode);
   const currentLanguage = useAppSelector(state => state.settings.language);
   const rbac = useRBAC();
@@ -105,10 +108,39 @@ export default function HomeScreen() {
     },
   });
 
+  // Fetch fresh profile to get a correctly-encoded avatar.
+  // Shares the cache key with ProfileScreen — no duplicate requests if both are visited.
+  const {data: attendanceSummary} = useQuery({
+    queryKey: ['attendance-summary'],
+    queryFn: async () => {
+      const res = await apiClient.get(API_MAP.attendance.summary);
+      return isApiSuccess(res.data) ? (res.data.data as {status: string}) : null;
+    },
+    staleTime: 30 * 1000,
+  });
+  const isCheckedIn = attendanceSummary?.status === 'checked_in';
+
+  const {data: profileData, refetch: refetchProfile} = useQuery({
+    queryKey: ['profile', 'me'],
+    queryFn: async () => {
+      const res = await apiClient.get(API_MAP.employee.profile);
+      return isApiSuccess(res.data) ? (res.data.data as EmployeeProfile) : null;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // Prefer fresh profile avatar over the potentially stale Redux login-time value
+  const resolvedAvatar = avatarUri(profileData?.avatar ?? user?.avatar);
+
+  // Reset image error flag whenever we get a new (better) avatar source
+  useEffect(() => {
+    if (resolvedAvatar) {setAvatarError(false);}
+  }, [resolvedAvatar]);
+
   const [refreshing, setRefreshing] = React.useState(false);
   async function onRefresh() {
     setRefreshing(true);
-    await Promise.all([refetchBalances(), refetchNotifications()]);
+    await Promise.all([refetchBalances(), refetchNotifications(), refetchProfile()]);
     setRefreshing(false);
   }
 
@@ -177,13 +209,28 @@ export default function HomeScreen() {
             const tabNav = navigation.getParent() ?? navigation;
             tabNav.navigate('MoreTab', {screen: 'Profile'});
           }}>
-          {user?.avatar ? (
-            <Image source={{uri: user.avatar}} style={styles.avatar} />
-          ) : (
-            <View style={[styles.avatar, styles.avatarFallback]}>
-              <Text style={styles.avatarText}>{displayName?.charAt(0) ?? '?'}</Text>
-            </View>
-          )}
+          <View style={styles.avatarWrapper}>
+            {resolvedAvatar && !avatarError ? (
+              <Image
+                source={{uri: resolvedAvatar}}
+                style={styles.avatar}
+                resizeMode="cover"
+                onError={() => setAvatarError(true)}
+              />
+            ) : (
+              <View style={[styles.avatar, styles.avatarFallback]}>
+                <Text style={styles.avatarText}>{displayName?.charAt(0) ?? '?'}</Text>
+              </View>
+            )}
+            {attendanceSummary ? (
+              <View
+                style={[
+                  styles.attendanceDot,
+                  {backgroundColor: isCheckedIn ? colors.success : colors.error},
+                ]}
+              />
+            ) : null}
+          </View>
           <View style={{flex: 1}}>
             <Text style={styles.profileName}>{displayName}</Text>
             <Text style={styles.profileSub}>
@@ -209,6 +256,29 @@ export default function HomeScreen() {
                 </View>
               ))}
             </View>
+          ) : (balancesData ?? []).length === 0 ? (
+            /* ── No allocations placeholder ── */
+            <TouchableOpacity
+              style={styles.leaveEmpty}
+              activeOpacity={0.75}
+              onPress={() => navigation.navigate('LeavesTab' as any, {screen: 'LeaveList'})}>
+              <View style={[styles.leaveEmptyIcon, {backgroundColor: colors.primary + '15'}]}>
+                <Text style={styles.leaveEmptyEmoji}>🏝️</Text>
+              </View>
+              <View style={{flex: 1}}>
+                <Text style={[styles.leaveEmptyTitle, {color: theme.text}]}>
+                  {t('leave.noLeaveBalance')}
+                </Text>
+                <Text style={[styles.leaveEmptySub, {color: theme.textSecondary}]}>
+                  {t('leave.noLeaveBalanceHint')}
+                </Text>
+              </View>
+              <View style={[styles.leaveEmptyBtn, {backgroundColor: colors.primary + '15'}]}>
+                <Text style={[styles.leaveEmptyBtnText, {color: colors.primary}]}>
+                  {t('leave.balance')}
+                </Text>
+              </View>
+            </TouchableOpacity>
           ) : (
             <View style={styles.leaveRow}>
               {(balancesData ?? []).slice(0, 3).map((b, idx) => {
@@ -309,13 +379,33 @@ const styles = StyleSheet.create({
 
   // Profile row in header
   profileRow: {flexDirection: 'row', alignItems: 'center', gap: spacing.sm},
-  avatar: {width: 48, height: 48, borderRadius: 24},
+  avatarWrapper: {
+    position: 'relative',
+  },
+  avatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    overflow: 'hidden',
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.5)',
+    backgroundColor: 'rgba(255,255,255,0.15)',
+  },
   avatarFallback: {
-    backgroundColor: 'rgba(255,255,255,0.3)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   avatarText: {fontSize: fontSize.xl, color: colors.white, fontWeight: '700'},
+  attendanceDot: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    width: 13,
+    height: 13,
+    borderRadius: 7,
+    borderWidth: 2,
+    borderColor: colors.primary,
+  },
   profileName: {fontSize: fontSize.md, fontWeight: '700', color: colors.white},
   profileSub: {fontSize: fontSize.xs, color: 'rgba(255,255,255,0.8)', marginTop: 2},
 
@@ -339,10 +429,31 @@ const styles = StyleSheet.create({
   barFill: {height: 4, borderRadius: 2},
   leaveSkeleton: {width: 60, height: 40, borderRadius: radius.sm},
 
+  // Empty leave balance placeholder
+  leaveEmpty: {alignItems: 'center', paddingVertical: spacing.xs, gap: 6, flexDirection: 'row', paddingHorizontal: spacing.sm},
+  leaveEmptyIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexShrink: 0,
+  },
+  leaveEmptyEmoji: {fontSize: 22},
+  leaveEmptyTitle: {fontSize: fontSize.sm, fontWeight: '700'},
+  leaveEmptySub: {fontSize: fontSize.xs},
+  leaveEmptyBtn: {
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 4,
+    borderRadius: radius.round,
+    marginTop: 2,
+  },
+  leaveEmptyBtnText: {fontSize: fontSize.xs, fontWeight: '700'},
+
   // Services section
   servicesSection: {paddingHorizontal: spacing.md, paddingBottom: spacing.xl},
   sectionTitle: {fontSize: fontSize.lg, fontWeight: '700', marginBottom: spacing.md},
-  grid: {flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm},
+  grid: {flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, justifyContent: 'center'},
   card: {
     width: CARD_SIZE,
     aspectRatio: 1,

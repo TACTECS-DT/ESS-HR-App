@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+﻿import React, {useState} from 'react';
 import {View, Text, FlatList, StyleSheet, TouchableOpacity, RefreshControl} from 'react-native';
 import {useTranslation} from 'react-i18next';
 import {useNavigation} from '@react-navigation/native';
@@ -14,7 +14,7 @@ import {useTheme} from '../../hooks/useTheme';
 import {useAppSelector} from '../../hooks/useAppSelector';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
-import type {Payslip} from '../../api/mocks/payslip.mock';
+import type {Payslip} from '../../api/types/payslip';
 import {API_MAP} from '../../api/apiMap';
 
 type Nav = StackNavigationProp<RequestsStackParamList>;

@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity, TextInput} from 'react-native';
+﻿import React, {useState} from 'react';
+import {View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity, TextInput, ActivityIndicator} from 'react-native';
 import {useTranslation} from 'react-i18next';
 import {useRoute, useNavigation} from '@react-navigation/native';
 import type {RouteProp} from '@react-navigation/stack';
@@ -16,7 +16,7 @@ import {useRBAC} from '../../hooks/useRBAC';
 import {useApiError} from '../../hooks/useApiError';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {RequestsStackParamList} from '../../navigation/types';
-import type {LeaveRequest} from '../../api/mocks/leave.mock';
+import type {LeaveRequest} from '../../api/types/leave';
 import {API_MAP} from '../../api/apiMap';
 
 type Route = RouteProp<RequestsStackParamList, 'LeaveDetail'>;
@@ -143,12 +143,13 @@ export default function LeaveDetailScreen() {
   const modeName = t(`leave.mode.${request.mode}`);
   const isOwnRequest = request.employee_id === user?.id;
 
-  // Action visibility based on status + RBAC
-  // Odoo 19 state keys: confirm=To Approve, validate1=Second Approval,
-  //                       validate=Approved, refuse=Refused, cancel=Cancelled
-  const canApprove = canApproveLeave && request.status === 'confirm';
+  // Action visibility based on status + RBAC + per-leave can_approve flag.
+  // can_approve=false means the logged-in user is a parent_id-only manager for this
+  // employee — they can see the leave but are not the designated leave approver.
+  const isLeaveApprover = request.can_approve === true;
+  const canApprove = canApproveLeave && request.status === 'confirm' && isLeaveApprover;
   const canValidate = canValidateLeave && request.status === 'validate1';
-  const canRefuse = canRefuseLeave && (
+  const canRefuse = canRefuseLeave && isLeaveApprover && (
     request.status === 'confirm' ||
     (request.status === 'validate1' && canValidateLeave)
   );
@@ -231,7 +232,9 @@ export default function LeaveDetailScreen() {
                   style={[styles.actionBtn, {backgroundColor: colors.success}]}
                   onPress={() => confirmAction(t('leave.actions.approve'), () => approveMutation.mutate())}
                   disabled={anyPending}>
-                  <Text style={styles.actionBtnText}>{'✓ '}{t('leave.actions.approve')}</Text>
+                  {approveMutation.isPending
+                    ? <ActivityIndicator size="small" color="#fff" />
+                    : <Text style={styles.actionBtnText}>{'✓ '}{t('leave.actions.approve')}</Text>}
                 </TouchableOpacity>
               ) : null}
               {canValidate ? (
@@ -239,7 +242,9 @@ export default function LeaveDetailScreen() {
                   style={[styles.actionBtn, {backgroundColor: colors.primary}]}
                   onPress={() => confirmAction(t('leave.actions.validate'), () => validateMutation.mutate())}
                   disabled={anyPending}>
-                  <Text style={styles.actionBtnText}>{'✓✓ '}{t('leave.actions.validate')}</Text>
+                  {validateMutation.isPending
+                    ? <ActivityIndicator size="small" color="#fff" />
+                    : <Text style={styles.actionBtnText}>{'✓✓ '}{t('leave.actions.validate')}</Text>}
                 </TouchableOpacity>
               ) : null}
               {canRefuse ? (
@@ -247,7 +252,9 @@ export default function LeaveDetailScreen() {
                   style={[styles.actionBtn, {backgroundColor: colors.error}]}
                   onPress={() => confirmAction(t('leave.actions.refuse'), () => refuseMutation.mutate())}
                   disabled={anyPending}>
-                  <Text style={styles.actionBtnText}>{'✗ '}{t('leave.actions.refuse')}</Text>
+                  {refuseMutation.isPending
+                    ? <ActivityIndicator size="small" color="#fff" />
+                    : <Text style={styles.actionBtnText}>{'✗ '}{t('leave.actions.refuse')}</Text>}
                 </TouchableOpacity>
               ) : null}
             </View>
@@ -268,9 +275,9 @@ export default function LeaveDetailScreen() {
             style={[styles.secondaryBtn, {borderColor: colors.primary}]}
             onPress={() => confirmAction(t('leave.actions.resetToDraft'), () => resetMutation.mutate())}
             disabled={anyPending}>
-            <Text style={[styles.secondaryBtnText, {color: colors.primary}]}>
-              {t('leave.actions.resetToDraft')}
-            </Text>
+            {resetMutation.isPending
+              ? <ActivityIndicator size="small" color={colors.primary} />
+              : <Text style={[styles.secondaryBtnText, {color: colors.primary}]}>{t('leave.actions.resetToDraft')}</Text>}
           </TouchableOpacity>
         ) : null}
 
@@ -279,7 +286,9 @@ export default function LeaveDetailScreen() {
             style={[styles.dangerBtn, {backgroundColor: colors.error}]}
             onPress={() => confirmAction(t('common.delete'), () => deleteMutation.mutate())}
             disabled={anyPending}>
-            <Text style={styles.dangerBtnText}>{t('common.delete')}</Text>
+            {deleteMutation.isPending
+              ? <ActivityIndicator size="small" color="#fff" />
+              : <Text style={styles.dangerBtnText}>{t('common.delete')}</Text>}
           </TouchableOpacity>
         ) : null}
 

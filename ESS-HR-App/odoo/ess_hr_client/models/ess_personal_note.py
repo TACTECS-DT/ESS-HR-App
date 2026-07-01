@@ -1,5 +1,5 @@
 from odoo import models, fields, api, _, SUPERUSER_ID
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, AccessError
 
 
 class EssPersonalNote(models.Model):
@@ -50,7 +50,7 @@ class EssPersonalNote(models.Model):
         if not note.exists():
             raise UserError(_('Note not found.'))
         if note.employee_id.id != employee_id:
-            raise UserError(_('Access denied.'))
+            raise AccessError(_('Access denied: this note belongs to another employee.'))
         return self._format_note(note)
 
     @api.model
@@ -60,7 +60,7 @@ class EssPersonalNote(models.Model):
         if not note.exists():
             raise UserError(_('Note not found.'))
         if note.employee_id.id != employee_id:
-            raise UserError(_('Access denied.'))
+            raise AccessError(_('Access denied: this note belongs to another employee.'))
         allowed = ['title', 'body', 'color']
         write_vals = {k: v for k, v in vals.items() if k in allowed}
         note.with_user(SUPERUSER_ID).write(write_vals)
@@ -73,7 +73,7 @@ class EssPersonalNote(models.Model):
         if not note.exists():
             raise UserError(_('Note not found.'))
         if note.employee_id.id != employee_id:
-            raise UserError(_('Access denied.'))
+            raise AccessError(_('Access denied: this note belongs to another employee.'))
         note.with_user(SUPERUSER_ID).unlink()
         return True
 

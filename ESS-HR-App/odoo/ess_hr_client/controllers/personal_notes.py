@@ -9,7 +9,7 @@ class PersonalNotesController(http.Controller):
     @http.route('/ess/api/personal-notes', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
     def notes(self):
         kw = get_body()
-        employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
+        employee_id = get_auth_context().get('employee_id')
         if request.httprequest.method == 'GET':
             return call_and_log(
                 '/ess/api/personal-notes',
@@ -28,7 +28,7 @@ class PersonalNotesController(http.Controller):
     @http.route('/ess/api/personal-notes/<int:note_id>', type='http', auth='none', methods=['GET', 'PATCH', 'DELETE'], csrf=False, readonly=False)
     def note_by_id(self, note_id):
         kw = get_body()
-        employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
+        employee_id = get_auth_context().get('employee_id')
         method = request.httprequest.method
         if method == 'GET':
             return call_and_log(

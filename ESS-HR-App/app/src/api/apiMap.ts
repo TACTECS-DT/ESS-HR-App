@@ -3,34 +3,11 @@
  *
  * NEVER hardcode an API path anywhere in the app. Always import from here.
  *
- * ─── How the layers map ────────────────────────────────────────────────────
- *  mock  │ MOCK_MODE=true  │ axios-mock-adapter intercepts these paths locally
- *  odoo  │ MOCK_MODE=false │ baseURL = user-entered client server URL + /ess/api (from Redux)
- *  django│ MOCK_MODE=false │ baseURL = DJANGO_BASE_URL from .env; Django mirrors the same paths
- * ──────────────────────────────────────────────────────────────────────────
- *
  * To switch backend layers:
  *   1. Update ACTIVE_BACKEND in .env
  *   2. If paths differ (e.g. Odoo's /ess/api/* prefix) update values below
  *   3. No other file in the app needs to change
  */
-
-// ─── Helper ───────────────────────────────────────────────────────────────────
-
-/**
- * Convert a path-function result (using 0 as the ID placeholder) into a regex
- * for use with axios-mock-adapter's dynamic route matching.
- *
- * @example
- *   pathToRegex(API_MAP.leave.requestById(0))
- *   // → /\/leave\/requests\/\d+/
- */
-export function pathToRegex(path: string): RegExp {
-  const pattern = path
-    .replace(/\//g, '\\/')   // escape all slashes
-    .replace('0', '\\d+');   // replace the first numeric placeholder with \d+
-  return new RegExp(pattern);
-}
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
 const auth = {

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+﻿import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -24,7 +24,7 @@ import {useTheme} from '../../hooks/useTheme';
 import {useAppSelector} from '../../hooks/useAppSelector';
 import {useApiError} from '../../hooks/useApiError';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
-import type {HRLetter, SalaryType} from '../../api/mocks/hr-letters.mock';
+import type {HRLetter, SalaryType} from '../../api/types/hr-letters';
 import {API_MAP} from '../../api/apiMap';
 
 const SALARY_TYPES: {key: SalaryType; en: string; ar: string}[] = [

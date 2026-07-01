@@ -1,4 +1,4 @@
-from odoo import http
+﻿from odoo import http
 from odoo.http import request
 from odoo.exceptions import UserError
 
@@ -9,8 +9,7 @@ class PendingApprovalsController(http.Controller):
 
     @http.route('/ess/api/pending-approvals', type='http', auth='none', methods=['GET', 'POST'], csrf=False, readonly=False)
     def list(self):
-        kw = get_body()
-        employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
+        employee_id = get_auth_context().get('employee_id')
         return call_and_log(
             '/ess/api/pending-approvals',
             lambda: _gather_pending(request, employee_id),
@@ -19,7 +18,7 @@ class PendingApprovalsController(http.Controller):
     @http.route('/ess/api/pending-approvals/<int:item_id>/action', type='http', auth='none', methods=['POST'], csrf=False, readonly=False)
     def action(self, item_id):
         kw = get_body()
-        employee_id = kw.get('employee_id') or get_auth_context().get('employee_id')
+        employee_id = get_auth_context().get('employee_id')
         item_type = kw.get('type')
         action_name = kw.get('action')
         reason = kw.get('reason', '')
@@ -29,14 +28,53 @@ class PendingApprovalsController(http.Controller):
         )
 
 
+def _resolve_approver_role(env, approver_emp):
+    """Inline role resolution mirroring HrEmployeeExt._compute_ess_role."""
+    if not approver_emp or not approver_emp.user_id:
+        return 'employee'
+    user = approver_emp.user_id
+    if user.has_group('base.group_system'):
+        return 'admin'
+    if user.has_group('hr_holidays.group_hr_holidays_user') or user.has_group('hr.group_hr_user'):
+        return 'hr'
+    Employee = env['hr.employee'].sudo()
+    is_leave_mgr = Employee.search_count([('leave_manager_id', '=', user.id), ('active', '=', True)]) > 0
+    is_direct_mgr = Employee.search_count([('parent_id.user_id', '=', user.id), ('active', '=', True)]) > 0
+    is_att_mgr = False
+    try:
+        is_att_mgr = Employee.search_count([('attendance_manager_id', '=', user.id), ('active', '=', True)]) > 0
+    except Exception:
+        pass
+    if is_leave_mgr or is_direct_mgr or is_att_mgr:
+        return 'manager'
+    return 'employee'
+
+
 def _gather_pending(req, approver_employee_id):
     result = []
     env = req.env
 
-    leaves = env['hr.leave'].sudo().search([
-        ('state', 'in', ('confirm', 'validate1')),
-        ('employee_id.parent_id', '=', approver_employee_id),
-    ])
+    approver_emp = env['hr.employee'].sudo().browse(approver_employee_id)
+    if not approver_emp.exists():
+        return result
+
+    role = _resolve_approver_role(env, approver_emp)
+
+    # ── LEAVES — scoped by role ────────────────────────────────────────────────
+    if role in ('hr', 'admin'):
+        # HR sees all company leaves: confirm (waiting manager) + validate1 (waiting HR)
+        leaves = env['hr.leave'].sudo().search([
+            ('state', 'in', ('confirm', 'validate1')),
+        ])
+    elif role == 'manager' and approver_emp.user_id:
+        # Manager sees only leaves where they are the leave_manager_id, status=confirm
+        leaves = env['hr.leave'].sudo().search([
+            ('state', '=', 'confirm'),
+            ('employee_id.leave_manager_id', '=', approver_emp.user_id.id),
+        ])
+    else:
+        leaves = env['hr.leave'].sudo().browse([])
+
     for l in leaves:
         result.append({
             'id': l.id, 'type': 'leave',

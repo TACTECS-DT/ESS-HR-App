@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import {
   View,
   Text,
@@ -16,7 +16,7 @@ import ScreenHeader from '../../components/common/ScreenHeader';
 import EmptyState from '../../components/common/EmptyState';
 import LoadingSkeleton from '../../components/common/LoadingSkeleton';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
-import type {AppNotification} from '../../api/mocks/notifications.mock';
+import type {AppNotification} from '../../api/types/notifications';
 import {API_MAP} from '../../api/apiMap';
 
 const TYPE_ICONS: Record<AppNotification['type'], string> = {

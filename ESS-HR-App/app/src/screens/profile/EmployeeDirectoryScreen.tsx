@@ -1,4 +1,4 @@
-import React, {useState, useMemo} from 'react';
+﻿import React, {useState, useMemo} from 'react';
 import {
   View,
   Text,
@@ -22,7 +22,7 @@ import {useTheme} from '../../hooks/useTheme';
 import {useRBAC} from '../../hooks/useRBAC';
 import {spacing, fontSize, colors, radius} from '../../config/theme';
 import type {MoreStackParamList} from '../../navigation/types';
-import type {EmployeeListItem} from '../../api/mocks/profile.mock';
+import type {EmployeeListItem} from '../../api/types/profile';
 import {API_MAP} from '../../api/apiMap';
 
 type Nav = StackNavigationProp<MoreStackParamList>;
