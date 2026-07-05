@@ -1,0 +1,93 @@
+ESS ADMIN CONNECTION KEY
+========================
+
+PURPOSE
+-------
+The Admin Connection Key is a shared secret used to authenticate every
+stats sync request from the ESS Admin server to the ESS Client server.
+
+Without it, the client returns 401 Unauthorized and no stats are collected.
+
+
+HOW IT WORKS
+------------
+
+    ESS Admin (ess.server record)
+        |
+        |  stores raw key in connection_key field
+        |
+        |  on every sync:
+        |    GET {client_url}/ess/api/stats
+        |    Header: X-ESS-Admin-Key: <raw key>
+        |
+        v
+    ESS Client (/ess/api/stats)
+        |
+        |  reads ir.config_parameter 'ess.admin.api.key'
+        |  compares incoming header value to stored value
+        |
+        +-- match  → 200 OK, returns stats
+        +-- no match / missing → 401 Unauthorized
+
+
+KEY PROPERTIES
+--------------
+- Generated with secrets.token_urlsafe(32) → 256 bits, cryptographically random
+- Stored as raw text on both sides (DB is the trust boundary)
+- Masked in UI with password widget (eye icon to reveal)
+- Per-server: each client server has its own key
+  → a compromised key on one client does not affect others
+- Rotatable: click Generate Key again, update client, done
+
+
+SETUP STEPS (first time or after rotation)
+-------------------------------------------
+
+1. Open Odoo → ESS Admin → Client Servers → [your server record]
+
+2. In the "Admin Connection Key" section, click Generate Key
+   → A new 256-bit random key is created and saved
+   → A notification reminds you to update the client
+
+3. Click the eye icon on the key field to reveal the value
+   Select all and copy it
+
+4. Open Odoo → ESS HR Client → Configuration → Settings
+
+5. Click the eye icon on Admin Connection Key, paste the copied key
+
+6. Click Save
+
+7. Go back to ESS Admin → Client Servers → click Sync Stats Now
+   → Should now return 200 and update employee/user counts
+
+
+KEY ROTATION (when you suspect a key is compromised)
+------------------------------------------------------
+Repeat steps 1–7 above. The old key stops working the moment
+the new key is saved in the admin server record — even before
+the client is updated. Update the client immediately after.
+
+
+SECURITY NOTES
+--------------
+- HTTP only (dev): key is transmitted in plain text → acceptable for local dev
+- HTTPS (production): key is encrypted in transit → required for production
+- Both Odoo instances share the same DB trust boundary:
+  anyone with DB access already has full control regardless of key masking
+- The key provides protection at the HTTP API level, not the DB level
+
+
+FILES CHANGED
+-------------
+  ess_hr_admin:
+    models/ess_server.py              -- connection_key field + action_generate_key()
+    views/ess_server_views.xml        -- Admin Connection Key section with Generate button
+
+  ess_hr_client:
+    models/ess_client_settings.py     -- TransientModel reading/writing ir.config_parameter
+    views/ess_client_settings_views.xml -- Settings form view
+    views/ess_menus.xml               -- Configuration → Settings menu
+    models/__init__.py                -- imports ess_client_settings
+    __manifest__.py                   -- registers new view file
+    security/ir.model.access.csv      -- access rights for ess.client.settings
