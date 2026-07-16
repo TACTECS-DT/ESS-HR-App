@@ -119,3 +119,31 @@ When `_FEATURES_ENABLED = True` is set, `update_task_stage` and `delete_timeshee
 ## SUPERUSER Usage Summary
 
 `SUPERUSER_ID` / `.sudo()` is used extensively throughout all model methods for reading and writing. This is intentional — the module uses `auth='none'` on all routes and manages its own auth layer via headers. The risk is not the SUPERUSER usage itself but the auth layer above it (see C-1, C-2). If the auth layer is bypassed or spoofed, SUPERUSER gives attackers full write access to all records.
+
+---
+
+## ⏳ Addendum — Deferred (tracked here, not yet fixed)
+
+**Status:** Known, accepted, scheduled for later. Not part of the current employee-based
+leave-approval work (see `D:\ESS-HR-App\odoo\employee-based-leave-approvals.md`).
+
+### Why this becomes more urgent once the leave-approval plan ships
+The employee-based leave-approval plan removes the last `res.users` dependency from
+manager approval — authorization will be decided purely by comparing the
+`X-ESS-Employee-ID` header against an employee's assigned approver, with no
+user/password backstop at all. Today (per **C-1**), that header's identity is never
+actually verified against the bearer token — the token is checked for presence only,
+not validity. Once approval authority rests entirely on that header, **C-1 stops being
+a general hardening item and becomes the literal security boundary for who can approve
+or refuse any employee's leave.** Anyone who can set/spoof `X-ESS-Employee-ID` on a
+request (proxy, compromised device, edited request, log/replay) can approve leave as
+that employee — no login, password, or user account required to pull it off.
+
+This does not block or change the leave-approval plan itself (execution already runs
+as SUPERUSER regardless), but it should be prioritized **before** that feature is
+relied on in production. Recommended fix remains **C-1 / C-3** above: a DB-backed
+session/token table (hash of the issued token, keyed to employee_id, with expiry and
+revocation), checked on every request in `call_and_log()` — consistent with the hashed-
+secret pattern this module already uses in `ess.employee.credential`.
+
+**Owner's note:** acknowledged, will be scheduled and fixed later.
